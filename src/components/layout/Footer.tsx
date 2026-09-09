@@ -11,6 +11,9 @@ export function Footer() {
             <EvaMark className="size-4" />
             <span className="text-[0.9375rem] font-semibold tracking-[0.14em]">
               {identity.name}
+              <span className="eva-seal font-mono text-xs tracking-normal">
+                {identity.seal}
+              </span>
             </span>
           </div>
           <p className="eva-mono mt-3 text-muted">{identity.tagline}</p>

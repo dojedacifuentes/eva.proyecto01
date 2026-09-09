@@ -7,7 +7,7 @@ export function StatusLabel({ children }: { children: React.ReactNode }) {
     <span className="eva-mono inline-flex items-center gap-2 text-muted">
       <span
         aria-hidden="true"
-        className="size-[5px] shrink-0 rounded-full bg-accent"
+        className="eva-dot size-[5px] shrink-0 rounded-full bg-accent"
       />
       {children}
     </span>

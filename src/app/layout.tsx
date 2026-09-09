@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import {
+  DEFAULT_THEME,
+  THEME_COLOR,
+  THEME_SCRIPT,
+} from '@/components/theme/theme';
 import { identity, seo } from '@/data/eva';
 
 const geistSans = Geist({
@@ -32,8 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#faf8f3',
-  colorScheme: 'light',
+  themeColor: THEME_COLOR[DEFAULT_THEME],
 };
 
 export default function RootLayout({
@@ -44,18 +48,27 @@ export default function RootLayout({
   return (
     <html
       lang="es-CL"
+      // El modo oscuro llega ya resuelto desde el servidor: sin JavaScript el
+      // sitio es oscuro, y el script en línea sólo corrige a claro si el
+      // visitante lo eligió antes. En ningún caso hay flash.
+      data-theme={DEFAULT_THEME}
       className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
     >
       <body className="min-h-dvh">
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <a
           href="#contenido"
           className="eva-mono sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:rounded-eva focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
         >
           Saltar al contenido
         </a>
-        <Header />
-        <main id="contenido">{children}</main>
-        <Footer />
+        <div aria-hidden="true" className="eva-atmosphere" />
+        <div className="relative z-10">
+          <Header />
+          <main id="contenido">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

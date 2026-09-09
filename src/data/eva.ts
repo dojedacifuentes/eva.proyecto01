@@ -7,14 +7,16 @@
 
 export const identity = {
   name: 'EVA',
-  tagline: 'Derecho × Inteligencia Artificial',
-  eyebrow: 'DERECHO × INTELIGENCIA ARTIFICIAL',
+  /** Microelemento de la identidad: el sello EVA_01, presente en los dos modos. */
+  seal: '_01',
+  tagline: 'Derecho + Inteligencia Artificial',
+  eyebrow: 'DERECHO + INTELIGENCIA ARTIFICIAL',
   city: 'Valparaíso · Chile',
   year: '2026',
 } as const;
 
 export const seo = {
-  title: 'EVA — Derecho × Inteligencia Artificial',
+  title: 'EVA — Derecho + Inteligencia Artificial',
   description:
     'EVA crea herramientas jurídicas, enseña inteligencia artificial a abogados y estudiantes de Derecho, diseña workflows y acompaña a equipos legales en la incorporación de nuevas tecnologías.',
 } as const;
@@ -29,27 +31,28 @@ export const links = {
   contact: null as string | null,
 } as const;
 
-// ─── Navegación ──────────────────────────────────────────────────────────────
-// Anclas dentro de la misma página en la v0.1. Cuando cada sección tenga su
-// propia ruta, basta cambiar `href` por '/prototipos', '/informes', etc.
-export const nav = [
-  { label: 'EVA', href: '#eva' },
-  { label: 'CURSOS', href: '#cursos' },
-  { label: 'PROTOTIPOS', href: '#prototipos' },
-  { label: 'INFORMES', href: '#informes' },
-  { label: 'ESTUDIOS JURÍDICOS', href: '#estudios-juridicos' },
+// ─── Índice ──────────────────────────────────────────────────────────────────
+// El header ya no lleva navegación: el índice numerado del hero es la única
+// forma de recorrer la página, así que cada entrada apunta a un capítulo real.
+// Cuando una sección tenga ruta propia, basta cambiar `href` por '/prototipos'.
+export const chapterIndex = [
+  { number: '01', label: 'EVA', href: '#eva' },
+  { number: '02', label: 'CURSOS', href: '#cursos' },
+  { number: '03', label: 'PROTOTIPOS', href: '#prototipos' },
+  { number: '04', label: 'INFORMES', href: '#informes' },
+  { number: '05', label: 'ESTUDIOS', href: '#estudios-juridicos' },
 ] as const;
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 export const hero = {
   eyebrow: identity.eyebrow,
-  title: 'Construimos nuevas formas de trabajar con Derecho e inteligencia artificial.',
-  /** Alternativa aprobada, por si se quiere rotar el titular:
-   *  'Herramientas, formación y experimentación para el trabajo jurídico con IA.' */
+  /**
+   * El titular se compone en tres piezas para poder encender el signo «+» en
+   * el color de EVA sin pintar de cyan la frase entera.
+   */
+  title: { before: 'Derecho', symbol: '+', after: 'IA.', second: 'Sin humo.' },
   subtitle:
-    'EVA crea herramientas jurídicas, enseña inteligencia artificial a abogados y estudiantes de Derecho, diseña workflows y acompaña a equipos legales en la incorporación de nuevas tecnologías.',
-  primaryCta: { label: 'Conocer EVA', href: '#eva' },
-  secondaryCta: { label: 'Ver proyectos', href: '#prototipos' },
+    'Herramientas jurídicas, formación y nuevas formas de trabajar con inteligencia artificial.',
 } as const;
 
 // ─── Quién es EVA ────────────────────────────────────────────────────────────

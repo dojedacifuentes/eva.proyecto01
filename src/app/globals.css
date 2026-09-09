@@ -1,26 +1,67 @@
 @import 'tailwindcss';
 
 /* ───────────────────────────────────────────────────────────────────────────
-   TOKENS EVA
-   Paleta corta y deliberada: blanco cálido, marfil, negro suave, grises y un
-   único color EVA (el naranja de la identidad de EVA, muestreado de las piezas
-   editoriales del proyecto: #fd7c46).
+   SISTEMA VISUAL EVA — DARK / LIGHT
+   ───────────────────────────────────────────────────────────────────────────
+   Dos modos con la misma estructura, la misma jerarquía y la misma marca, pero
+   con atmósfera propia:
 
-   El naranja de marca está calibrado para fondos oscuros: sobre marfil tiene
-   2.4:1 y por eso NUNCA se usa para texto, sólo para marcas, filetes y
-   subrayados. Para texto y enlaces existe --eva-accent-ink (4.97:1 sobre el
-   fondo, AA).
+     DARK  — laboratorio: fondo negro azulado, retícula técnica apenas
+             perceptible, cyan activo, glow sólo en microdetalles.
+     LIGHT — publicación: blanco cálido, superficies blancas, cero retícula,
+             cero glow, el peso lo lleva la tipografía.
+
+   No es una inversión de colores: cambian los tokens y también los recursos
+   decorativos (--eva-grid, --eva-wash, --eva-glow se apagan en claro).
+
+   DARK es el modo por defecto y no depende de `prefers-color-scheme`: el
+   atributo `data-theme` viaja en el HTML del servidor y sólo lo corrige un
+   script en línea si el visitante guardó otra preferencia.
    ─────────────────────────────────────────────────────────────────────────── */
-:root {
-  --eva-background: #faf8f3; /* blanco cálido */
-  --eva-surface: #f3f0e9; /* marfil */
-  --eva-foreground: #16130f; /* negro suave */
-  --eva-muted: #6b665c; /* gris de texto secundario — 5.4:1 */
-  --eva-border: #e4dfd4; /* filete fino */
-  --eva-accent: #fd7c46; /* color EVA — sólo elementos gráficos */
-  --eva-accent-ink: #b8481a; /* color EVA legible — texto y enlaces */
+
+:root,
+:root[data-theme='dark'] {
+  /*
+   * Negro azulado, no negro. En oklch(0.07 .015 250) — el valor del Taller
+   * DIAT — el azul se pierde: sRGB lo resuelve en #000103 y la superficie
+   * elevada deja de distinguirse del fondo. Subido a 0.13 el matiz frío sí se
+   * percibe, los filetes existen y el modo oscuro deja de ser negro plano.
+   */
+  --eva-background: oklch(0.13 0.017 250); /* #04080e */
+  --eva-surface: oklch(0.165 0.019 250); /* #080f16 */
+  --eva-border: oklch(0.27 0.022 250);
+  --eva-border-strong: oklch(0.36 0.025 250);
+  --eva-foreground: oklch(0.95 0.008 240);
+  --eva-muted: oklch(0.68 0.014 240);
+  --eva-accent: oklch(0.71 0.17 200);
+  /* En oscuro el cyan ya es legible (≈9:1): tinta y acento coinciden. */
+  --eva-accent-ink: oklch(0.74 0.15 200);
+
+  /* Recursos de atmósfera — sólo existen en oscuro. */
+  --eva-grid: oklch(0.71 0.17 200 / 0.035);
+  --eva-wash: oklch(0.71 0.17 200 / 0.05);
+  --eva-glow: oklch(0.71 0.17 200 / 0.55);
 
   --eva-radius: 3px;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --eva-background: #f5f5f3;
+  --eva-surface: #ffffff;
+  --eva-border: rgba(0, 0, 0, 0.1);
+  --eva-border-strong: rgba(0, 0, 0, 0.18);
+  --eva-foreground: #1d1d1f;
+  --eva-muted: #6e6e73;
+  /* Mismo cyan de la marca, bajado y desaturado hasta ser legible en papel. */
+  --eva-accent: oklch(0.48 0.09 205);
+  --eva-accent-ink: oklch(0.45 0.09 205);
+
+  --eva-grid: transparent;
+  --eva-wash: transparent;
+  --eva-glow: transparent;
+
+  color-scheme: light;
 }
 
 @theme inline {
@@ -29,6 +70,7 @@
   --color-foreground: var(--eva-foreground);
   --color-muted: var(--eva-muted);
   --color-border: var(--eva-border);
+  --color-border-strong: var(--eva-border-strong);
   --color-accent: var(--eva-accent);
   --color-accent-ink: var(--eva-accent-ink);
 
@@ -39,17 +81,35 @@
 }
 
 @layer base {
+  /*
+   * El cambio de modo anima únicamente color, no geometría. La lista es
+   * deliberadamente corta: nada de posiciones, tamaños ni opacidades.
+   */
   *,
   *::before,
   *::after {
     border-color: var(--eva-border);
+    transition-property: background-color, color, border-color, fill, stroke;
+    transition-duration: 260ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /*
+   * Durante la restauración del tema guardado no debe animarse nada: el color
+   * correcto tiene que estar pintado desde el primer cuadro.
+   */
+  .eva-no-transition,
+  .eva-no-transition *,
+  .eva-no-transition *::before,
+  .eva-no-transition *::after {
+    transition: none !important;
   }
 
   html {
     scroll-behavior: smooth;
-    /* El header es sticky: las anclas no deben quedar debajo de él. */
     scroll-padding-top: 5.5rem;
     -webkit-text-size-adjust: 100%;
+    background-color: var(--eva-background);
   }
 
   body {
@@ -62,18 +122,43 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--eva-accent) 26%, transparent);
+    background-color: color-mix(in srgb, var(--eva-accent) 28%, transparent);
   }
 
   :focus-visible {
-    outline: 2px solid var(--eva-accent-ink);
+    outline: 2px solid var(--eva-accent);
     outline-offset: 3px;
     border-radius: 1px;
   }
 }
 
 @layer components {
-  /* Contenedor editorial. Márgenes amplios en móvil, más aire en desktop. */
+  /*
+   * Retícula técnica. Existe sólo en oscuro y está deliberadamente por debajo
+   * del umbral de atención: se percibe más que se ve. Dos frecuencias (96px y
+   * 24px) y una máscara que la apaga hacia abajo, para que no compita nunca
+   * con el titular.
+   */
+  .eva-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(90% 45% at 50% -8%, var(--eva-wash), transparent 62%),
+      linear-gradient(var(--eva-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--eva-grid) 1px, transparent 1px),
+      linear-gradient(var(--eva-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--eva-grid) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      96px 96px,
+      96px 96px,
+      24px 24px,
+      24px 24px;
+    mask-image: linear-gradient(180deg, #000 0%, #000 34%, transparent 76%);
+  }
+
   .eva-container {
     width: min(1200px, 100% - 2.75rem);
     margin-inline: auto;
@@ -85,7 +170,6 @@
     }
   }
 
-  /* Ritmo vertical de los capítulos. */
   .eva-section {
     padding-block: 5.5rem;
     border-top: 1px solid var(--eva-border);
@@ -97,7 +181,6 @@
     }
   }
 
-  /* Rejilla editorial asimétrica: rótulo a la izquierda, cuerpo desplazado. */
   .eva-grid {
     display: grid;
     gap: 2.5rem;
@@ -110,27 +193,7 @@
     }
   }
 
-  /*
-   * Navegación en móvil: una fila que se desplaza en horizontal, sin menú
-   * desplegable. El degradado del borde derecho avisa de que hay más secciones
-   * y desaparece en cuanto caben todas.
-   */
-  .eva-nav-scroll {
-    scrollbar-width: none;
-    mask-image: linear-gradient(to right, #000 82%, transparent 100%);
-  }
-
-  .eva-nav-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (min-width: 1024px) {
-    .eva-nav-scroll {
-      mask-image: none;
-    }
-  }
-
-  /* Etiqueta monoespaciada: categorías, estados, metadata. */
+  /* Etiqueta monoespaciada: categorías, estados, metadata, índice. */
   .eva-mono {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.75rem;
@@ -138,24 +201,53 @@
     text-transform: uppercase;
   }
 
-  /* Enlace de texto con subrayado fino que se enciende en el color EVA. */
   .eva-link {
     color: var(--eva-foreground);
     text-decoration: none;
-    box-shadow: inset 0 -1px 0 0 var(--eva-border);
-    transition:
-      color 200ms ease,
-      box-shadow 200ms ease;
+    box-shadow: inset 0 -1px 0 0 var(--eva-border-strong);
+    transition-property: background-color, color, border-color, fill, stroke,
+      box-shadow;
   }
 
   .eva-link:hover {
     color: var(--eva-accent-ink);
     box-shadow: inset 0 -1px 0 0 var(--eva-accent);
   }
+
+  /*
+   * Microelemento EVA: el sello `EVA_01`. El guion bajo es lo único que se
+   * enciende — en oscuro con un glow mínimo, en claro con el cyan profundo y
+   * sin brillo. Es el mismo signo en los dos modos.
+   */
+  .eva-seal {
+    color: var(--eva-accent);
+    text-shadow: 0 0 10px var(--eva-glow);
+    transition-property: background-color, color, border-color, fill, stroke,
+      text-shadow;
+  }
+
+  /*
+   * Iconos del interruptor. Se renderizan los dos y CSS elige según el modo,
+   * de forma que servidor y cliente pintan exactamente el mismo marcado.
+   */
+  .eva-icon-moon,
+  [data-theme='light'] .eva-icon-sun {
+    display: none;
+  }
+
+  [data-theme='light'] .eva-icon-moon {
+    display: block;
+  }
+
+  /* Punto activo: el otro lugar donde se permite glow. */
+  .eva-dot {
+    box-shadow: 0 0 8px var(--eva-glow);
+    transition-property: background-color, color, border-color, fill, stroke,
+      box-shadow;
+  }
 }
 
 @layer utilities {
-  /* Aparición discreta, sólo en la primera pantalla y sólo si se permite. */
   .eva-enter {
     animation: eva-enter 700ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
   }

@@ -11,8 +11,8 @@ pieza, sin rediseñar el sitio.
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Geist / Geist Mono.
-La página es completamente estática: no hay componentes de cliente ni JavaScript
-de interacción.
+La página es estática. El único componente de cliente es el interruptor de
+apariencia, y no depende de ninguna librería de temas.
 
 ## Desarrollo
 
@@ -30,8 +30,10 @@ src/
   app/            layout, página única, tokens (globals.css), favicon
   components/
     layout/       Header, Footer
-    sections/     Hero, AboutEva, CoursesSection, PrototypesSection,
-                  ReportsSection, LegalTeamsSection, ClosingSection
+    sections/     Hero, ChapterIndex, AboutEva, CoursesSection,
+                  PrototypesSection, ReportsSection, LegalTeamsSection,
+                  ClosingSection
+    theme/        theme.ts (tokens de modo + script en línea), ThemeToggle
     ui/           SectionIntro, StatusLabel, EmptyChapter, EvaMark
   data/
     eva.ts        fuente única de verdad del copy y la navegación
@@ -50,18 +52,51 @@ src/
    `src/app/<ruta>/page.tsx` reutilizando el componente de sección y cambiar el
    `href` correspondiente en `nav`, de `#ancla` a `/ruta`.
 
-## Identidad
+## Los dos modos
 
-Paleta corta en `src/app/globals.css` (`--eva-*`): blanco cálido, marfil, negro
-suave, gris y **un único color EVA**, el naranja `#fd7c46` de las piezas
-editoriales del proyecto.
+Misma estructura, misma jerarquía, misma marca; atmósfera distinta. No es una
+inversión de colores: además de los tokens cambian los recursos decorativos.
 
-Ese naranja está calibrado para fondo oscuro: sobre marfil da 2.4:1, así que
-**nunca se usa para texto**, sólo para marcas, filetes y subrayados. El texto y
-los enlaces usan `--eva-accent-ink` (`#b8481a`, 4.97:1 sobre el fondo, AA).
+| | DARK (por defecto) | LIGHT |
+|---|---|---|
+| Carácter | laboratorio | publicación |
+| Fondo | `#04080e` negro azulado | `#f5f5f3` blanco cálido |
+| Superficie | `#080f16` | `#ffffff` |
+| Texto | 17.3:1 | 15.4:1 |
+| Secundario | 7.0:1 | 4.7:1 |
+| Acento | cyan `#00bfcb` (8.9:1) | cyan profundo `#006c76` (5.7:1) |
+| Retícula y glow | activos, casi imperceptibles | apagados (`transparent`) |
 
-La monoespaciada se reserva para categorías, etiquetas, estados, fechas y
-metadata.
+Todo vive en `src/app/globals.css`: `:root` es el modo oscuro y
+`:root[data-theme='light']` el claro. Al cambiar de modo sólo se animan cinco
+propiedades — `background-color`, `color`, `border-color`, `fill` y `stroke` —
+durante 260 ms. Nunca posiciones.
+
+**El fondo oscuro no usa el `oklch(0.07 .015 250)` de referencia**: en sRGB se
+resuelve como `#000103`, un negro plano donde el matiz frío desaparece y la
+superficie elevada deja de distinguirse. Subido a `0.13` el azul se percibe y
+los filetes existen.
+
+### Cómo se decide el modo
+
+1. El HTML sale del servidor con `data-theme="dark"`. Sin JavaScript, el sitio
+   es oscuro.
+2. Un script en línea al principio del `<body>` corrige a claro **sólo** si el
+   visitante lo guardó antes en `localStorage` (`eva-theme`).
+3. `prefers-color-scheme` no interviene en ningún momento: la primera visita es
+   siempre oscura.
+4. Ese cambio va envuelto en `.eva-no-transition` y se libera dos cuadros
+   después, para que el color correcto esté pintado desde el primer fotograma y
+   no haya desvanecimiento al cargar.
+
+### Identidad
+
+La marca es el sello **`EVA_01`**: el guion bajo es lo único que se enciende —
+con un glow mínimo en oscuro, en cyan profundo y sin brillo en claro. Aparece en
+el header y en el footer, y es el mismo signo en los dos modos.
+
+En el hero, la única nota de color es el signo `+` del titular. La monoespaciada
+se reserva para categorías, etiquetas, estados, fechas, metadata e índice.
 
 ## Pendientes de contenido
 
