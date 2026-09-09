@@ -8,7 +8,13 @@ const s = sections.prototypes;
 /** Capítulo «Prototipos» — el laboratorio de EVA. */
 export function PrototypesSection() {
   return (
-    <SectionIntro id={s.id} eyebrow={s.eyebrow} title={s.title} text={s.text}>
+    <SectionIntro
+      id={s.id}
+      number={s.number}
+      eyebrow={s.eyebrow}
+      title={s.title}
+      text={s.text}
+    >
       {prototypes.length === 0 ? (
         <EmptyChapter status={s.status} note={s.emptyNote} label={s.label} />
       ) : null}

@@ -57,6 +57,8 @@ export const hero = {
 
 // ─── Quién es EVA ────────────────────────────────────────────────────────────
 export const about = {
+  number: '01',
+  eyebrow: 'EL PROYECTO',
   title: 'EVA',
   paragraphs: [
     'EVA es un proyecto de exploración aplicada sobre Derecho e inteligencia artificial.',
@@ -75,6 +77,7 @@ export const about = {
 export const sections = {
   courses: {
     id: 'cursos',
+    number: '02',
     eyebrow: 'FORMACIÓN',
     title: 'Cursos',
     text: 'Programas para abogados y estudiantes de Derecho que buscan comprender y utilizar inteligencia artificial con criterio profesional.',
@@ -83,6 +86,7 @@ export const sections = {
   },
   prototypes: {
     id: 'prototipos',
+    number: '03',
     eyebrow: 'LAB',
     title: 'Prototipos',
     text: 'Herramientas y experimentos que exploran nuevas formas de investigar, analizar, organizar y producir trabajo jurídico.',
@@ -92,6 +96,7 @@ export const sections = {
   },
   reports: {
     id: 'informes',
+    number: '04',
     eyebrow: 'INVESTIGACIÓN',
     title: 'Informes',
     text: 'Investigación aplicada sobre inteligencia artificial, automatización cognitiva y transformación del trabajo jurídico.',
@@ -100,6 +105,7 @@ export const sections = {
   },
   legalTeams: {
     id: 'estudios-juridicos',
+    number: '05',
     eyebrow: 'EQUIPOS LEGALES',
     title: 'IA aplicada al trabajo jurídico',
     text: 'EVA acompaña a estudios jurídicos y equipos legales en el diseño de workflows, evaluación de herramientas y exploración de casos de uso de inteligencia artificial.',

@@ -4,7 +4,7 @@ import { closing, links } from '@/data/eva';
 export function ClosingSection() {
   return (
     <section id={closing.id} className="eva-section bg-surface">
-      <div className="eva-container">
+      <div className="eva-container eva-reveal">
         <h2 className="max-w-[16ch] text-[clamp(1.875rem,5vw,3.5rem)] leading-[1.06] font-medium tracking-[-0.02em] text-balance">
           {closing.title}
         </h2>

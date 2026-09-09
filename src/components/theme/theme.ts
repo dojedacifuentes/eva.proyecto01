@@ -35,3 +35,34 @@ export const THEME_SCRIPT = `(function(){try{var d=document.documentElement;var 
 )}:${JSON.stringify(
   THEME_COLOR.dark,
 )});var r=function(){d.classList.remove('eva-no-transition');};requestAnimationFrame(function(){requestAnimationFrame(r);});setTimeout(r,120);}catch(e){}})();`;
+
+/** Modo actualmente pintado, leído del <html> (única fuente de verdad). */
+export function currentTheme(): Theme {
+  return document.documentElement.getAttribute("data-theme") === "light"
+    ? "light"
+    : "dark";
+}
+
+/**
+ * Cambia de modo y guarda la preferencia.
+ *
+ * Vive aquí y no dentro del interruptor porque hay dos formas de invocarlo: el
+ * botón de la barra y la acción «Cambiar apariencia» del navegador ⌘K. Las dos
+ * tienen que hacer exactamente lo mismo.
+ */
+export function toggleTheme(): Theme {
+  const next: Theme = currentTheme() === "light" ? "dark" : "light";
+
+  document.documentElement.setAttribute("data-theme", next);
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute("content", THEME_COLOR[next]);
+
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, next);
+  } catch {
+    // Modo privado o almacenamiento bloqueado: el cambio vale para la sesión.
+  }
+
+  return next;
+}

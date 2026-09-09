@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
-import { THEME_COLOR, THEME_STORAGE_KEY, type Theme } from '@/components/theme/theme';
+import { toggleTheme } from '@/components/theme/theme';
 
 /**
  * Interruptor de apariencia.
@@ -12,29 +11,13 @@ import { THEME_COLOR, THEME_STORAGE_KEY, type Theme } from '@/components/theme/t
  * hidratar y el botón sigue siendo un simple botón — foco y teclado nativos.
  */
 export function ThemeToggle() {
-  const toggle = useCallback(() => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next: Theme = current === 'light' ? 'dark' : 'light';
-
-    document.documentElement.setAttribute('data-theme', next);
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', THEME_COLOR[next]);
-
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch {
-      // Modo privado o almacenamiento bloqueado: el cambio vale para la sesión.
-    }
-  }, []);
-
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={() => toggleTheme()}
       title="Cambiar apariencia"
       aria-label="Cambiar apariencia"
-      className="-mr-1.5 grid size-9 place-items-center rounded-eva text-muted transition-colors hover:text-accent-ink"
+      className="grid size-9 place-items-center rounded-eva text-muted transition-colors hover:text-foreground"
     >
       {/* Sol — visible en oscuro: pulsarlo lleva al modo claro. */}
       <svg
@@ -54,7 +37,14 @@ export function ThemeToggle() {
         aria-hidden="true"
         className="eva-icon-moon col-start-1 row-start-1 size-4"
       >
-        <circle cx="8" cy="8" r="5.4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+        <circle
+          cx="8"
+          cy="8"
+          r="5.4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
+        />
         <path d="M8 2.6a5.4 5.4 0 0 0 0 10.8Z" fill="currentColor" />
       </svg>
     </button>

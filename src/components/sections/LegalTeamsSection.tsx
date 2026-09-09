@@ -14,7 +14,13 @@ export function LegalTeamsSection() {
   const href = links.contact ?? `#${closing.id}`;
 
   return (
-    <SectionIntro id={s.id} eyebrow={s.eyebrow} title={s.title} text={s.text}>
+    <SectionIntro
+      id={s.id}
+      number={s.number}
+      eyebrow={s.eyebrow}
+      title={s.title}
+      text={s.text}
+    >
       <div className="mt-10 border-t border-border pt-6">
         <a href={href} className="eva-link py-1 text-[0.9375rem]">
           {s.cta} <span aria-hidden="true">→</span>

@@ -11,8 +11,10 @@ pieza, sin rediseñar el sitio.
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Geist / Geist Mono.
-La página es estática. El único componente de cliente es el interruptor de
-apariencia, y no depende de ninguna librería de temas.
+La página es estática y no tiene ninguna dependencia más allá de React y Next:
+ni librería de temas, ni de diálogos, ni de animación. Los componentes de
+cliente son tres — el interruptor de apariencia, la navegación y el estado de
+scroll — y ninguno pasa de cien líneas.
 
 ## Desarrollo
 
@@ -30,6 +32,8 @@ src/
   app/            layout, página única, tokens (globals.css), favicon
   components/
     layout/       Header, Footer
+    nav/          SectionNav (barra + posición), NavCommand (⌘K y hoja
+                  móvil), ScrollState
     sections/     Hero, ChapterIndex, AboutEva, CoursesSection,
                   PrototypesSection, ReportsSection, LegalTeamsSection,
                   ClosingSection
@@ -51,6 +55,43 @@ src/
    `/herramientas`, `/workflows`, `/estudios-juridicos`, `/acerca`): crear
    `src/app/<ruta>/page.tsx` reutilizando el componente de sección y cambiar el
    `href` correspondiente en `nav`, de `#ancla` a `/ruta`.
+
+## Navegación
+
+Tres superficies para el mismo mapa de cinco capítulos, definido una sola vez en
+`chapterIndex`.
+
+1. **El índice del hero.** Sumario numerado, siempre presente en la primera
+   pantalla.
+2. **La barra superior.** Vacía de enlaces mientras se ve el hero; al pasarlo
+   aparecen las secciones, el filete inferior y la barra de progreso. Revelación
+   progresiva: la navegación llega cuando empieza a hacer falta.
+3. **El navegador ⌘K.** La misma superficie es paleta de comandos en escritorio
+   (⌘K / Ctrl+K) y hoja anclada al pulgar en móvil. Busca sin acentos y por
+   sinónimos — «asesoría», «lab», «formación» llevan a su capítulo — e incluye
+   Instagram y el cambio de apariencia como acciones.
+
+Detalles que no se ven pero se notan:
+
+- La posición actual se marca con `aria-current`, no sólo con el subrayado: quien
+  usa lector de pantalla recibe la misma información.
+- El navegador se apoya en el `<dialog>` nativo, que ya resuelve trampa de foco,
+  Escape, capa superior y fondo inerte. Al cerrarse, el foco viaja a la sección
+  elegida (que se hace enfocable al vuelo) o vuelve al botón que lo abrió.
+- Las flechas mueven el foco entre enlaces reales en lugar de simular una
+  selección, así que Intro, Tab y los lectores de pantalla funcionan solos.
+- El estado «ya pasé el hero» **no** usa `IntersectionObserver`. La señal es
+  binaria y el observador sólo avisa al cruzar un umbral: un salto instantáneo
+  —pulsar un ancla, recargar con hash— puede llevar el elemento de un lado a
+  otro entre dos fotogramas sin cruzar nada, y el estado se congela. La
+  comparación aritmética no tiene ese punto ciego, y el borde del hero se mide
+  una vez, de modo que desplazarse no cuesta ninguna lectura de layout.
+- La barra de progreso y la aparición de cada capítulo son animaciones ligadas
+  al scroll (`animation-timeline`), resueltas por el navegador sin un solo
+  oyente. Donde no existen, no pasa nada: el contenido está visible desde el
+  principio.
+- Sin JavaScript la navegación se muestra siempre, en lugar de esconderse para
+  siempre.
 
 ## Los dos modos
 
