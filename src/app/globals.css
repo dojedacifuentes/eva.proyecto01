@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────────────────────────────────────────────────────
+   TOKENS EVA
+   Paleta corta y deliberada: blanco cálido, marfil, negro suave, grises y un
+   único color EVA (el naranja de la identidad de EVA, muestreado de las piezas
+   editoriales del proyecto: #fd7c46).
+
+   El naranja de marca está calibrado para fondos oscuros: sobre marfil tiene
+   2.4:1 y por eso NUNCA se usa para texto, sólo para marcas, filetes y
+   subrayados. Para texto y enlaces existe --eva-accent-ink (4.97:1 sobre el
+   fondo, AA).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --eva-background: #faf8f3; /* blanco cálido */
+  --eva-surface: #f3f0e9; /* marfil */
+  --eva-foreground: #16130f; /* negro suave */
+  --eva-muted: #6b665c; /* gris de texto secundario — 5.4:1 */
+  --eva-border: #e4dfd4; /* filete fino */
+  --eva-accent: #fd7c46; /* color EVA — sólo elementos gráficos */
+  --eva-accent-ink: #b8481a; /* color EVA legible — texto y enlaces */
+
+  --eva-radius: 3px;
+}
+
+@theme inline {
+  --color-background: var(--eva-background);
+  --color-surface: var(--eva-surface);
+  --color-foreground: var(--eva-foreground);
+  --color-muted: var(--eva-muted);
+  --color-border: var(--eva-border);
+  --color-accent: var(--eva-accent);
+  --color-accent-ink: var(--eva-accent-ink);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-eva: var(--eva-radius);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--eva-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* El header es sticky: las anclas no deben quedar debajo de él. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--eva-background);
+    color: var(--eva-foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--eva-accent) 26%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--eva-accent-ink);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+}
+
+@layer components {
+  /* Contenedor editorial. Márgenes amplios en móvil, más aire en desktop. */
+  .eva-container {
+    width: min(1200px, 100% - 2.75rem);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .eva-container {
+      width: min(1200px, 100% - 6rem);
+    }
+  }
+
+  /* Ritmo vertical de los capítulos. */
+  .eva-section {
+    padding-block: 5.5rem;
+    border-top: 1px solid var(--eva-border);
+  }
+
+  @media (min-width: 768px) {
+    .eva-section {
+      padding-block: 9rem;
+    }
+  }
+
+  /* Rejilla editorial asimétrica: rótulo a la izquierda, cuerpo desplazado. */
+  .eva-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .eva-grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: 4rem;
+    }
+  }
+
+  /*
+   * Navegación en móvil: una fila que se desplaza en horizontal, sin menú
+   * desplegable. El degradado del borde derecho avisa de que hay más secciones
+   * y desaparece en cuanto caben todas.
+   */
+  .eva-nav-scroll {
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+  }
+
+  .eva-nav-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .eva-nav-scroll {
+      mask-image: none;
+    }
+  }
+
+  /* Etiqueta monoespaciada: categorías, estados, metadata. */
+  .eva-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  /* Enlace de texto con subrayado fino que se enciende en el color EVA. */
+  .eva-link {
+    color: var(--eva-foreground);
+    text-decoration: none;
+    box-shadow: inset 0 -1px 0 0 var(--eva-border);
+    transition:
+      color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .eva-link:hover {
+    color: var(--eva-accent-ink);
+    box-shadow: inset 0 -1px 0 0 var(--eva-accent);
+  }
+}
+
+@layer utilities {
+  /* Aparición discreta, sólo en la primera pantalla y sólo si se permite. */
+  .eva-enter {
+    animation: eva-enter 700ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  }
+
+  @keyframes eva-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
