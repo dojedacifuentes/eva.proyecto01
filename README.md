@@ -65,6 +65,7 @@ metadata.
 
 ## Pendientes de contenido
 
-- `links.instagram` en `src/data/eva.ts` es un marcador (`#`): falta la URL real.
-- `links.contact` es `null`: mientras tanto, el CTA de «Estudios jurídicos»
-  apunta al cierre.
+- `links.contact` en `src/data/eva.ts` es `null`: todavía no hay correo ni
+  formulario. Mientras siga en `null`, el CTA de «Estudios jurídicos» apunta al
+  cierre, donde está el enlace público de Instagram. Poner un correo ahí
+  (`mailto:...`) es lo único necesario para activarlo.

@@ -20,9 +20,8 @@ export const seo = {
 } as const;
 
 // ─── Enlaces externos ────────────────────────────────────────────────────────
-// TODO(EVA): reemplazar por la URL real del perfil de Instagram.
 export const links = {
-  instagram: '#',
+  instagram: 'https://www.instagram.com/eva.proyecto01/',
   /**
    * Correo o formulario de contacto. Mientras sea null, el CTA de la sección
    * «Estudios jurídicos» apunta al cierre, donde está el enlace público.
