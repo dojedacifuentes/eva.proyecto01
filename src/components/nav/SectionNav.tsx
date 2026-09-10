@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { chapterIndex } from '@/data/eva';
 
@@ -13,12 +14,15 @@ import { chapterIndex } from '@/data/eva';
  *
  * El estado se comunica con `aria-current`, de modo que quien navega con
  * lector de pantalla recibe la misma información que quien ve el subrayado.
+ *
+ * En rutas que no son la landing no hay secciones que observar: los enlaces son
+ * absolutos y siguen llevando a su capítulo, simplemente sin marca de posición.
  */
 export function SectionNav() {
   const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
-    const ids = chapterIndex.map((chapter) => chapter.href.slice(1));
+    const ids = chapterIndex.map((chapter) => chapter.id);
     const sections = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
@@ -47,25 +51,19 @@ export function SectionNav() {
   }, []);
 
   return (
-    <nav
-      aria-label="Secciones"
-      className="eva-nav-sections hidden lg:block"
-    >
+    <nav aria-label="Secciones" className="eva-nav-sections hidden lg:block">
       <ul className="flex items-center gap-7">
-        {chapterIndex.map((chapter) => {
-          const id = chapter.href.slice(1);
-          return (
-            <li key={chapter.href}>
-              <a
-                href={chapter.href}
-                className="eva-nav-link eva-mono block transition-colors"
-                aria-current={active === id ? 'true' : undefined}
-              >
-                {chapter.label}
-              </a>
-            </li>
-          );
-        })}
+        {chapterIndex.map((chapter) => (
+          <li key={chapter.id}>
+            <Link
+              href={chapter.href}
+              className="eva-nav-link eva-mono block transition-colors"
+              aria-current={active === chapter.id ? 'true' : undefined}
+            >
+              {chapter.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );

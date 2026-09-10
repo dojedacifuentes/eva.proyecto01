@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { NavCommand } from '@/components/nav/NavCommand';
 import { SectionNav } from '@/components/nav/SectionNav';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
@@ -20,8 +21,8 @@ export function Header() {
   return (
     <header className="eva-header">
       <div className="eva-container flex h-[var(--eva-header-h)] items-center justify-between gap-6">
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="flex shrink-0 items-center gap-2.5"
           aria-label={`${identity.name} — inicio`}
         >
@@ -32,7 +33,7 @@ export function Header() {
               {identity.seal}
             </span>
           </span>
-        </a>
+        </Link>
 
         <div className="flex items-center gap-5 lg:gap-7">
           <SectionNav />

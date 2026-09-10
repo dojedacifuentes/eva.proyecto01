@@ -22,20 +22,20 @@ type Item = {
  * que ayuda.
  */
 const KEYWORDS: Record<string, string> = {
-  '#eva': 'proyecto acerca quienes somos herramientas exploracion',
-  '#cursos': 'formacion ensenar programas estudiantes abogados clases talleres',
-  '#prototipos': 'lab laboratorio herramientas experimentos aplicaciones',
-  '#informes': 'investigacion research publicaciones documentos papers',
-  '#estudios-juridicos':
+  eva: 'proyecto acerca quienes somos herramientas exploracion',
+  cursos: 'formacion ensenar programas estudiantes abogados clases talleres',
+  prototipos: 'lab laboratorio herramientas experimentos aplicaciones',
+  informes: 'investigacion research publicaciones documentos papers',
+  'estudios-juridicos':
     'estudios juridicos equipos legales asesoria workflows empresas consultoria',
 };
 
 const ITEMS: Item[] = [
   ...chapterIndex.map((chapter) => ({
-    id: chapter.href,
+    id: chapter.id,
     label: chapter.label,
     meta: chapter.number,
-    keywords: KEYWORDS[chapter.href] ?? '',
+    keywords: KEYWORDS[chapter.id] ?? '',
     href: chapter.href,
   })),
   {
@@ -322,9 +322,7 @@ export function NavCommand() {
                       target={item.external ? '_blank' : undefined}
                       rel={item.external ? 'noreferrer noopener' : undefined}
                       onClick={() => {
-                        if (!item.external && item.href) {
-                          destination.current = item.href.slice(1);
-                        }
+                        if (!item.external) destination.current = item.id;
                         close();
                       }}
                       className={className}

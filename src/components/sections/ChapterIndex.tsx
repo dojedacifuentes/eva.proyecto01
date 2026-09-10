@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { chapterIndex } from '@/data/eva';
 
 /**
@@ -19,10 +20,10 @@ export function ChapterIndex() {
            * escritorio partiría la fila de cinco.
            */
           <li
-            key={chapter.href}
+            key={chapter.id}
             className="border-b border-border max-md:[&:last-child]:col-span-2 md:border-b-0 md:[&:not(:last-child)]:border-r"
           >
-            <a
+            <Link
               href={chapter.href}
               className="group flex items-baseline gap-2.5 py-4 md:py-5"
             >
@@ -30,7 +31,7 @@ export function ChapterIndex() {
               <span className="eva-mono text-muted transition-colors group-hover:text-foreground">
                 {chapter.label}
               </span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

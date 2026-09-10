@@ -32,15 +32,26 @@ export const links = {
 } as const;
 
 // ─── Índice ──────────────────────────────────────────────────────────────────
-// El header ya no lleva navegación: el índice numerado del hero es la única
-// forma de recorrer la página, así que cada entrada apunta a un capítulo real.
-// Cuando una sección tenga ruta propia, basta cambiar `href` por '/prototipos'.
+// El índice numerado del hero y la navegación de la barra recorren estos cinco
+// capítulos.
+//
+// Los enlaces son absolutos (`/#ancla`, no `#ancla`) porque la barra vive en el
+// layout y también se pinta en rutas que no son la landing — /panel, por
+// ejemplo. Un ancla relativa allí no lleva a ninguna parte.
+//
+// `id` va aparte del `href` para que el observador de posición no tenga que
+// recortar cadenas. Cuando una sección abra ruta propia, cambia sólo el `href`.
 export const chapterIndex = [
-  { number: '01', label: 'EVA', href: '#eva' },
-  { number: '02', label: 'CURSOS', href: '#cursos' },
-  { number: '03', label: 'PROTOTIPOS', href: '#prototipos' },
-  { number: '04', label: 'INFORMES', href: '#informes' },
-  { number: '05', label: 'ESTUDIOS', href: '#estudios-juridicos' },
+  { number: '01', id: 'eva', label: 'EVA', href: '/#eva' },
+  { number: '02', id: 'cursos', label: 'CURSOS', href: '/#cursos' },
+  { number: '03', id: 'prototipos', label: 'PROTOTIPOS', href: '/#prototipos' },
+  { number: '04', id: 'informes', label: 'INFORMES', href: '/#informes' },
+  {
+    number: '05',
+    id: 'estudios-juridicos',
+    label: 'ESTUDIOS',
+    href: '/#estudios-juridicos',
+  },
 ] as const;
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
