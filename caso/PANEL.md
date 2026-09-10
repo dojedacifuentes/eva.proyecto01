@@ -50,6 +50,7 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 - falta | Cursos — colección vacía, estado declarado «PROGRAMACIÓN EN DESARROLLO» | src/data/eva.ts:84
 - falta | Prototipos — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:94
 - falta | Informes — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:103
+- ok | Avatar de EVA en el hero — retrato interactivo con nueve frases; el gesto lo declara cada línea | src/data/eva.ts (avatar)
 - ok | Panel del caso en /panel — 9 secciones leídas de caso/PANEL.md en compilación, sin indexar y sin enlace desde la landing | src/app/panel/page.tsx
 
 ## 03 · Documentos que hay

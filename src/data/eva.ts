@@ -66,6 +66,27 @@ export const hero = {
     'Herramientas jurídicas, formación y nuevas formas de trabajar con inteligencia artificial.',
 } as const;
 
+// ─── El avatar ───────────────────────────────────────────────────────────────
+// EVA dice lo que piensa con la misma cara. Sólo se le escapa media sonrisa
+// cuando la frase es especialmente cruel — de ahí que cada línea declare qué
+// gesto merece. El chiste está en el dato, no en el componente.
+export const avatar = {
+  status: 'EN LÍNEA',
+  cue: 'Otra',
+  hint: 'Pulsa para que siga hablando',
+  lines: [
+    { text: 'Un chat recuerda mientras dura la conversación. Un caso dura más que tu paciencia.', face: 'seria' },
+    { text: 'Cita tres fallos. Dos existen. Ese es exactamente el problema.', face: 'sonrisa' },
+    { text: 'Automatizar el desorden sólo te da desorden más rápido.', face: 'seria' },
+    { text: 'Si tu escrito necesita que lo expliques, ya perdiste a la audiencia. Y probablemente el caso.', face: 'seria' },
+    { text: 'La IA no te va a quitar el trabajo. El colega que sabe usarla, quizás.', face: 'sonrisa' },
+    { text: 'Un expediente repartido en doce carpetas no es un expediente. Es una escena del crimen.', face: 'sonrisa' },
+    { text: 'El plazo es lo único en Derecho que no negocia.', face: 'seria' },
+    { text: '«La IA va a revolucionar el Derecho» es la forma elegante de decir que nunca la has usado.', face: 'sonrisa' },
+    { text: 'La responsabilidad no se delega a un modelo. Tiene nombre, RUT y firma.', face: 'seria' },
+  ],
+} as const;
+
 // ─── Quién es EVA ────────────────────────────────────────────────────────────
 export const about = {
   number: '01',

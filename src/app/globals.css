@@ -399,6 +399,37 @@
   }
 
   /*
+   * El retrato de EVA viene de estudio, con fondo claro. Puesto tal cual sobre
+   * el negro azulado es un rectángulo brillante flotando: rompe justo la
+   * atmósfera sobre la que se construye todo lo demás. En oscuro se baja y se
+   * desatura hasta que se asienta en el fondo, y un velo lo funde por abajo
+   * contra la chapa de estado. En claro no hace falta tocar nada.
+   */
+  .eva-portrait img {
+    filter: brightness(0.88) contrast(1.05) saturate(0.9);
+  }
+
+  [data-theme='light'] .eva-portrait img {
+    filter: none;
+  }
+
+  .eva-portrait-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 55%,
+      var(--eva-background) 100%
+    );
+    opacity: 0.6;
+  }
+
+  [data-theme='light'] .eva-portrait-scrim {
+    opacity: 0.35;
+  }
+
+  /*
    * Iconos del interruptor. Se renderizan los dos y CSS elige según el modo,
    * de forma que servidor y cliente pintan exactamente el mismo marcado.
    */
