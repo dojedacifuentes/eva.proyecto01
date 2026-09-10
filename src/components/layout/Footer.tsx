@@ -1,27 +1,19 @@
-import { EvaMark } from '@/components/ui/EvaMark';
 import { identity } from '@/data/eva';
 
-/** Footer mínimo. Sin sitemap: la navegación ya está arriba. */
+/**
+ * Pie mínimo.
+ *
+ * La marca, la ciudad y el enlace a Instagram viven en el lateral, así que aquí
+ * sólo queda lo que cierra la página. Repetirlo sería ruido.
+ */
 export function Footer() {
   return (
     <footer className="border-t border-border">
-      <div className="eva-container flex flex-col gap-5 py-12 sm:flex-row sm:items-end sm:justify-between md:py-16">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <EvaMark className="size-4" />
-            <span className="text-[0.9375rem] font-semibold tracking-[0.14em]">
-              {identity.name}
-              <span className="eva-seal font-mono text-xs tracking-normal">
-                {identity.seal}
-              </span>
-            </span>
-          </div>
-          <p className="eva-mono mt-3 text-muted">{identity.tagline}</p>
-        </div>
-
-        <p className="eva-mono text-muted sm:text-right">
+      <div className="eva-container flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-8">
+        <p className="eva-mono text-muted">{identity.tagline}</p>
+        <p className="eva-mono text-muted">
           {identity.year}
-          <span aria-hidden="true" className="px-2 text-border">
+          <span aria-hidden="true" className="px-2 text-border-strong">
             /
           </span>
           {identity.city}

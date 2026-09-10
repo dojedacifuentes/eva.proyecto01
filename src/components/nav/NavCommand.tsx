@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toggleTheme } from '@/components/theme/theme';
-import { chapterIndex, links } from '@/data/eva';
+import { chapters, links } from '@/data/eva';
 
 type Item = {
   id: string;
@@ -15,27 +15,12 @@ type Item = {
   run?: () => void;
 };
 
-/*
- * El rótulo de una sección no es la única palabra con la que se la busca. Quien
- * escribe «asesoría», «lab» o «formación» tiene que llegar a su capítulo: una
- * paleta que no reconoce el vocabulario del propio proyecto estorba más de lo
- * que ayuda.
- */
-const KEYWORDS: Record<string, string> = {
-  eva: 'proyecto acerca quienes somos herramientas exploracion',
-  cursos: 'formacion ensenar programas estudiantes abogados clases talleres',
-  prototipos: 'lab laboratorio herramientas experimentos aplicaciones',
-  informes: 'investigacion research publicaciones documentos papers',
-  'estudios-juridicos':
-    'estudios juridicos equipos legales asesoria workflows empresas consultoria',
-};
-
 const ITEMS: Item[] = [
-  ...chapterIndex.map((chapter) => ({
+  ...chapters.map((chapter) => ({
     id: chapter.id,
     label: chapter.label,
     meta: chapter.number,
-    keywords: KEYWORDS[chapter.id] ?? '',
+    keywords: chapter.keywords,
     href: chapter.href,
   })),
   {

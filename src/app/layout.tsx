@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { MobileNav } from '@/components/layout/MobileNav';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { TopBar } from '@/components/layout/TopBar';
 import {
   DEFAULT_THEME,
   THEME_COLOR,
@@ -52,6 +54,14 @@ export const viewport: Viewport = {
   themeColor: THEME_COLOR[DEFAULT_THEME],
 };
 
+/**
+ * Armazón de la aplicación: lateral fijo, barra que nombra la página y barra
+ * inferior en móvil.
+ *
+ * La navegación es permanente y siempre muestra el mapa completo, en lugar de
+ * aparecer al pasar el hero. Cada capítulo es una ruta, así que se puede
+ * enlazar, compartir y volver atrás — cosa que un ancla no permite.
+ */
 export default function RootLayout({
   children,
 }: {
@@ -75,12 +85,21 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
+
         <div aria-hidden="true" className="eva-atmosphere" />
-        <div className="relative z-10">
-          <Header />
-          <main id="contenido">{children}</main>
-          <Footer />
+
+        <div className="relative z-10 flex min-h-dvh">
+          <Sidebar />
+          <div className="eva-shell flex min-w-0 flex-1 flex-col">
+            <TopBar />
+            <main id="contenido" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </div>
+
+        <MobileNav />
       </body>
     </html>
   );

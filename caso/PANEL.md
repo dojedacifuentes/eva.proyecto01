@@ -28,7 +28,7 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 > Tres líneas. Si mañana hubiera que entregar el caso a otra persona, esto es lo
 > primero que leería.
 
-- ok | Landing v0.1 y panel del caso construidos y publicados en GitHub — 44 archivos versionados en 6 commits | git log
+- ok | Sitio y panel del caso construidos y publicados en GitHub, con navegación permanente y una ruta por capítulo | git log
 - falta | Contenido publicado en el sitio: cero. Las tres colecciones —cursos, prototipos e informes— están vacías | src/data/collections.ts:10
 - falta | Sin desplegar y sin calendario: el repositorio está verificado con clon limpio y npm ci, pero no consta una sola fecha en ninguna parte del proyecto | no consta
 
@@ -44,13 +44,13 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 
 ## 02 · Entregables en curso
 
-- ok | Landing v0.1 — 5 capítulos, dos modos visuales, navegación completa; lint y build limpios | git log · 5 commits
+- ok | Sitio con armazón de aplicación — lateral permanente, barra que nombra la página y barra inferior en móvil; cada capítulo es ruta propia | src/app/layout.tsx
+- ok | Cinco rutas de capítulo más portada y panel; todas estáticas | src/data/eva.ts (chapters)
 - curso | Post 06 «Markdown, y por qué un expediente se escribe en texto plano» — comprometido en el CTA del post 05 | eva-05-panel-caso-claude-code.zip/00_texto-del-post.txt
 - curso | Serie «Expediente vivo» — el post 05 es «capítulo 01»; el número total de capítulos no consta | eva-05-panel-caso-claude-code.zip/00_texto-del-post.txt
 - falta | Cursos — colección vacía, estado declarado «PROGRAMACIÓN EN DESARROLLO» | src/data/eva.ts:84
 - falta | Prototipos — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:94
 - falta | Informes — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:103
-- ok | Avatar de EVA en el hero — retrato interactivo con nueve frases; el gesto lo declara cada línea | src/data/eva.ts (avatar)
 - ok | Panel del caso en /panel — 9 secciones leídas de caso/PANEL.md en compilación, sin indexar y sin enlace desde la landing | src/app/panel/page.tsx
 
 ## 03 · Documentos que hay
@@ -73,6 +73,7 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 - falta | Texto de los posts 03 y 04 — hay láminas, no hay copy archivado | primeras 3 publicaciones/
 - falta | Canal de contacto — links.contact sigue en null y el CTA de «Estudios jurídicos» apunta al cierre | src/data/eva.ts:31
 - falta | Dominio propio — metadataBase cae en la URL que asigna Vercel | src/lib/site.ts
+- verificar | Retratos de EVA: se retiraron del hero por decisión de diseño; no consta dónde deben usarse | no consta
 - verificar | Relación entre QUINTA PUBLICACION (8 PNG) y el post 05 del zip (11 láminas): el número no coincide | no consta
 - verificar | Numeración de las publicaciones — hay «primeras 3», un «carrusel 4», una «quinta» y un «Post 05»; no consta si 4 y 5 son la misma pieza | no consta
 

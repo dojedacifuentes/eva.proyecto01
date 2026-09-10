@@ -207,14 +207,33 @@
     mask-image: linear-gradient(180deg, #000 0%, #000 34%, transparent 76%);
   }
 
+  /*
+   * Ancho de lectura dentro de la columna de contenido. Ya no se centra en la
+   * ventana sino en lo que queda a la derecha del lateral, así que el máximo
+   * baja: 1200px junto a un lateral de 16rem daba líneas demasiado largas.
+   */
   .eva-container {
-    width: min(1200px, 100% - 2.75rem);
+    width: min(1080px, 100% - 2.5rem);
     margin-inline: auto;
   }
 
   @media (min-width: 768px) {
     .eva-container {
-      width: min(1200px, 100% - 6rem);
+      width: min(1080px, 100% - 5rem);
+    }
+  }
+
+  /*
+   * La barra inferior de móvil flota sobre el contenido: sin este colchón, el
+   * último bloque de cada página queda debajo y no se puede leer.
+   */
+  .eva-shell {
+    padding-bottom: 5.25rem;
+  }
+
+  @media (min-width: 1024px) {
+    .eva-shell {
+      padding-bottom: 0;
     }
   }
 
@@ -227,9 +246,9 @@
   .eva-header {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 40;
     background-color: var(--eva-header-bg);
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid var(--eva-border);
   }
 
   @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -239,58 +258,66 @@
     }
   }
 
-  html[data-scrolled] .eva-header {
-    border-bottom-color: var(--eva-border);
-  }
-
   /*
-   * La navegación está visible por defecto: si no hay JavaScript, nadie se
-   * queda sin ella. Sólo cuando el observador confirma que está en marcha
-   * (data-scroll-ready) se esconde durante la primera pantalla.
+   * Enlace del lateral. El filete del borde izquierdo marca la página actual:
+   * es el mismo recurso que el subrayado de antes, girado noventa grados para
+   * una lista vertical.
    */
-  .eva-nav-sections {
-    transition:
-      opacity 320ms cubic-bezier(0.4, 0, 0.2, 1),
-      transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  html[data-scroll-ready]:not([data-scrolled]) .eva-nav-sections {
-    opacity: 0;
-    transform: translateY(-2px);
-    pointer-events: none;
-  }
-
-  /*
-   * Enlace de sección con subrayado propio: crece desde la izquierda al pasar
-   * el puntero y queda fijo en la sección activa. El indicador es del acento,
-   * el texto nunca cambia de posición.
-   */
-  .eva-nav-link {
+  .eva-side-link {
     position: relative;
-    padding-block: 0.35rem;
     color: var(--eva-muted);
   }
 
-  .eva-nav-link::after {
+  .eva-side-link::before {
     content: '';
     position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: 1px;
+    left: 0;
+    top: 50%;
+    height: 1.15rem;
+    width: 2px;
+    border-radius: 1px;
     background-color: var(--eva-accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-50%) scaleY(0);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .eva-nav-link:hover,
-  .eva-nav-link[aria-current='true'] {
+  .eva-side-link:hover {
+    color: var(--eva-foreground);
+    background-color: color-mix(in srgb, var(--eva-accent) 7%, transparent);
+  }
+
+  .eva-side-link.is-active {
+    color: var(--eva-foreground);
+    background-color: color-mix(in srgb, var(--eva-accent) 10%, transparent);
+  }
+
+  .eva-side-link.is-active::before {
+    transform: translateY(-50%) scaleY(1);
+  }
+
+  /* Barra inferior de móvil: mismo material translúcido que la superior. */
+  .eva-mobile-nav {
+    background-color: var(--eva-header-bg);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .eva-mobile-nav {
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      backdrop-filter: saturate(180%) blur(20px);
+    }
+  }
+
+  .eva-tab {
+    color: var(--eva-muted);
+    transition: color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .eva-tab.is-active {
     color: var(--eva-foreground);
   }
 
-  .eva-nav-link:hover::after,
-  .eva-nav-link[aria-current='true']::after {
-    transform: scaleX(1);
+  .eva-tab.is-active .eva-mono {
+    color: var(--eva-accent-ink);
   }
 
   /*
@@ -309,7 +336,7 @@
   }
 
   @supports (animation-timeline: scroll()) {
-    html[data-scrolled] .eva-progress {
+    .eva-progress {
       display: block;
       animation: eva-progress linear both;
       animation-timeline: scroll(root block);
