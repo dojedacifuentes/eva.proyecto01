@@ -9,6 +9,7 @@ import {
   THEME_SCRIPT,
 } from '@/components/theme/theme';
 import { identity, seo } from '@/data/eva';
+import { siteUrl } from '@/lib/site';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -23,13 +24,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Con esto, cada ruta relativa de la metadata —la imagen de vista previa
+  // incluida— se resuelve a una URL absoluta. Sin ello, los previsualizadores
+  // de WhatsApp, Instagram o Slack no encuentran la imagen.
+  metadataBase: new URL(siteUrl),
   title: { default: seo.title, template: `%s — ${identity.name}` },
   description: seo.description,
   applicationName: identity.name,
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'es_CL',
+    url: '/',
     siteName: identity.name,
+    title: seo.title,
+    description: seo.description,
+  },
+  twitter: {
+    card: 'summary_large_image',
     title: seo.title,
     description: seo.description,
   },
