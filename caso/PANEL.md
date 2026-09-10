@@ -4,7 +4,7 @@
 > no consta va marcado como pendiente de verificación, nunca completado a ojo.
 
 Método: EVA, Post 05 «Expediente vivo» cap. 01
-Actualizado: 2026-09-09
+Actualizado: 2026-09-10
 Alcance: el proyecto EVA como caso — publicaciones, landing, formación e investigación
 Fuera de alcance: Programa DIAT PUCV, aldunate_experimento02 y 90DC, que comparten carpeta de descargas pero son casos distintos
 
@@ -28,9 +28,9 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 > Tres líneas. Si mañana hubiera que entregar el caso a otra persona, esto es lo
 > primero que leería.
 
-- ok | Landing v0.1 construida y publicada en GitHub — 5 capítulos, dos modos visuales y navegación completa; 39 archivos versionados en 5 commits | git log
+- ok | Landing v0.1 y panel del caso construidos y publicados en GitHub — 44 archivos versionados en 6 commits | git log
 - falta | Contenido publicado en el sitio: cero. Las tres colecciones —cursos, prototipos e informes— están vacías | src/data/collections.ts:10
-- falta | Sin desplegar y sin calendario: el repositorio está verificado y listo, pero no consta una sola fecha en ninguna parte del proyecto | no consta
+- falta | Sin desplegar y sin calendario: el repositorio está verificado con clon limpio y npm ci, pero no consta una sola fecha en ninguna parte del proyecto | no consta
 
 ## 01 · Plazos y vencimientos
 
@@ -50,6 +50,7 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 - falta | Cursos — colección vacía, estado declarado «PROGRAMACIÓN EN DESARROLLO» | src/data/eva.ts:84
 - falta | Prototipos — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:94
 - falta | Informes — colección vacía, estado declarado «EN DESARROLLO» | src/data/eva.ts:103
+- ok | Panel del caso en /panel — 9 secciones leídas de caso/PANEL.md en compilación, sin indexar y sin enlace desde la landing | src/app/panel/page.tsx
 
 ## 03 · Documentos que hay
 
@@ -63,7 +64,8 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 - ok | POST 3 — 4 láminas sueltas en la raíz del proyecto | POST 3 LAMINA 1.png
 - ok | EVA IMAGENES — 11 retratos de la identidad visual | EVA IMAGENES/
 - ok | Prompt maestro de la landing v0.1 — el brief completo | Downloads/Prompt maestro · EVA Landing v0.1.md
-- ok | Repositorio eva.proyecto01 — 39 archivos versionados, 5 commits | github.com/dojedacifuentes/eva.proyecto01
+- ok | Repositorio eva.proyecto01 — 44 archivos versionados, 6 commits | github.com/dojedacifuentes/eva.proyecto01
+- ok | Este panel, en texto plano y versionado | caso/PANEL.md
 
 ## 04 · Documentos que faltan
 
@@ -75,7 +77,7 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 
 ## 05 · Pendientes con responsable
 
-- falta | Desplegar la landing en Vercel — el repo está listo, verificado con clon limpio y npm ci | git log · 57d64a8
+- falta | Desplegar en Vercel — el repositorio está listo y verificado; el paso pendiente es iniciar sesión en la cuenta de Vercel, que corresponde a su titular | git log · b908642
 - falta | Definir el canal de contacto para la línea de asesoría | src/data/eva.ts:31
 - curso | Publicar el post 06 ya anunciado | eva-05-panel-caso-claude-code.zip/00_texto-del-post.txt
 - verificar | No consta reparto de responsabilidades: el repositorio registra un solo autor y ningún documento asigna tareas | git log
@@ -105,4 +107,6 @@ fuente que se pueda desincronizar: si algo cambia, cambia aquí.
 - ok | 2026-09-09 · Sistema visual dark/light con oscuro por defecto | git 27dcbc5
 - ok | 2026-09-09 · Navegación completa y pulido de interfaz | git 48726c3
 - ok | 2026-09-09 · Imagen de vista previa, robots y sitemap | git 57d64a8
+- ok | 2026-09-09 · Panel del caso en /panel, generado desde caso/PANEL.md | git b908642
+- ok | 2026-09-10 · Checkpoint de cierre: el panel se actualiza a sí mismo tras publicarse | caso/PANEL.md
 - verificar | No consta actividad registrada anterior al 2026-09-09; las publicaciones son anteriores pero no están versionadas | git log
