@@ -159,6 +159,13 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
   const bodyRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef(stats);
   const queue = useRef<Line[]>([]);
+  /*
+   * Las líneas que ha creado el bucle, en orden. Son las únicas que el bucle
+   * puede quitar: las de arranque las renderiza React y, si el bucle las
+   * borrara, React fallaría al retirarlas al pasar a movimiento reducido
+   * (removeChild sobre un nodo que ya no es hijo) y tumbaría la página.
+   */
+  const typed = useRef<HTMLParagraphElement[]>([]);
   const [feed] = useState(() => createFeed(0xe7a02));
   /* Con movimiento reducido no hay mecanografía: una lectura fija, de un generador aparte. */
   const [frozen] = useState(() => {
@@ -174,6 +181,13 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
   useEffect(() => {
     if (selected) queue.current.push(...feed.region(selected));
   }, [selected, feed]);
+
+  /* Al pasar a movimiento reducido, React pinta la lectura fija; lo tecleado se retira. */
+  useEffect(() => {
+    if (!reduced) return;
+    for (const line of typed.current) line.remove();
+    typed.current = [];
+  }, [reduced]);
 
   /* El bucle de escritura: una línea nueva cada vez que acaba la anterior. */
   useEffect(() => {
@@ -202,9 +216,10 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
         current = document.createElement('p');
         current.dataset.kind = line.kind;
         body.appendChild(current);
+        typed.current.push(current);
         text = line.text;
         shown = 0;
-        while (body.childElementCount > KEEP) body.firstElementChild?.remove();
+        while (typed.current.length > KEEP) typed.current.shift()?.remove();
       }
 
       carry += delta * SPEED;
