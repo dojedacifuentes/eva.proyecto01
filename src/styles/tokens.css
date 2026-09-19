@@ -34,6 +34,23 @@
   --eva-gutter: clamp(1.25rem, 4vw, 3rem);
   --eva-header: 3.75rem;
 
+  /*
+   * Letra: el suelo. Nada que se lea baja de 11 px, ni siquiera los rótulos de
+   * instrumento (antes había botones a 6,7 px y HUD a 8 px). Lo que se pulsa o
+   * informa va a 12; el cuerpo de lectura, entre 15 y 16.
+   */
+  --eva-type-micro: 0.6875rem;
+  --eva-type-label: 0.75rem;
+  --eva-type-body: 1rem;
+
+  /*
+   * Carril de atraque: la esquina inferior derecha es del canal de EVA. Ningún
+   * control interactivo se maqueta dentro de este cuadrado.
+   */
+  --eva-dock: 4.5rem;
+  /* Ancho del panel del canal abierto; en escritorio el contenido le deja este sitio. */
+  --eva-channel-w: 24rem;
+
   /* Movimiento */
   --eva-fast: 160ms;
   --eva-normal: 420ms;

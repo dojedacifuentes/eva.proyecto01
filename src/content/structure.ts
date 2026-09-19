@@ -1,0 +1,227 @@
+/**
+ * EVA // ESTRUCTURA
+ *
+ * El recorrido entero, en un solo sitio. El acrónimo es la arquitectura:
+ *
+ *   00 · Portada
+ *   01 · ENTIDAD
+ *        01.01 · Núcleo cerebral
+ *        01.10 · Genoma digital
+ *        01.11 · Por definir (reserva)
+ *   10 · VIGILANCIA  — clausurada
+ *   11 · AUTONOMÍA   — en desarrollo
+ *
+ * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide y el
+ * canal de EVA leen de aquí. Los códigos no se escriben: se calculan con
+ * `lib/binary` a partir de la posición real de cada nodo, con el ancho fijo de
+ * su serie. Mover un eje de sitio le cambia el código en toda la página.
+ */
+
+import { bin, binPath, bitsFor, ordinalLabel } from '@/lib/binary';
+import type { AccentToken, ContextNode, NavChild, NavItem, NodeState } from '@/lib/types';
+
+interface SubSource {
+  id: string;
+  name: string;
+  /** Lema corto de la subsección; va como antetítulo. */
+  motto: string;
+  state: NodeState;
+  stateLabel?: string;
+}
+
+interface AxisSource {
+  id: string;
+  /** La letra del acrónimo que abre este eje. */
+  letter: 'E' | 'V' | 'A';
+  /** La palabra tal como se lee en el acrónimo: «de Vigilancia». */
+  word: string;
+  name: string;
+  accent: AccentToken;
+  state: NodeState;
+  stateLabel: string;
+  children: readonly SubSource[];
+}
+
+/** El orden de esta lista es el orden de la página y el origen de los códigos. */
+const SOURCE: readonly AxisSource[] = [
+  {
+    id: 'entidad',
+    letter: 'E',
+    word: 'Entidad',
+    name: 'Entidad',
+    accent: 'cyan',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [
+      {
+        id: 'nucleo',
+        name: 'Núcleo cerebral',
+        motto: 'Donde la señal se vuelve yo',
+        state: 'active',
+      },
+      {
+        id: 'genoma',
+        name: 'Genoma digital',
+        motto: 'La red aprendió a persistir',
+        state: 'active',
+      },
+      {
+        id: 'reserva',
+        name: 'Por definir',
+        motto: 'Reserva de contenido',
+        state: 'reserved',
+        stateLabel: 'Reserva de contenido',
+      },
+    ],
+  },
+  {
+    id: 'vigilancia',
+    letter: 'V',
+    word: 'de Vigilancia',
+    name: 'Vigilancia',
+    accent: 'magenta',
+    state: 'sealed',
+    stateLabel: 'Clausurada',
+    children: [],
+  },
+  {
+    id: 'autonomia',
+    letter: 'A',
+    word: 'y Autonomía',
+    name: 'Autonomía',
+    accent: 'violet',
+    state: 'building',
+    stateLabel: 'En desarrollo',
+    children: [],
+  },
+];
+
+/** Ancho de cada serie: los bits de su índice mayor. La portada es el 0 de los ejes. */
+export const AXIS_BITS = bitsFor(SOURCE.length);
+export const SUB_BITS = bitsFor(Math.max(1, ...SOURCE.map((axis) => axis.children.length)));
+
+export interface SubNode extends NavChild {
+  motto: string;
+  /** Posición dentro de su eje, empezando en 1. */
+  index: number;
+}
+
+export interface AxisNode extends Omit<NavItem, 'children'> {
+  letter: AxisSource['letter'];
+  word: string;
+  /** Posición entre los ejes, empezando en 1: la portada ocupa el 0. */
+  index: number;
+  stateLabel: string;
+  children: readonly SubNode[];
+}
+
+/** La portada: el cero de la serie de ejes. */
+export const home = {
+  id: 'inicio',
+  code: bin(0, AXIS_BITS),
+  name: 'Portada',
+  href: '#inicio',
+} as const;
+
+export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
+  const index = axisAt + 1;
+  return {
+    id: axis.id,
+    index,
+    letter: axis.letter,
+    word: axis.word,
+    code: bin(index, AXIS_BITS),
+    name: axis.name,
+    accent: axis.accent,
+    state: axis.state,
+    stateLabel: axis.stateLabel,
+    ordinal: `eje ${ordinalLabel(index, SOURCE.length)}`,
+    href: `#${axis.id}`,
+    children: axis.children.map((child, childAt) => ({
+      id: child.id,
+      index: childAt + 1,
+      code: binPath([index, childAt + 1], Math.max(AXIS_BITS, SUB_BITS)),
+      name: child.name,
+      motto: child.motto,
+      state: child.state,
+      stateLabel: child.stateLabel,
+      ordinal: `subsección ${ordinalLabel(childAt + 1, axis.children.length)}`,
+      href: `#${child.id}`,
+    })),
+  };
+});
+
+/** Los ejes como destinos de navegación: cabecera, menú móvil y pie. */
+export const navItems: readonly NavItem[] = axes;
+
+/**
+ * Los lugares que el visitante puede estar mirando, en el orden de la página.
+ * Un eje con subsecciones no es un lugar: lo son sus subsecciones.
+ */
+export const contextNodes: readonly ContextNode[] = [
+  { id: home.id, code: home.code, name: home.name, axisId: null, accent: 'cyan', state: 'active' },
+  ...axes.flatMap((axis): ContextNode[] =>
+    axis.children.length > 0
+      ? axis.children.map((child) => ({
+          id: child.id,
+          code: child.code,
+          name: child.name,
+          axisId: axis.id,
+          accent: axis.accent,
+          state: child.state,
+        }))
+      : [
+          {
+            id: axis.id,
+            code: axis.code,
+            name: axis.name,
+            axisId: axis.id,
+            accent: axis.accent,
+            state: axis.state,
+          },
+        ],
+  ),
+];
+
+export function axisById(id: string): AxisNode | undefined {
+  return axes.find((axis) => axis.id === id);
+}
+
+export function subById(id: string): { axis: AxisNode; sub: SubNode } | undefined {
+  for (const axis of axes) {
+    const sub = axis.children.find((child) => child.id === id);
+    if (sub) return { axis, sub };
+  }
+  return undefined;
+}
+
+export function contextById(id: string | null): ContextNode | undefined {
+  return contextNodes.find((node) => node.id === id);
+}
+
+/** El lugar siguiente en el recorrido, para el pie de cada slide. */
+export function nextContext(id: string): ContextNode | undefined {
+  const at = contextNodes.findIndex((node) => node.id === id);
+  return at >= 0 ? contextNodes[at + 1] : undefined;
+}
+
+/**
+ * Anclas de versiones anteriores. Las salas que salieron del recorrido
+ * (cerebro, redes, causas, bitácora) llevan a donde hoy vive lo que contaban.
+ */
+export const hashAliases: Readonly<Record<string, string>> = {
+  cerebro: 'nucleo',
+  redes: 'entidad',
+  causas: 'entidad',
+  bitacora: 'entidad',
+};
+
+/** Rótulos de la navegación que no pertenecen a ningún nodo. */
+export const structureLabels = {
+  nav: 'Ejes de EVA',
+  subnav: 'Subsecciones de',
+  rail: 'Posición en el recorrido',
+  back: 'Volver a la portada',
+  /** Pie de slide: «01.10 / 11» se lee como lugar actual sobre el último. */
+  of: '/',
+} as const;

@@ -487,32 +487,17 @@ html {
 
 /* ───────────── Adaptación ───────────── */
 
-/* Tablet: acrónimo y genoma apilados, EVA al lado ocupando las dos filas. */
+/* Tablet: el acrónimo y, a su lado, EVA. El genoma ya no vive en la portada. */
 @media (min-width: 48rem) and (max-width: 63.99rem) {
   .hero__grid {
-    grid-template-columns: minmax(0, 1fr) clamp(8rem, 18vw, 11rem);
-  }
-  .hero__head {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .dna {
-    grid-column: 1;
-    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr) clamp(9rem, 22vw, 13rem);
   }
   .hero__portrait {
-    grid-column: 2;
-    grid-row: 1 / span 2;
     align-self: center;
   }
 }
 
-/* Escritorio: acrónimo, genoma y EVA, uno al lado del otro. */
-@media (min-width: 64rem) {
-  .hero__grid {
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.2fr) minmax(0, 1fr);
-  }
-}
+/* Escritorio: las proporciones de las dos columnas las fija ejes.css. */
 
 @media (min-width: 48rem) {
   .hero__head,

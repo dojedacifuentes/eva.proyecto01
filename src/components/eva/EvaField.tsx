@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { fieldSignal } from '@/lib/field';
 import { emitPulse, pointerSignal, toRgb } from '@/lib/pointer';
 
 interface Particle {
@@ -27,6 +28,11 @@ const IDLE_RGB = '63, 216, 238';
  * Las partículas se enganchan al puntero, se vuelven cuadradas cuando el cursor
  * se posa sobre algo interactivo y se apartan con la onda de cada clic.
  *
+ * El recorrido también le habla (`lib/field`): cada eje tiñe los hilos con su
+ * acento, Vigilancia —clausurada— lo frena hasta casi detenerlo, y las acciones
+ * del genoma lo sacuden un instante. La quietud de Vigilancia es una frenada
+ * que se ve ocurrir, no un interruptor.
+ *
  * - Un solo requestAnimationFrame, posiciones en refs, sin estado de React.
  * - Se pausa con la pestaña oculta; densidad reducida en pantallas chicas.
  * - Con movimiento reducido dibuja un único fotograma estático.
@@ -45,6 +51,8 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
     let width = 0;
     let height = 0;
     let frame = 0;
+    /** Quietud vigente, 0–1: persigue despacio a `fieldSignal.calm`. */
+    let calm = 0;
 
     const resize = () => {
       const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -95,7 +103,7 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
           const b = dots[j];
           const distance = Math.hypot(a.x - b.x, a.y - b.y);
           if (distance < LINK_DISTANCE) {
-            context.strokeStyle = `rgba(63, 216, 238, ${0.1 * (1 - distance / LINK_DISTANCE)})`;
+            context.strokeStyle = `rgba(${fieldSignal.rgb}, ${0.1 * (1 - distance / LINK_DISTANCE)})`;
             context.beginPath();
             context.moveTo(a.x, a.y);
             context.lineTo(b.x, b.y);
@@ -135,7 +143,19 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
       const { x: px, y: py, active, locked } = pointerSignal;
       const now = performance.now();
 
+      // La quietud llega y se va despacio: unos dos segundos de frenada visible.
+      calm += (fieldSignal.calm - calm) * 0.02;
+      const drift = 1 - calm * 0.94;
+      const surge = fieldSignal.surge;
+      fieldSignal.surge = surge < 0.01 ? 0 : surge * 0.93;
+
       for (const dot of dots) {
+        // Una sacudida del genoma: un empujón al azar que se disipa solo.
+        if (surge > 0.01) {
+          dot.vx += (Math.random() - 0.5) * surge * 0.7;
+          dot.vy += (Math.random() - 0.5) * surge * 0.7;
+        }
+
         if (active) {
           const dx = px - dot.x;
           const dy = py - dot.y;
@@ -179,8 +199,9 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
           dot.vy = (dot.vy / speed) * 1.6;
         }
 
-        dot.x += dot.vx;
-        dot.y += dot.vy;
+        // En quietud conserva su velocidad pero apenas avanza: al salir, retoma donde iba.
+        dot.x += dot.vx * drift;
+        dot.y += dot.vy * drift;
         if (dot.x < -10) dot.x = width + 10;
         if (dot.x > width + 10) dot.x = -10;
         if (dot.y < -10) dot.y = height + 10;

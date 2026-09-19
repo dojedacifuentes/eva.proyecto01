@@ -183,9 +183,12 @@ function buildShell(segments: [number, number]): THREE.BufferGeometry {
 interface BrainShellProps {
   detail: Detail;
   reduced: boolean;
+  /** Ritmo de la sala: acorta la vuelta de la banda de escaneo. 1 es el del escáner. */
+  tempo?: number;
 }
 
-export function BrainShell({ detail, reduced }: BrainShellProps) {
+export function BrainShell({ detail, reduced, tempo = 1 }: BrainShellProps) {
+  const sweepSeconds = SWEEP_SECONDS / (1 + (tempo - 1) * 0.6);
   const material = useRef<THREE.ShaderMaterial>(null);
   const geometry = useMemo(() => buildShell(detail.shell), [detail]);
   useEffect(() => () => geometry.dispose(), [geometry]);
@@ -223,7 +226,7 @@ export function BrainShell({ detail, reduced }: BrainShellProps) {
     // Con movimiento reducido no hay barrido: la banda se queda fuera de la corteza.
     u.uSweep.value = reduced
       ? -9
-      : SWEEP_FROM + ((time % SWEEP_SECONDS) / SWEEP_SECONDS) * (SWEEP_TO - SWEEP_FROM);
+      : SWEEP_FROM + ((time % sweepSeconds) / sweepSeconds) * (SWEEP_TO - SWEEP_FROM);
     const focus = u.uFocus.value as THREE.Vector3;
     const ease = Math.min(1, step * 6);
     if (coreSignal.focusStrength > 0) {

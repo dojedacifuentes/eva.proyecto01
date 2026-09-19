@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { lab } from '@/content/lab';
 import { neuroscan } from '@/content/neuroscan';
+import { bin } from '@/lib/binary';
 import { seeded } from './neural-data';
 
 /**
@@ -20,12 +21,18 @@ const { readout } = lab.core;
 const { labels } = readout;
 const { zones } = neuroscan.brain;
 
-/** Caracteres por segundo. Muy rápido a propósito: se lee el ritmo, no cada cifra. */
-const SPEED = 800;
+/** Caracteres por segundo. Rápido a propósito: se lee el ritmo, no cada cifra. */
+const SPEED = 520;
 /** Pausa al cerrar cada línea, en milisegundos: así se perciben como unidades. */
-const HOLD = 70;
-/** Líneas que se conservan en pantalla; por encima, las más viejas se van. */
-const KEEP = 90;
+const HOLD = 120;
+/**
+ * Líneas que se conservan en el DOM; por encima, las más viejas se van. La
+ * ventana tiene alto fijo y recorta por dentro: con cuarenta sobra para
+ * llenarla en cualquier pantalla.
+ */
+const KEEP = 40;
+/** Ancho de los contadores de ciclo: seis bits dan para sesenta y tres vueltas. */
+const CYCLE_BITS = 6;
 /** Frases sueltas del flujo de pensamiento, para que a veces piense en palabras. */
 const THOUGHTS = neuroscan.stream.flatMap((fragment) => fragment.lines).filter((line) => line.length < 70);
 
@@ -38,7 +45,8 @@ interface Line {
 
 const number = new Intl.NumberFormat('es-CL');
 const decimal = (value: number, digits: number) => value.toFixed(digits).replace('.', ',');
-const pad = (value: number) => String(value).padStart(2, '0');
+/** Los ciclos son identificadores, no medidas: van en binario, y dan la vuelta al agotar el ancho. */
+const pad = (value: number) => bin(value % 2 ** CYCLE_BITS, CYCLE_BITS);
 
 /**
  * Generador de líneas. Lleva su propio reloj de ciclos: cada tantas líneas

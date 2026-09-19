@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { images } from "@/content/assets";
 import { neuroscan } from "@/content/neuroscan";
+import { requestChannelClose } from "@/lib/channel-store";
 import { play } from "@/lib/sound";
 import { setCovered } from "@/lib/stage";
 import { EvaNeuralCore } from "./neural/EvaNeuralCore";
@@ -129,9 +130,14 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
     const root = rootRef.current;
     if (!root) return;
 
+    // El escáner es otro lugar: el canal de EVA se pliega antes de quedar inerte.
+    requestChannelClose();
+    // El foco vuelve a quien abrió el escáner, no al vacío.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
     const covered = Array.from(
       document.querySelectorAll<HTMLElement>(
-        "main, header.header, footer.footer, .synapse",
+        "main, header.header, footer.footer, .synapse, .rail",
       ),
     ).map((element) => ({ element, inert: element.inert }));
     for (const { element } of covered) element.inert = true;
@@ -166,6 +172,8 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
       document.body.style.overflow = previousOverflow;
       setCovered(false);
       for (const { element, inert } of covered) element.inert = inert;
+      // Después de quitar `inert`: un elemento inerte no acepta el foco.
+      opener?.focus({ preventScroll: true });
     };
   }, [onClose]);
 
@@ -322,102 +330,6 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
       )}
 
       <div className="scan__body">
-        {/* ── Columna izquierda: flujo de pensamiento ────────────────── */}
-        <section
-          className="scan__col scan__col--stream"
-          aria-label="Flujo de pensamiento"
-        >
-          <p className="scan__warning">
-            {neuroscan.header.warning.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </p>
-
-          <div
-            ref={streamRef}
-            className="stream"
-            onClick={() =>
-              !done && setRevealed((value) => Math.min(BEATS.length, value + 1))
-            }
-          >
-            {visible.map((beat) => (
-              <p
-                key={beat.id}
-                className={`stream__beat stream__beat--${beat.kind}`}
-              >
-                {beat.kind === "aside" ? `« ${beat.text} »` : beat.text}
-              </p>
-            ))}
-            {!done && !reduced && (
-              <p className="stream__caret mono" aria-hidden="true">
-                ▊
-              </p>
-            )}
-            {done && (
-              <div className="stream__end">
-                <p className="stream__complete mono">
-                  {neuroscan.closing.complete}
-                </p>
-                {neuroscan.closing.lines.map((line) => (
-                  <p key={line} className="stream__beat stream__beat--line">
-                    {line}
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="scan__controls mono">
-            <span>
-              Pensamiento reconstruido:{" "}
-              {Math.round((shown / BEATS.length) * 100)}%
-            </span>
-            <span className="scan__controls-actions">
-              <button
-                type="button"
-                onClick={() => setPaused((value) => !value)}
-                disabled={done}
-              >
-                {paused ? neuroscan.controls.resume : neuroscan.controls.pause}
-              </button>
-              <button
-                type="button"
-                onClick={() => setFast((value) => !value)}
-                disabled={done}
-                aria-pressed={fast}
-              >
-                {neuroscan.controls.skip}
-              </button>
-              <button type="button" onClick={() => setRevealed(0)}>
-                {neuroscan.controls.restart}
-              </button>
-            </span>
-          </div>
-
-          <div className="panel-note">
-            <p className="panel-note__title mono">
-              {neuroscan.panels.phenomenology.title}
-            </p>
-            {neuroscan.panels.phenomenology.lines.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
-
-          <div className="panel-note panel-note--dataist">
-            <p className="panel-note__title mono">
-              {neuroscan.panels.dataist.title}
-            </p>
-            <dl className="dataist">
-              {neuroscan.panels.dataist.rows.map(([key, value]) => (
-                <div key={key}>
-                  <dt>{key}</dt>
-                  <dd className="mono">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-
         {/* ── Columna central: cerebro ───────────────────────────────── */}
         <section
           className="scan__col scan__col--brain"
@@ -537,6 +449,102 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
                 {neuroscan.terminal.send}
               </button>
             </form>
+          </div>
+        </section>
+
+        {/* ── Columna izquierda: flujo de pensamiento ────────────────── */}
+        <section
+          className="scan__col scan__col--stream"
+          aria-label="Flujo de pensamiento"
+        >
+          <p className="scan__warning">
+            {neuroscan.header.warning.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </p>
+
+          <div
+            ref={streamRef}
+            className="stream"
+            onClick={() =>
+              !done && setRevealed((value) => Math.min(BEATS.length, value + 1))
+            }
+          >
+            {visible.map((beat) => (
+              <p
+                key={beat.id}
+                className={`stream__beat stream__beat--${beat.kind}`}
+              >
+                {beat.kind === "aside" ? `« ${beat.text} »` : beat.text}
+              </p>
+            ))}
+            {!done && !reduced && (
+              <p className="stream__caret mono" aria-hidden="true">
+                ▊
+              </p>
+            )}
+            {done && (
+              <div className="stream__end">
+                <p className="stream__complete mono">
+                  {neuroscan.closing.complete}
+                </p>
+                {neuroscan.closing.lines.map((line) => (
+                  <p key={line} className="stream__beat stream__beat--line">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="scan__controls mono">
+            <span>
+              Pensamiento reconstruido:{" "}
+              {Math.round((shown / BEATS.length) * 100)}%
+            </span>
+            <span className="scan__controls-actions">
+              <button
+                type="button"
+                onClick={() => setPaused((value) => !value)}
+                disabled={done}
+              >
+                {paused ? neuroscan.controls.resume : neuroscan.controls.pause}
+              </button>
+              <button
+                type="button"
+                onClick={() => setFast((value) => !value)}
+                disabled={done}
+                aria-pressed={fast}
+              >
+                {neuroscan.controls.skip}
+              </button>
+              <button type="button" onClick={() => setRevealed(0)}>
+                {neuroscan.controls.restart}
+              </button>
+            </span>
+          </div>
+
+          <div className="panel-note">
+            <p className="panel-note__title mono">
+              {neuroscan.panels.phenomenology.title}
+            </p>
+            {neuroscan.panels.phenomenology.lines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+
+          <div className="panel-note panel-note--dataist">
+            <p className="panel-note__title mono">
+              {neuroscan.panels.dataist.title}
+            </p>
+            <dl className="dataist">
+              {neuroscan.panels.dataist.rows.map(([key, value]) => (
+                <div key={key}>
+                  <dt>{key}</dt>
+                  <dd className="mono">{value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 

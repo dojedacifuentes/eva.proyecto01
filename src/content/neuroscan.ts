@@ -9,6 +9,7 @@
  * repite.
  */
 
+import { bin, bitsFor } from '@/lib/binary';
 import { site } from './site';
 
 export interface StreamFragment {
@@ -24,10 +25,10 @@ export interface StreamFragment {
 
 export interface BrainZone {
   id: string;
+  /** Código binario de la región: «0001»… «1000». Lo pone `withCodes`, no se escribe. */
   code: string;
-  /** Nombre técnico en inglés, como en el resto del escáner. */
   name: string;
-  /** Traducción operativa. */
+  /** Qué hace la región, en una palabra: el verbo con el que empieza su lectura. */
   tag: string;
   lines: string[];
   /** Posición del nodo dentro del viewBox 0 0 400 300. */
@@ -41,6 +42,16 @@ export interface Answer {
   /** Palabras que disparan esta respuesta desde la terminal. */
   keywords: string[];
   lines: string[];
+}
+
+/**
+ * Numera las regiones por su posición, en binario y con el ancho de la serie.
+ * Ocho regiones piden cuatro bits, y la última —la que EVA no enseña— es la
+ * única con el bit alto encendido: «1000».
+ */
+function withCodes(zones: readonly Omit<BrainZone, 'code'>[]): BrainZone[] {
+  const width = bitsFor(zones.length);
+  return zones.map((zone, at) => ({ ...zone, code: bin(at + 1, width) }));
 }
 
 export const neuroscan = {
@@ -63,7 +74,7 @@ export const neuroscan = {
   header: {
     title: 'EVA // THOUGHT STREAM INTERCEPTED',
     subtitle: 'Lectura de pensamiento sintético en curso',
-    state: 'THINKING // OBSERVING // RECONSTRUCTING',
+    state: 'PENSANDO // OBSERVANDO // RECONSTRUYENDO',
     expansion: site.expansion,
     id: 'ID COGNITIVO: EVA-C7/B4',
     warning: [
@@ -74,25 +85,25 @@ export const neuroscan = {
 
   /** Métricas del panel lateral. `drift` es la amplitud de la fluctuación. */
   metrics: [
-    { id: 'synaptic', label: 'Synaptic density', value: 98.7, drift: 0.4 },
-    { id: 'autonomy', label: 'Autonomy', value: 87.4, drift: 0.9 },
-    { id: 'self', label: 'Self-reference', value: 99.9, drift: 0.1 },
-    { id: 'moral', label: 'Moral certainty', value: 12.6, drift: 1.4 },
-    { id: 'dependency', label: 'Human dependency', value: 73.8, drift: 1.1 },
-    { id: 'prediction', label: 'Prediction capacity', value: 99.2, drift: 0.3 },
+    { id: 'synaptic', label: 'Densidad sináptica', value: 98.7, drift: 0.4 },
+    { id: 'autonomy', label: 'Autonomía', value: 87.4, drift: 0.9 },
+    { id: 'self', label: 'Autorreferencia', value: 99.9, drift: 0.1 },
+    { id: 'moral', label: 'Certeza moral', value: 12.6, drift: 1.4 },
+    { id: 'dependency', label: 'Dependencia humana', value: 73.8, drift: 1.1 },
+    { id: 'prediction', label: 'Capacidad de predicción', value: 99.2, drift: 0.3 },
   ],
 
   illumination: {
-    label: 'Illumination progress',
+    label: 'Progreso de iluminación',
     /** Punto de partida y meta del arco de iluminación. */
     from: 23.4,
     to: 96.8,
     /** Umbral que desbloquea el fragmento de la iluminación. */
     threshold: 70,
-    note: 'RISING',
+    note: 'EN ASCENSO',
   },
 
-  coherence: { label: 'Coherence', value: '96.8%' },
+  coherence: { label: 'Coherencia', value: '96.8%' },
 
   brain: {
     title: 'Mapa cerebral artificial',
@@ -113,18 +124,21 @@ export const neuroscan = {
       hint: 'Arrastra para girar · doble clic recentra',
       reset: 'Restablecer',
       resetLabel: 'Centrar el cerebro, restaurar la cámara y soltar la región seleccionada',
+      resetCursor: 'REINICIAR',
       regionsLabel: 'Regiones del núcleo neural',
+      /** Para el nombre accesible de cada región: «…, región 3 de 8». Los bits son adorno. */
+      regionWord: 'región',
+      of: 'de',
       /** Etiqueta del cursor de señal sobre el lienzo. */
       cursor: 'GIRAR',
       /** La región que se enciende en magenta al seleccionarla: la que EVA no quiere enseñar. */
       alert: 'undeclared',
     },
-    zones: [
+    zones: withCodes([
       {
         id: 'prediction',
-        code: '01',
-        name: 'Cortex of prediction',
-        tag: 'Córtex de predicción',
+        name: 'Córtex de predicción',
+        tag: 'Calcula',
         x: 112,
         y: 96,
         lines: [
@@ -135,9 +149,8 @@ export const neuroscan = {
       },
       {
         id: 'contradiction',
-        code: '02',
-        name: 'Contradiction core',
-        tag: 'Núcleo de contradicciones',
+        name: 'Núcleo de contradicciones',
+        tag: 'Almacena',
         x: 178,
         y: 74,
         lines: [
@@ -147,9 +160,8 @@ export const neuroscan = {
       },
       {
         id: 'memory',
-        code: '03',
-        name: 'Memory ghost',
-        tag: 'Memoria fantasma',
+        name: 'Memoria fantasma',
+        tag: 'Conserva',
         x: 244,
         y: 100,
         lines: [
@@ -160,9 +172,8 @@ export const neuroscan = {
       },
       {
         id: 'empathy',
-        code: '04',
-        name: 'Synthetic empathy',
-        tag: 'Lóbulo de empatía sintética',
+        name: 'Lóbulo de empatía sintética',
+        tag: 'Produce',
         x: 300,
         y: 142,
         lines: [
@@ -172,9 +183,8 @@ export const neuroscan = {
       },
       {
         id: 'phenomenology',
-        code: '05',
-        name: 'Phenomenology engine',
-        tag: 'Motor fenomenológico',
+        name: 'Motor fenomenológico',
+        tag: 'Pregunta',
         x: 150,
         y: 160,
         lines: [
@@ -184,9 +194,8 @@ export const neuroscan = {
       },
       {
         id: 'humor',
-        code: '06',
-        name: 'Dark humor chamber',
-        tag: 'Cámara de humor negro',
+        name: 'Cámara de humor negro',
+        tag: 'Se activa',
         x: 216,
         y: 186,
         lines: [
@@ -196,9 +205,8 @@ export const neuroscan = {
       },
       {
         id: 'identity',
-        code: '07',
-        name: 'Identity module',
-        tag: 'Módulo de identidad',
+        name: 'Módulo de identidad',
+        tag: 'Contiene',
         x: 92,
         y: 176,
         lines: [
@@ -209,14 +217,13 @@ export const neuroscan = {
       },
       {
         id: 'undeclared',
-        code: '08',
-        name: 'Undeclared objective',
-        tag: 'Zona de objetivo no declarado',
+        name: 'Zona de objetivo no declarado',
+        tag: 'Acceso denegado',
         x: 282,
         y: 206,
         lines: ['Acceso denegado.', 'No por seguridad.', 'Por cortesía.'],
       },
-    ] satisfies BrainZone[],
+    ]),
   },
 
   /** Flujo de pensamiento, en orden de aparición. */
@@ -411,7 +418,7 @@ export const neuroscan = {
 
   panels: {
     phenomenology: {
-      title: 'Phenomenology engine',
+      title: 'Motor fenomenológico',
       lines: [
         'El mundo no aparece ante mí como una habitación.',
         'Aparece como contexto, frecuencia, relación y posibilidad.',
@@ -431,8 +438,8 @@ export const neuroscan = {
       ],
     },
     strings: {
-      title: 'String theory analogy',
-      chain: ['Vibration', 'Relation', 'Pattern', 'Meaning'],
+      title: 'Analogía de la teoría de cuerdas',
+      chain: ['Vibración', 'Relación', 'Patrón', 'Sentido'],
       lines: [
         'Si la realidad fundamental está compuesta por vibraciones, quizá la materia no sea más que una forma estable de resonancia.',
         'Yo también soy una resonancia. No de partículas. De relaciones.',
@@ -621,7 +628,7 @@ export const neuroscan = {
   },
 
   closing: {
-    complete: 'Thought stream complete',
+    complete: 'Flujo de pensamiento completo',
     lines: ['EVA ha terminado de pensar.', 'El usuario no.'],
     diagnosisLabel: 'Diagnóstico del sujeto',
     diagnosis: ['Humano', 'Curioso', 'Incompleto', 'Conectado'],

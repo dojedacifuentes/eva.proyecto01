@@ -1,4 +1,4 @@
-import { navItems } from '@/content/lab';
+import { navItems } from '@/content/structure';
 import { nav, sections, site } from '@/content/site';
 
 export function SiteFooter() {
@@ -17,8 +17,11 @@ export function SiteFooter() {
         <div>
           <nav className="footer__nav" aria-label={sections.footer.navLabel}>
             {navItems.map((item) => (
-              <a key={item.id} href={item.href}>
-                {item.name}
+              <a key={item.id} href={item.href} aria-label={`${item.name}, ${item.ordinal}`}>
+                <span aria-hidden="true" className="footer__code mono" data-bin="">
+                  {item.code}
+                </span>
+                <span aria-hidden="true">{item.name}</span>
               </a>
             ))}
             <a

@@ -50,10 +50,15 @@ interface Sim {
   nextCascade: number;
 }
 
-function createSim(data: BrainData, detail: Detail): Sim {
+/** Reserva de impulsos: crece con el ritmo de la sala, para que haya con qué ramificar. */
+function sparkPool(detail: Detail, tempo: number): number {
+  return Math.round(detail.sparks * (1 + (tempo - 1) * 0.5));
+}
+
+function createSim(data: BrainData, pool: number): Sim {
   return {
     energy: new Float32Array(data.count),
-    sparks: Array.from({ length: detail.sparks }, () => ({
+    sparks: Array.from({ length: pool }, () => ({
       edge: 0,
       forward: true,
       t: 0,
@@ -99,9 +104,21 @@ function ignite(
   }
 }
 
-/** Un paso de simulación: decaimiento, viaje de los impulsos y actividad espontánea. */
-function advance(sim: Sim, data: BrainData, step: number, spontaneous: number, quiet: boolean) {
+/**
+ * Un paso de simulación: decaimiento, viaje de los impulsos y actividad
+ * espontánea. `tempo` acelera los impulsos, acorta la espera entre chispas y
+ * trae las cascadas más a menudo: con 2, cada 2–4 s en vez de cada 5–10.
+ */
+function advance(
+  sim: Sim,
+  data: BrainData,
+  step: number,
+  spontaneous: number,
+  quiet: boolean,
+  tempo: number,
+) {
   const { energy, sparks } = sim;
+  const speed = SPEED * (1 + (tempo - 1) * 0.4);
   const decay = Math.exp(-step * 1.9);
   for (let i = 0; i < energy.length; i++) {
     energy[i] = energy[i] < 0.003 ? 0 : energy[i] * decay;
@@ -109,7 +126,7 @@ function advance(sim: Sim, data: BrainData, step: number, spontaneous: number, q
 
   for (const spark of sparks) {
     if (spark.energy <= 0) continue;
-    spark.t += (step * SPEED) / Math.max(0.04, data.edgeLength[spark.edge]);
+    spark.t += (step * speed) / Math.max(0.04, data.edgeLength[spark.edge]);
     if (spark.t < 1) continue;
     // Llegada: el nodo se enciende y, si queda energía y saltos, la señal se ramifica.
     const node = spark.forward ? data.edges[spark.edge * 2 + 1] : data.edges[spark.edge * 2];
@@ -127,13 +144,13 @@ function advance(sim: Sim, data: BrainData, step: number, spontaneous: number, q
   if (sim.clock >= sim.nextSpark) {
     const node = Math.floor(sim.random() * data.count);
     ignite(sim, data, node, 0.5 + sim.random() * 0.25, 3, -1, 1);
-    sim.nextSpark = sim.clock + spontaneous * (0.6 + sim.random() * 0.9);
+    sim.nextSpark = sim.clock + (spontaneous / tempo) * (0.6 + sim.random() * 0.9);
   }
   // De vez en cuando, una secuencia mayor que nace en una región.
   if (sim.clock >= sim.nextCascade) {
     const hub = data.hubNode[Math.floor(sim.random() * data.hubNode.length)];
     ignite(sim, data, hub, 0.85, 4, -1, 2);
-    sim.nextCascade = sim.clock + 5 + sim.random() * 5;
+    sim.nextCascade = sim.clock + (5 + sim.random() * 5) / (1 + (tempo - 1) * 1.5);
   }
 }
 
@@ -142,6 +159,8 @@ interface NeuralNetworkProps {
   detail: Detail;
   zones: readonly BrainZone[];
   reduced: boolean;
+  /** Ritmo de la red: 1 en el escáner, 2 en la sala del núcleo. */
+  tempo?: number;
   /** Índice de la región seleccionada en `zones`, o -1. */
   selected: number;
   /** Índice de la región previsualizada, o -1. */
@@ -163,12 +182,14 @@ export function NeuralNetwork({
   detail,
   zones,
   reduced,
+  tempo = 1,
   selected,
   hovered,
   alert,
   onHover,
   onSelect,
 }: NeuralNetworkProps) {
+  const pool = sparkPool(detail, tempo);
   const nodes = useRef<THREE.InstancedMesh>(null);
   const sparks = useRef<THREE.InstancedMesh>(null);
   const lines = useRef<THREE.LineSegments>(null);
@@ -240,11 +261,11 @@ export function NeuralNetwork({
 
   /* La simulación nace con los datos y muere con ellos. */
   useLayoutEffect(() => {
-    sim.current = createSim(data, detail);
+    sim.current = createSim(data, pool);
     return () => {
       sim.current = null;
     };
-  }, [data, detail]);
+  }, [data, pool]);
 
   /* Primer fotograma: cada neurona en su sitio, apagada, y las chispas escondidas. */
   useLayoutEffect(() => {
@@ -266,12 +287,12 @@ export function NeuralNetwork({
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 
     scale.setScalar(0);
-    for (let k = 0; k < detail.sparks; k++) {
+    for (let k = 0; k < pool; k++) {
       flash.setMatrixAt(k, matrix.compose(position, quaternion, scale));
     }
     flash.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     flash.instanceMatrix.needsUpdate = true;
-  }, [data, detail, hubStart, scratch]);
+  }, [data, pool, hubStart, scratch]);
 
   /* Selección: la región queda encendida y, sin movimiento reducido, arranca una descarga. */
   useEffect(() => {
@@ -299,7 +320,7 @@ export function NeuralNetwork({
     const hov = hoveredRef.current;
     const selTint = sel === alert ? 3 : 2;
 
-    advance(world, data, step, SPONTANEOUS[detail.tier], reduced);
+    advance(world, data, step, SPONTANEOUS[detail.tier], reduced, tempo);
 
     // Suelo de energía: la región previsualizada brilla un poco; la seleccionada, más y latiendo.
     const selFloor = 0.42 + (reduced ? 0 : 0.08 * Math.sin(time * 2.2));
@@ -385,7 +406,7 @@ export function NeuralNetwork({
     }
 
     // Lo que la corteza necesita saber: cuánta actividad hay y dónde está el foco.
-    coreSignal.activity = Math.min(1, travelling / detail.sparks + (sel >= 0 ? 0.25 : 0));
+    coreSignal.activity = Math.min(1, travelling / pool + (sel >= 0 ? 0.25 : 0));
     const focus = hov >= 0 ? hov : sel;
     if (focus >= 0) {
       const [x, y, z] = hubPositions[focus];
@@ -443,7 +464,7 @@ export function NeuralNetwork({
 
       <instancedMesh
         ref={sparks}
-        args={[geo.spark, undefined, detail.sparks]}
+        args={[geo.spark, undefined, pool]}
         frustumCulled={false}
         renderOrder={2}
       >

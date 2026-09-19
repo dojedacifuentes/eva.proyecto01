@@ -1,0 +1,1512 @@
+/*
+ * EVA // EJES — la página organizada por su acrónimo.
+ *
+ *   00 portada · 01 ENTIDAD (01.01 núcleo · 01.10 genoma · 01.11 reserva)
+ *   10 VIGILANCIA — clausurada · 11 AUTONOMÍA — en desarrollo
+ *
+ * Dirección visual, «expediente desbordado»: la página es el archivo con el que
+ * alguien intenta clasificar a EVA, y EVA es lo que se sale de las carpetas.
+ *
+ *   · Tejido — los protagonistas (cerebro, hélice, cinta del genoma, mallas de
+ *     las letras) no viven en cajas: se funden con el fondo por los bordes.
+ *   · Instrumento — rótulos, bits, sellos y navegación: monoespaciados,
+ *     pequeños, exactos. Nunca por debajo de 11 px.
+ *   · Síntoma — el glitch sólo en cambios de estado: mutación, sello, cambio de
+ *     lugar, conexión del canal.
+ *   · Un acento por eje: Entidad cian, Vigilancia magenta sobre violeta,
+ *     Autonomía violeta sobre magenta.
+ */
+
+/* ───────────── Acentos por eje ───────────── */
+
+[data-axis='vigilancia'] {
+  --accent: var(--eva-magenta);
+  --accent-2: var(--eva-violet);
+}
+[data-axis='autonomia'] {
+  --accent: var(--eva-violet);
+  --accent-2: var(--eva-magenta);
+}
+.node--reserva {
+  --accent: var(--eva-magenta);
+  --accent-2: var(--eva-violet);
+}
+
+/* El fondo acompaña: un velo del color del eje, muy tenue, que entra despacio. */
+.field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1600ms var(--eva-ease);
+  pointer-events: none;
+}
+html[data-axis='vigilancia'] .field::after {
+  opacity: 1;
+  background:
+    radial-gradient(60rem 38rem at 22% 40%, rgba(240, 122, 185, 0.1), transparent 70%),
+    radial-gradient(44rem 30rem at 88% 78%, rgba(154, 141, 255, 0.09), transparent 70%);
+}
+html[data-axis='autonomia'] .field::after {
+  opacity: 1;
+  background:
+    radial-gradient(60rem 38rem at 24% 42%, rgba(154, 141, 255, 0.12), transparent 70%),
+    radial-gradient(44rem 30rem at 86% 80%, rgba(240, 122, 185, 0.07), transparent 70%);
+}
+html[data-node='reserva'] .field::after {
+  opacity: 1;
+  background: radial-gradient(70rem 26rem at 50% 50%, rgba(200, 110, 232, 0.08), transparent 72%);
+}
+
+/* Todo código binario: cifras tabulares, para que los registros casen en columna. */
+[data-bin] {
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+}
+
+/* ───────────── Cabecera: los tres ejes ───────────── */
+
+.nav {
+  align-items: center;
+  gap: 0.15rem;
+}
+.nav__axis {
+  display: flex;
+  align-items: center;
+}
+.nav a {
+  gap: 0.5rem;
+  padding: 0 0.7rem;
+  white-space: nowrap;
+}
+.nav__code {
+  color: var(--accent);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+/*
+ * El estado de un eje que no se abre se marca en su código: recuadro
+ * discontinuo si está clausurado, subrayado de puntos si está en obras. El
+ * rótulo completo («CLAUSURADA», «EN DESARROLLO») no cabe en la cabecera junto
+ * a las subsecciones; va en el nombre accesible, en la portada, en el riel, en
+ * el menú móvil y en la propia sección.
+ */
+.nav a[data-state='sealed'] .nav__code {
+  padding: 0 0.2rem;
+  outline: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset: 1px;
+}
+.nav a[data-state='building'] .nav__code {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.nav a[data-state='sealed'],
+.nav a[data-state='building'],
+.nav a[data-state='reserved'] {
+  color: var(--eva-muted);
+}
+/*
+ * Presupuesto de ancho. La columna de la cabecera no pasa de 1.152 px, y con
+ * todo a la vista (estado del sistema, tres ejes, tres subsecciones con nombre
+ * y dos rótulos de estado) harían falta unos 1.700. Se queda lo que orienta:
+ * ejes con código, subsecciones con código y el nombre sólo de la actual. El
+ * «sistema activo» ya lo dicen la portada y el pie.
+ */
+.header .status {
+  display: none;
+}
+@media (max-width: 79.99rem) {
+  .header__contact {
+    display: none;
+  }
+}
+.nav a[data-state]:hover,
+.nav a[data-state]:focus-visible,
+.nav a[data-state][aria-current] {
+  color: var(--eva-text);
+}
+/* Las subsecciones sólo aparecen cuando el visitante está dentro de su eje. */
+.nav__sub {
+  display: none;
+  align-items: center;
+  margin-left: 0.1rem;
+  padding-left: 0.35rem;
+  border-left: 1px solid var(--eva-line-strong);
+}
+html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
+  display: flex;
+}
+.nav__sub a {
+  min-height: 36px;
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+}
+.nav__sub a::before {
+  display: none;
+}
+.nav__sub a[aria-current] .nav__code {
+  color: var(--eva-text);
+  opacity: 1;
+}
+.nav__sub a[aria-current] {
+  box-shadow: inset 0 -1px 0 var(--accent);
+}
+/* De las subsecciones, el código; el nombre sólo el de la actual, y sólo si hay sitio. */
+.nav__sub-name {
+  display: none;
+}
+@media (min-width: 80rem) {
+  .nav__sub a[aria-current] .nav__sub-name {
+    display: inline;
+  }
+}
+
+/* ───────────── Menú móvil: la jerarquía entera ───────────── */
+
+.mobile-menu__axis {
+  border-bottom: 1px solid var(--eva-line);
+}
+.mobile-menu__axis > a {
+  border-bottom: 0;
+}
+.mobile-menu a {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mobile-menu__state {
+  margin-left: auto;
+  padding: 0.15rem 0.45rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 2px;
+  font-size: var(--eva-type-micro);
+}
+.mobile-menu a[data-state='sealed'],
+.mobile-menu a[data-state='building'],
+.mobile-menu a[data-state='reserved'] {
+  color: var(--eva-soft);
+}
+.mobile-menu a.mobile-menu__sub {
+  min-height: 48px;
+  padding: 0.5rem 0 0.5rem 1.4rem;
+  border-bottom: 0;
+  border-left: 1px solid var(--eva-line-strong);
+  margin-left: 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+.mobile-menu__axis > .mobile-menu__sub:last-child {
+  margin-bottom: 0.9rem;
+}
+.mobile-menu a[aria-current] {
+  color: var(--accent);
+}
+
+/* ───────────── Riel de posición: el registro de bits ───────────── */
+
+/* Sólo con margen suficiente: por debajo de 1.280 px el riel pisaría el borde del contenido. */
+.rail {
+  display: none;
+}
+@media (min-width: 80rem) {
+  .rail {
+    position: fixed;
+    top: 50%;
+    left: max(0.55rem, env(safe-area-inset-left));
+    z-index: 45;
+    display: grid;
+    justify-items: start;
+    gap: 0.55rem;
+    translate: 0 -50%;
+  }
+}
+/* Cuatro celdas: dos bits de eje y dos de subsección. «01» es una luz; «11», dos. */
+.rail__register {
+  display: grid;
+  grid-template-columns: repeat(4, 7px);
+  gap: 3px;
+}
+.rail__register i {
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--eva-line-strong);
+  transition:
+    background var(--eva-normal) var(--eva-ease),
+    border-color var(--eva-normal) var(--eva-ease),
+    box-shadow var(--eva-normal) var(--eva-ease);
+}
+.rail__register i[data-gap] {
+  margin-left: 3px;
+}
+.rail__register i[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.rail__register i[data-void] {
+  border-style: dotted;
+  opacity: 0.4;
+}
+.rail__code {
+  color: var(--accent);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+}
+.rail__list {
+  display: grid;
+  gap: 0.1rem;
+  margin-top: 0.3rem;
+}
+.rail__list a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 28px;
+  min-height: 28px;
+}
+.rail__list a > i {
+  display: block;
+  width: 12px;
+  height: 1px;
+  background: var(--eva-line-strong);
+  transition:
+    width var(--eva-normal) var(--eva-ease),
+    background var(--eva-fast) linear;
+}
+.rail__list a[data-state='sealed'] > i,
+.rail__list a[data-state='building'] > i,
+.rail__list a[data-state='reserved'] > i {
+  background: repeating-linear-gradient(90deg, var(--eva-line-strong) 0 2px, transparent 2px 4px);
+}
+.rail__list a[aria-current] > i {
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+}
+.rail__list a:hover > i,
+.rail__list a:focus-visible > i {
+  width: 24px;
+  background: var(--eva-text);
+}
+/* El nombre sale al apuntar o enfocar: el riel no compite con el contenido. */
+.rail__name {
+  position: absolute;
+  left: 100%;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: 3px;
+  background: rgba(5, 12, 20, 0.94);
+  color: var(--eva-soft);
+  font-size: var(--eva-type-micro);
+  white-space: nowrap;
+  opacity: 0;
+  translate: -4px 0;
+  pointer-events: none;
+  transition:
+    opacity var(--eva-fast) linear,
+    translate var(--eva-fast) var(--eva-ease);
+}
+.rail__name b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.rail__list a:hover .rail__name,
+.rail__list a:focus-visible .rail__name {
+  opacity: 1;
+  translate: 0;
+}
+
+/* ───────────── Un lugar del recorrido ───────────── */
+
+.node__head {
+  display: grid;
+  gap: 0.8rem;
+}
+@media (min-width: 40rem) {
+  .node__head {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1.5rem;
+    align-items: end;
+  }
+}
+/* El código, grande y en contorno: se ve antes de leerse. El punto de la ruta
+   va más tenue para que «01.10» se lea como ruta y no como decimal. */
+.node__code {
+  font-size: clamp(2.4rem, 5.4vw, 4rem);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 72%, transparent);
+}
+.node__titles {
+  min-width: 0;
+}
+.node__state {
+  display: inline-block;
+  margin-left: 0.7rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 2px;
+  color: var(--accent);
+}
+.node__lede {
+  margin-top: 0.55rem;
+  max-width: 46rem;
+  color: var(--eva-soft);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.node__hint {
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+.node__note {
+  max-width: 40rem;
+  color: var(--eva-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.node .eyebrow {
+  font-size: var(--eva-type-micro);
+}
+.slide__foot {
+  font-size: var(--eva-type-micro);
+}
+.slide__foot b {
+  color: var(--accent);
+  font-weight: 600;
+}
+/* El pie nunca deja un enlace bajo el carril del canal de EVA. */
+.node .slide__foot,
+.hero .slide__foot {
+  padding-right: var(--eva-dock);
+}
+/* Y el final de la página tampoco: lo último siempre se puede desplazar fuera del carril. */
+.footer {
+  padding-bottom: calc(var(--eva-dock) + 1.5rem);
+}
+
+/* ───────────── 01.01 · Núcleo cerebral ───────────── */
+
+.node__aside {
+  display: grid;
+  gap: 0.6rem;
+  align-content: end;
+}
+.node__aside > p {
+  max-width: 34rem;
+  color: var(--eva-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.node__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+
+/*
+ * El cerebro ocupa media sala a todo el alto y no tiene marco: ni borde, ni
+ * fondo opaco, ni recorte. Dos esquinas de retícula flotan a su alrededor —la
+ * marca de quien intenta encuadrarlo— y el cerebro las cruza. Al otro lado, de
+ * arriba abajo: el título, la ventana que lo lee y la puerta al escáner.
+ *
+ * Presupuesto vertical a 1440×900: 848 px útiles bajo la cabecera; relleno
+ * 90 + escenario 612 + registro de regiones 48 + pie 48 = 798. La sala cabe.
+ */
+.core-room {
+  display: grid;
+  gap: 1rem;
+  grid-template-areas:
+    'head'
+    'stage'
+    'readout'
+    'aside';
+}
+.core-room__head {
+  grid-area: head;
+  min-width: 0;
+}
+.core-room__stage {
+  grid-area: stage;
+  position: relative;
+  min-width: 0;
+}
+.core-room .readout {
+  grid-area: readout;
+}
+.core-room__aside {
+  grid-area: aside;
+  min-width: 0;
+}
+@media (min-width: 64rem) {
+  .core-room {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'stage head'
+      'stage readout'
+      'stage aside';
+    column-gap: clamp(1.25rem, 2.4vw, 2.25rem);
+    row-gap: 1rem;
+  }
+  .core-room .node__head {
+    grid-template-columns: 1fr;
+    row-gap: 0.6rem;
+  }
+  .core-room .node__code {
+    font-size: clamp(2.2rem, 3.6vw, 3.2rem);
+  }
+  .core-room .h2 {
+    font-size: clamp(1.45rem, 2vw, 1.9rem);
+  }
+}
+.core-room__stage::before,
+.core-room__stage::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  border: 1px solid color-mix(in srgb, var(--eva-cyan) 70%, transparent);
+  pointer-events: none;
+}
+.core-room__stage::before {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.core-room__stage::after {
+  right: 0;
+  bottom: 3.4rem;
+  border-left: 0;
+  border-top: 0;
+}
+/* En la sala el escenario es cuadrado en móvil y alto en escritorio: la mitad del slide. */
+.core[data-variant='room'] .core__stage {
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+}
+@media (min-width: 64rem) {
+  .core[data-variant='room'] .core__stage {
+    aspect-ratio: auto;
+    height: clamp(24rem, 68vh, 44rem);
+  }
+}
+/* Las ocho regiones como un registro: sólo el código; el nombre sale en el HUD
+   al apuntar, enfocar o elegir, y lo lleva el nombre accesible del botón. */
+.core[data-variant='room'] .core__regions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.5rem 0 0;
+  border-top: 0;
+}
+.core[data-variant='room'] .core__chip {
+  min-width: 44px;
+  min-height: 40px;
+  justify-content: center;
+  padding: 0.2rem 0.5rem;
+}
+.core[data-variant='room'] .core__chip:not(.core__chip--reset) span {
+  display: none;
+}
+@media (pointer: coarse) {
+  .core[data-variant='room'] .core__chip {
+    min-height: 44px;
+  }
+}
+
+/* ── La ventana de lectura: terminal, texto que baja sin parar ── */
+
+/*
+ * Alto fijo en TODOS los anchos. En móvil la ventana no tenía alto: el cuerpo
+ * crecía con cada línea (387 → 2.058 px en diez segundos) y estiraba la
+ * sección entera mientras el visitante leía. Ahora recorta por dentro siempre.
+ */
+.readout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: clamp(13rem, 34svh, 18rem);
+  border: 1px solid var(--eva-line-strong);
+  border-radius: var(--eva-radius-lg);
+  background: rgba(3, 10, 18, 0.82);
+  overflow: hidden;
+  transition: opacity var(--eva-normal) var(--eva-ease);
+}
+@media (min-width: 64rem) {
+  .readout {
+    height: auto;
+    min-height: 9rem;
+    /* Ocupa lo que dejan el título y la puerta al escáner junto al cerebro, y
+       `contain: size` impide que sus líneas le den alto a esa fila. Sin él, la
+       ventana volvería a estirar la sala al llenarse. */
+    align-self: stretch;
+    contain: size;
+  }
+}
+/* EVA habla por su canal: la ventana baja la voz. Una sola cosa habla a la vez. */
+.core-room[data-hushed] .readout {
+  opacity: 0.32;
+}
+/* Líneas de barrido muy tenues: pantalla, no papel. */
+.readout::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 3px,
+    rgba(128, 217, 239, 0.035) 3px 4px
+  );
+  pointer-events: none;
+}
+.readout__bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--eva-line);
+  color: var(--eva-cyan);
+  font-size: var(--eva-type-micro);
+}
+.readout__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--eva-muted);
+}
+.readout__status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--eva-cyan);
+  box-shadow: 0 0 0 3px rgba(128, 217, 239, 0.16);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+.readout__body {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0.7rem 0.85rem 1rem;
+  overflow: hidden;
+  color: var(--eva-soft);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  /* Minúsculas y mayúsculas tal cual: σ no es Σ, y w no es W. */
+  text-transform: none;
+  /* Lo más viejo se desvanece por arriba; lo nuevo entra por abajo. */
+  mask-image: linear-gradient(180deg, transparent, #000 14%);
+}
+.readout__body p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.readout__body p[data-kind='meta'] {
+  color: var(--eva-cyan);
+}
+.readout__body p[data-kind='link'] {
+  color: var(--eva-text);
+}
+.readout__body p[data-kind='count'] {
+  color: var(--eva-blue);
+}
+.readout__body p[data-kind='thought'] {
+  color: #fff;
+  font-style: italic;
+}
+.readout__body p[data-kind='region'] {
+  color: var(--eva-violet);
+}
+.readout__body p[data-kind='binary'] {
+  color: rgba(128, 217, 239, 0.42);
+  letter-spacing: 0.1em;
+}
+/* El cursor de escritura, al final de la última línea mientras teclea. */
+.readout__body[data-typing='true'] p:last-child::after {
+  content: '▊';
+  margin-left: 0.15em;
+  color: var(--eva-cyan);
+  animation: blink 0.9s steps(1) infinite;
+}
+.readout__foot {
+  padding: 0.45rem 0.85rem;
+  border-top: 1px solid var(--eva-line);
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+}
+
+/* ───────────── 01.10 · Genoma digital ───────────── */
+
+.genome__label {
+  color: var(--eva-cyan);
+  font-size: var(--eva-type-micro);
+}
+/*
+ * El párrafo del nacimiento. Se pidió a 14 px; en contexto se queda corto: el
+ * cuerpo del sitio va a 15–15,7 px y esto es un párrafo narrativo sobre un
+ * fondo que se mueve. Va a 16 px (15 en móvil), interlineado 1,65 y una columna
+ * de unos 56 caracteres, en la tipografía de lectura —no en monoespaciada—,
+ * con un velo oscuro detrás, sin caja, que le garantiza contraste sobre las
+ * partículas.
+ */
+.genome__copy {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  max-width: 36rem;
+}
+.genome__copy::before {
+  content: '';
+  position: absolute;
+  inset: -1.5rem -2rem;
+  z-index: -1;
+  background: radial-gradient(ellipse at 40% 50%, rgba(3, 8, 14, 0.78), transparent 72%);
+  pointer-events: none;
+}
+.genome__birth {
+  color: var(--eva-text);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+@media (min-width: 48rem) {
+  .genome__birth {
+    font-size: var(--eva-type-body);
+  }
+}
+.genome__fiction {
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+/* Párrafo que se escribe: lo que falta es invisible pero ocupa su sitio. */
+.typed[data-armed] .typed__rest {
+  visibility: hidden;
+}
+.typed__caret {
+  display: inline-block;
+  width: 0;
+  overflow: visible;
+  color: var(--eva-cyan);
+  animation: blink 1s steps(1) infinite;
+}
+.typed:not([data-armed]) .typed__caret {
+  display: none;
+}
+.typed__skip {
+  margin-top: 0.5rem;
+  min-height: 32px;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--eva-line);
+  border-radius: 3px;
+  color: var(--eva-muted);
+  background: transparent;
+  font-size: var(--eva-type-micro);
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear;
+}
+.typed__skip:hover,
+.typed__skip:focus-visible {
+  border-color: var(--eva-cyan);
+  color: var(--eva-text);
+}
+
+/* ───────────── 01.11 · Reserva: el genoma a la vista ───────────── */
+
+/* Una banda, no un slide: presencia mínima, sin ajuste de scroll. */
+.node--reserva {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  padding-block: clamp(2.5rem, 7vh, 4.5rem);
+  border-block: 1px dashed color-mix(in srgb, var(--eva-violet) 30%, transparent);
+  scroll-margin-top: var(--eva-header);
+}
+.node--reserva .node__code {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+.node--reserva .h2 {
+  color: var(--eva-soft);
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  font-weight: 500;
+}
+.node--reserva .node__note {
+  margin-bottom: 0.5rem;
+}
+.strand {
+  position: relative;
+  margin: 0;
+}
+/* La cinta cruza la página a sangre y se deshace por los dos lados. */
+.strand__canvas {
+  display: block;
+  width: 100%;
+  height: clamp(11rem, 30vh, 17rem);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.strand__label {
+  position: absolute;
+  left: 50%;
+  bottom: -0.2rem;
+  translate: -50% 0;
+  color: color-mix(in srgb, var(--eva-magenta) 75%, var(--eva-muted));
+  font-size: var(--eva-type-micro);
+  white-space: nowrap;
+}
+
+/* ───────────── 10 · Vigilancia y 11 · Autonomía ───────────── */
+
+.axis {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+@media (min-width: 56rem) {
+  .axis {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+.axis__figure {
+  position: relative;
+  height: clamp(15rem, 42svh, 30rem);
+}
+@media (min-width: 56rem) {
+  .axis__figure {
+    height: clamp(20rem, 62vh, 36rem);
+  }
+}
+/* La letra, como malla, sin marco: se funde con el fondo por los cuatro lados. */
+.axis__mesh {
+  display: block;
+  width: 100%;
+  height: 100%;
+  mask-image: radial-gradient(ellipse closest-side at 50% 50%, #000 74%, transparent 100%);
+}
+.axis__copy {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+}
+.axis__copy .h2 {
+  font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+  letter-spacing: -0.02em;
+}
+.axis__line {
+  max-width: 34rem;
+  color: var(--eva-text);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+/* ── Vigilancia: la faja de clausura ── */
+
+/*
+ * Un precinto administrativo cruzando la «V». Es un rótulo, no un enlace ni un
+ * cargador: dice en qué estado está la sección y nada más. Entra con un
+ * estremecimiento breve —el síntoma del sello— y se queda quieta.
+ */
+.seal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.seal__tape {
+  display: flex;
+  gap: 1.75rem;
+  width: max-content;
+  padding: 0.55rem 0;
+  rotate: -9deg;
+  border-block: 1px solid color-mix(in srgb, var(--eva-magenta) 80%, transparent);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(240, 122, 185, 0.16) 0 10px,
+      rgba(154, 141, 255, 0.1) 10px 20px
+    ),
+    rgba(12, 4, 14, 0.82);
+  color: var(--eva-magenta);
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.22em;
+  white-space: nowrap;
+  box-shadow: 0 0 40px rgba(240, 122, 185, 0.16);
+  animation: seal-drift 46s linear infinite;
+}
+.seal__tape i {
+  color: var(--eva-violet);
+  font-style: normal;
+}
+@keyframes seal-drift {
+  to {
+    translate: -18% 0;
+  }
+}
+/* Al entrar en pantalla, el sello se estremece una vez. */
+.node--sealed .axis__figure {
+  animation: seal-hit 520ms steps(1, end) both;
+  animation-timeline: view();
+  animation-range: entry 40% entry 60%;
+}
+@keyframes seal-hit {
+  0%,
+  100% {
+    filter: none;
+    translate: 0;
+  }
+  20% {
+    filter: drop-shadow(5px 0 0 rgba(240, 122, 185, 0.6)) drop-shadow(-5px 0 0 rgba(154, 141, 255, 0.6));
+    translate: -4px 1px;
+  }
+  45% {
+    filter: drop-shadow(-4px 0 0 rgba(240, 122, 185, 0.5));
+    translate: 5px -1px;
+  }
+  70% {
+    translate: -2px 0;
+  }
+}
+
+/* ── Autonomía: andamio y registro vacío ── */
+
+/* Un andamio de líneas finas alrededor de la «A»: estructura puesta, obra a medias. */
+.scaffold {
+  position: absolute;
+  inset: 8% 14%;
+  pointer-events: none;
+  border: 1px dashed color-mix(in srgb, var(--eva-violet) 38%, transparent);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--eva-violet) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--eva-magenta) 12%, transparent) 1px, transparent 1px);
+  background-size: 100% 25%, 25% 100%;
+  mask-image: radial-gradient(ellipse at 50% 50%, transparent 38%, #000 100%);
+  animation: scaffold-breathe 7s ease-in-out infinite;
+}
+@keyframes scaffold-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+.slots {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.slots__label {
+  color: var(--accent);
+  font-size: var(--eva-type-micro);
+}
+.slots__list {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--eva-soft);
+  font-size: var(--eva-type-label);
+}
+.slots__list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.2rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 3px;
+}
+.slots__list b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.slots__next {
+  color: var(--eva-muted);
+}
+.slots__caret {
+  color: var(--accent-2);
+  font-style: normal;
+  animation: blink 1.1s steps(1) infinite;
+}
+
+/* ───────────── Portada: el acrónimo como tres puertas ───────────── */
+
+.acronym__words {
+  overflow: visible;
+}
+.acronym__row {
+  position: relative;
+  justify-content: space-between;
+  gap: clamp(0.6rem, 2vw, 1.5rem);
+  padding: 0 0.4rem 0 0;
+  border-bottom: 1px solid transparent;
+  color: var(--eva-text);
+  transition:
+    border-color var(--eva-normal) var(--eva-ease),
+    color var(--eva-fast) linear;
+}
+.acronym__row:hover,
+.acronym__row:focus-visible {
+  border-bottom-color: var(--accent);
+}
+.acronym__word {
+  font-size: clamp(1rem, 2.2vw, 1.75rem);
+  font-weight: 600;
+  transition: translate var(--eva-normal) var(--eva-ease);
+}
+.acronym__row:hover .acronym__word,
+.acronym__row:focus-visible .acronym__word {
+  translate: 0.4rem 0;
+}
+.acronym__meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.2rem;
+  font-size: var(--eva-type-micro);
+}
+.acronym__index {
+  margin-left: 0;
+  color: var(--accent);
+  font-size: var(--eva-type-label);
+  font-weight: 600;
+}
+.acronym__state {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 2px;
+  color: var(--accent);
+  font-style: normal;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.acronym__row[data-state='sealed'] .acronym__state,
+.acronym__row[data-state='building'] .acronym__state {
+  border-style: dashed;
+}
+.acronym__row[data-state='sealed'] .acronym__word,
+.acronym__row[data-state='building'] .acronym__word {
+  color: var(--eva-soft);
+}
+/* Sin el genoma en medio, el acrónimo crece: dos columnas, no tres. */
+.acronym {
+  grid-template-columns: clamp(6rem, 17vw, 15rem) minmax(0, 1fr);
+  min-height: clamp(15rem, 52vh, 30rem);
+}
+@media (min-width: 64rem) {
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+  .hero__portrait {
+    max-width: 19rem;
+  }
+}
+@media (max-width: 47.99rem) {
+  /* En móvil el retrato flota arriba a la derecha: las puertas dejan ese hueco libre. */
+  .acronym__row {
+    padding-right: 0;
+  }
+  .acronym__row:first-child {
+    padding-right: 5.6rem;
+  }
+  .acronym__index {
+    display: block;
+  }
+  .acronym__word {
+    font-size: 1.05rem;
+    white-space: normal;
+  }
+}
+
+/* ───────────── SINAPSIS // EVA — el canal flotante ───────────── */
+
+/*
+ * Cerrado es un botón de 48 px anclado abajo a la derecha, dentro de su
+ * carril (`--eva-dock`). Abierto, en escritorio es una tira de transcripción
+ * sobre la columna derecha; en móvil, una hoja inferior que deja a la vista la
+ * mitad de arriba —el protagonista— mientras EVA habla.
+ */
+.synapse {
+  position: fixed;
+  right: max(0.9rem, env(safe-area-inset-right));
+  bottom: max(0.9rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: grid;
+  justify-items: end;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+.synapse > * {
+  pointer-events: auto;
+}
+
+/* ── El botón: dos nodos y el hueco entre ellos ── */
+
+.synapse__button {
+  position: relative;
+  order: 2;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: 50%;
+  color: var(--eva-cyan);
+  background: rgba(5, 13, 22, 0.92);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    box-shadow var(--eva-normal) var(--eva-ease);
+}
+.synapse__button:hover,
+.synapse__button:focus-visible {
+  border-color: var(--eva-cyan);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(63, 216, 238, 0.12);
+}
+.synapse[data-open] .synapse__button {
+  border-color: var(--eva-cyan);
+}
+.synapse__glyph {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.synapse__glyph i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  transition: translate var(--eva-normal) var(--eva-ease);
+}
+/* La señal cruza el hueco: un punto que salta de un nodo al otro. */
+.synapse__glyph::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  width: 3px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: var(--eva-text);
+  opacity: 0;
+}
+.synapse[data-pending] .synapse__glyph::after,
+.synapse[data-open] .synapse__glyph::after {
+  animation: synapse-jump 1.5s ease-in-out infinite;
+}
+/* Abierto, los nodos se tocan: la sinapsis está transmitiendo. */
+.synapse[data-open] .synapse__glyph i:first-child {
+  translate: 2.5px 0;
+}
+.synapse[data-open] .synapse__glyph i:last-child {
+  translate: -2.5px 0;
+}
+@keyframes synapse-jump {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    translate: 7px 0;
+  }
+}
+/* El punto discreto: queda cuando el aviso ya se fue y el hilo sigue sin abrir. */
+.synapse__dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--eva-bg);
+  border-radius: 50%;
+  background: var(--eva-magenta);
+  scale: 0;
+  transition: scale var(--eva-normal) var(--eva-ease);
+}
+.synapse[data-pending]:not([data-open]) .synapse__dot {
+  scale: 1;
+}
+
+/* ── El aviso: una vez por lugar, y sin abrir nada ── */
+
+.synapse__toast {
+  position: absolute;
+  right: calc(100% + 0.6rem);
+  bottom: 50%;
+  display: grid;
+  gap: 0.1rem;
+  width: max-content;
+  max-width: min(17rem, calc(100vw - 6rem));
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: var(--eva-radius);
+  background: rgba(5, 13, 22, 0.95);
+  text-align: left;
+  translate: 8px 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--eva-normal) var(--eva-ease),
+    translate var(--eva-normal) var(--eva-ease);
+}
+.synapse__toast b {
+  color: var(--eva-text);
+  font-size: var(--eva-type-micro);
+  font-weight: 600;
+}
+.synapse__toast i {
+  color: var(--eva-muted);
+  font-size: 0.625rem;
+  font-style: normal;
+}
+.synapse[data-toast]:not([data-open]) .synapse__toast {
+  opacity: 1;
+  translate: 0 50%;
+}
+
+/* ── El panel: una tira de transcripción ── */
+
+/*
+ * Abierto en escritorio, el contenido se aparta: `main` y el pie ceden a la
+ * derecha el ancho del panel. Así el canal no tapa nunca el registro del
+ * cerebro ni las acciones del genoma. Las escenas se reencuadran solas: el
+ * cerebro recalcula su escala y la hélice, su lienzo.
+ */
+@media (min-width: 64rem) {
+  html[data-channel='open'] main,
+  html[data-channel='open'] .footer {
+    padding-right: calc(var(--eva-channel-w) + 1.5rem);
+  }
+}
+
+.synapse__panel {
+  order: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--eva-channel-w), calc(100vw - 1.8rem));
+  height: min(30rem, calc(100svh - var(--eva-header) - 6rem));
+  border: 1px solid var(--eva-line-strong);
+  border-radius: var(--eva-radius-lg);
+  background: rgba(4, 11, 19, 0.96);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  transform-origin: 100% 100%;
+  transition:
+    opacity 160ms var(--eva-ease),
+    scale 160ms var(--eva-ease),
+    visibility 0s linear 160ms;
+}
+/* Plegado: fuera de la vista y del foco, pero con su desplazamiento intacto. */
+.synapse:not([data-open]) .synapse__panel {
+  position: absolute;
+  right: 0;
+  bottom: 3.6rem;
+  opacity: 0;
+  scale: 0.96;
+  visibility: hidden;
+  pointer-events: none;
+}
+.synapse[data-open] .synapse__panel {
+  transition:
+    opacity 200ms var(--eva-ease),
+    scale 200ms var(--eva-ease),
+    visibility 0s;
+  animation: synapse-link 240ms steps(1, end);
+}
+.synapse__panel:focus-visible {
+  outline-offset: -3px;
+}
+/* El síntoma de la conexión: un desgarro cromático de un cuarto de segundo. */
+@keyframes synapse-link {
+  0% {
+    filter: drop-shadow(4px 0 0 rgba(240, 122, 185, 0.6)) drop-shadow(-4px 0 0 rgba(63, 216, 238, 0.6));
+  }
+  50% {
+    filter: drop-shadow(-2px 0 0 rgba(154, 141, 255, 0.6));
+  }
+  100% {
+    filter: none;
+  }
+}
+.synapse__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.55rem 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--eva-line);
+  font-size: var(--eva-type-micro);
+}
+.synapse__name {
+  color: var(--eva-cyan);
+  white-space: nowrap;
+}
+.synapse__name i {
+  color: var(--eva-line-strong);
+  font-style: normal;
+}
+.synapse__place {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  color: var(--eva-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.synapse__place b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.synapse__close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: -0.35rem -0.2rem -0.35rem 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--eva-soft);
+  background: transparent;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--eva-fast) linear;
+}
+.synapse__close:hover,
+.synapse__close:focus-visible {
+  color: var(--eva-cyan);
+}
+.synapse__log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 0.85rem 1.2rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--eva-line-strong) transparent;
+  /* Lo de arriba se apaga; lo nuevo entra por abajo. */
+  mask-image: linear-gradient(180deg, transparent, #000 1.4rem);
+}
+/* El primer mensaje no queda pegado al techo: el hilo crece desde abajo. */
+.synapse__log > :first-child {
+  margin-top: auto;
+}
+.synapse__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  font-size: 0.625rem;
+}
+.synapse__divider::before,
+.synapse__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--eva-line-strong);
+}
+.synapse__line {
+  display: flex;
+  gap: 0.55rem;
+  color: var(--eva-soft);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.synapse__line[data-kind='explain'] {
+  color: var(--eva-text);
+}
+.synapse__line[data-kind='calc'] {
+  color: color-mix(in srgb, var(--eva-cyan) 70%, var(--eva-muted));
+  font-family: var(--font-jetbrains), monospace;
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.02em;
+}
+.synapse__line[data-cut] {
+  color: var(--eva-muted);
+  font-style: italic;
+}
+.synapse__line[data-current] {
+  color: var(--eva-text);
+  cursor: pointer;
+}
+.synapse__prompt {
+  flex: none;
+  color: var(--eva-cyan);
+  font-family: var(--font-jetbrains), monospace;
+}
+.synapse__text {
+  min-width: 0;
+}
+/* Lo que falta por escribir es invisible pero ocupa su sitio: la línea tiene
+   su alto final desde el principio y nada salta mientras se teclea. */
+.synapse__rest {
+  visibility: hidden;
+}
+.synapse__caret {
+  display: inline-block;
+  width: 0;
+  overflow: visible;
+  color: var(--eva-cyan);
+  animation: blink 1s steps(1) infinite;
+}
+.synapse__resume {
+  position: absolute;
+  left: 50%;
+  bottom: 2.6rem;
+  translate: -50% 0;
+  min-height: 36px;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--eva-cyan);
+  border-radius: 999px;
+  color: var(--eva-text);
+  background: rgba(5, 13, 22, 0.96);
+  font-size: var(--eva-type-micro);
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+.synapse__resume i {
+  color: var(--eva-cyan);
+  font-style: normal;
+}
+.synapse__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  border-top: 1px solid var(--eva-line);
+  color: var(--eva-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+}
+.synapse__foot span:last-child {
+  text-align: right;
+  text-transform: none;
+}
+
+/* Móvil: hoja inferior. Arriba queda a la vista el protagonista de la sección. */
+@media (max-width: 47.99rem) {
+  .synapse[data-open] {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    justify-items: stretch;
+    gap: 0;
+  }
+  .synapse[data-open] .synapse__panel {
+    width: auto;
+    height: min(62svh, 34rem);
+    border-radius: var(--eva-radius-lg) var(--eva-radius-lg) 0 0;
+    border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform-origin: 50% 100%;
+  }
+  /* Abierto, el cierre vive en la cabecera de la hoja: el botón flotante se retira. */
+  .synapse[data-open] .synapse__button {
+    display: none;
+  }
+  .synapse__foot span:last-child {
+    display: none;
+  }
+}
+
+/* ───────────── Pantallas bajas: cada slide sigue cabiendo ───────────── */
+
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .section {
+    padding-block: 1.25rem;
+  }
+  .node__code {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+  }
+  .node .h2 {
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  }
+  .node__lede,
+  .node__aside > p {
+    font-size: 0.85rem;
+  }
+  .core[data-variant='room'] .core__stage {
+    height: clamp(19rem, 58vh, 30rem);
+  }
+  .core-room .node__code {
+    font-size: 2rem;
+  }
+  .dna__stage {
+    height: clamp(20rem, 70vh, 34rem);
+    margin-block: -1.5rem;
+  }
+  .genome__birth {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .dna__hud {
+    grid-template-columns: repeat(2, auto);
+    justify-content: start;
+    column-gap: 1rem;
+  }
+  .dna__reply {
+    min-height: 3.4rem;
+    font-size: 0.82rem;
+  }
+  .axis__figure {
+    height: clamp(16rem, 58vh, 26rem);
+  }
+}
+
+/* ───────────── Movimiento reducido ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .field::after,
+  .synapse__panel,
+  .synapse[data-open] .synapse__panel,
+  .synapse__toast,
+  .rail__register i {
+    transition: none;
+    animation: none;
+  }
+  .synapse__glyph::after,
+  .synapse__caret,
+  .typed__caret,
+  .slots__caret,
+  .seal__tape,
+  .scaffold,
+  .node--sealed .axis__figure,
+  .core__wait,
+  .readout__status i,
+  .readout__body[data-typing='true'] p:last-child::after {
+    animation: none;
+  }
+  .synapse[data-pending] .synapse__glyph::after {
+    opacity: 1;
+  }
+  .core__canvas {
+    transition: none;
+  }
+}

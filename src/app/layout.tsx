@@ -5,10 +5,12 @@ import './interface.css';
 import './neuroscan.css';
 import './dna.css';
 import './lab.css';
+import './ejes.css';
 import { EvaField } from '@/components/eva/EvaField';
-import { EvaThoughtStream } from '@/components/eva/EvaThoughtStream';
+import { EvaSynapse } from '@/components/eva/EvaSynapse';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';
 import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
+import { BitRail } from '@/components/layout/BitRail';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { flags, nav, site } from '@/content/site';
@@ -79,9 +81,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {flags.signalCursor && <EvaSignalCursor />}
 
         <SiteHeader />
+        <BitRail />
         <main id="contenido">{children}</main>
         <SiteFooter />
-        <EvaThoughtStream />
+        {/* El canal de EVA acompaña toda la página, cerrado hasta que el visitante lo abre. */}
+        <EvaSynapse />
         <ScrollReveal />
       </body>
     </html>

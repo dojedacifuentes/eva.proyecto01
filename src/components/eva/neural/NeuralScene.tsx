@@ -9,16 +9,15 @@ import type { BrainZone } from '@/content/neuroscan';
 import { BrainShell } from './BrainShell';
 import { NeuralNetwork } from './NeuralNetwork';
 import { buildBrain, type BrainData, type Detail } from './neural-data';
+import { BRAIN_CENTER_Y, FOV, fitScale, ringRadii, HOME as HOME_AT } from './neural-frame';
 import { coreSignal, resetCoreSignal } from './neural-signal';
 
 const CYAN = '#3fd8ee';
 const VIOLET = '#9a8dff';
 const WHITE = '#dff4ff';
 
-/** Escala del cerebro en la escena: las unidades de cerebro miden ~2 de largo. */
-const SCALE = 1.5;
-/** Posición inicial de la cámara: tres cuartos, un poco por encima. */
-const HOME = new THREE.Vector3(2.9, 1.8, 4.7);
+/** Posición inicial de la cámara: tres cuartos, un poco por encima. El encuadre vive en `neural-frame`. */
+const HOME = new THREE.Vector3(...HOME_AT);
 const ORIGIN = new THREE.Vector3(0, 0, 0);
 /** Giro automático en reposo, en radianes por segundo: una vuelta cada ~50 s. */
 const SPIN = 0.125;
@@ -54,23 +53,46 @@ function haloTexture() {
   return texture;
 }
 
-/** Dos anillos finos que giran alrededor del cerebro y un halo detrás. */
-function Chamber({ reduced }: { reduced: boolean }) {
+interface ChamberProps {
+  reduced: boolean;
+  /** Escala de encuadre del cerebro. */
+  scale: number;
+  /** Proporción del lienzo: los anillos no pasan del medio ancho visible. */
+  aspect: number;
+}
+
+/**
+ * Dos órbitas finas alrededor del cerebro y un halo detrás. Las órbitas son
+ * toros de radio 1 que se escalan al marco; el halo se coloca en cada
+ * fotograma al otro lado del cerebro respecto de la cámara, así sigue detrás
+ * cuando el visitante lo gira.
+ */
+function Chamber({ reduced, scale, aspect }: ChamberProps) {
   const outer = useRef<THREE.Mesh>(null);
   const inner = useRef<THREE.Mesh>(null);
+  const glow = useRef<THREE.Sprite>(null);
   const halo = useMemo(() => haloTexture(), []);
   useEffect(() => () => halo.dispose(), [halo]);
 
-  useFrame((_, delta) => {
+  const { inner: innerRadius, outer: outerRadius } = ringRadii(scale, aspect);
+  const sweep = innerRadius / 1.07;
+
+  useFrame((state, delta) => {
+    const sprite = glow.current;
+    if (sprite) {
+      sprite.position.copy(state.camera.position).normalize().multiplyScalar(-1.6);
+      sprite.position.y -= 0.1;
+    }
     if (reduced) return;
     const step = Math.min(delta, 0.05);
-    if (outer.current) outer.current.rotation.z += step * 0.06;
-    if (inner.current) inner.current.rotation.y += step * 0.09;
+    // Precesión lenta: girar un toro sobre su propio eje no se vería.
+    if (outer.current) outer.current.rotation.y += step * 0.05;
+    if (inner.current) inner.current.rotation.y -= step * 0.08;
   });
 
   return (
     <group>
-      <sprite scale={[6, 6, 1]} position={[0, -0.1, -1.6]}>
+      <sprite ref={glow} scale={[sweep * 3.8, sweep * 3.8, 1]} position={[0, -0.1, -1.6]}>
         <spriteMaterial
           map={halo}
           transparent
@@ -80,8 +102,8 @@ function Chamber({ reduced }: { reduced: boolean }) {
           toneMapped={false}
         />
       </sprite>
-      <mesh ref={outer} rotation={[Math.PI / 2 + 0.22, 0, 0]}>
-        <torusGeometry args={[2.85, 0.006, 6, 160]} />
+      <mesh ref={outer} rotation={[Math.PI / 2 + 0.22, 0, 0]} scale={outerRadius}>
+        <torusGeometry args={[1, 0.0022, 6, 160]} />
         <meshBasicMaterial
           color={CYAN}
           transparent
@@ -91,12 +113,12 @@ function Chamber({ reduced }: { reduced: boolean }) {
           toneMapped={false}
         />
       </mesh>
-      <mesh ref={inner} rotation={[0.35, 0, 0.55]}>
-        <torusGeometry args={[3.2, 0.004, 6, 160]} />
+      <mesh ref={inner} rotation={[Math.PI / 2 - 0.3, 0.5, 0]} scale={innerRadius}>
+        <torusGeometry args={[1, 0.0018, 6, 160]} />
         <meshBasicMaterial
           color={VIOLET}
           transparent
-          opacity={0.16}
+          opacity={0.18}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
           toneMapped={false}
@@ -113,12 +135,15 @@ interface StageProps {
   detail: Detail;
   zones: readonly BrainZone[];
   reduced: boolean;
+  tempo: number;
+  zoom: boolean;
   selected: number;
   hovered: number;
   alert: number;
   reset: number;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
+  onFit?: (scale: number) => void;
 }
 
 /**
@@ -132,20 +157,34 @@ function Stage({
   detail,
   zones,
   reduced,
+  tempo,
+  zoom,
   selected,
   hovered,
   alert,
   reset,
   onHover,
   onSelect,
+  onFit,
 }: StageProps) {
   const brain = useRef<THREE.Group>(null);
   const controls = useRef<Controls>(null);
   const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
   const spin = useRef(SPIN);
   /** Ángulo objetivo del cerebro mientras se enfoca una región; null en reposo. */
   const yaw = useRef<number | null>(null);
   const resetting = useRef(false);
+
+  const aspect = size.width / Math.max(1, size.height);
+  const fit = fitScale(aspect);
+  const rest = SPIN * (1 + (tempo - 1) * 0.6);
+  const lift = -BRAIN_CENTER_Y * fit;
+
+  /* El encuadre se publica hacia la capa HTML: sirve para verificarlo desde fuera. */
+  useEffect(() => {
+    onFit?.(fit);
+  }, [fit, onFit]);
 
   /* Al seleccionar, el cerebro gira hasta poner la región de cara a la cámara. */
   useEffect(() => {
@@ -175,7 +214,7 @@ function Stage({
     }
 
     // Giro automático: se frena sobre una región y se para al arrastrar o con movimiento reducido.
-    const target = reduced || coreSignal.dragging ? 0 : coreSignal.hovering ? SPIN * 0.15 : SPIN;
+    const target = reduced || coreSignal.dragging ? 0 : coreSignal.hovering ? rest * 0.15 : rest;
     spin.current += (target - spin.current) * Math.min(1, step * 3);
 
     if (yaw.current !== null) {
@@ -189,8 +228,8 @@ function Stage({
 
     // Respiración: flota, se hincha apenas y cabecea muy despacio.
     if (!reduced) {
-      group.position.y = Math.sin(time * 0.5) * 0.05;
-      group.scale.setScalar(SCALE * (1 + Math.sin(time * 0.9) * 0.006));
+      group.position.y = lift + Math.sin(time * 0.5) * 0.05;
+      group.scale.setScalar(fit * (1 + Math.sin(time * 0.9) * 0.006));
       group.rotation.x = Math.sin(time * 0.31) * 0.03;
     }
 
@@ -206,13 +245,15 @@ function Stage({
 
   return (
     <>
-      <group ref={brain} scale={SCALE}>
-        <BrainShell detail={detail} reduced={reduced} />
+      <Chamber reduced={reduced} scale={fit} aspect={aspect} />
+      <group ref={brain} scale={fit} position={[0, lift, 0]}>
+        <BrainShell detail={detail} reduced={reduced} tempo={tempo} />
         <NeuralNetwork
           data={data}
           detail={detail}
           zones={zones}
           reduced={reduced}
+          tempo={tempo}
           selected={selected}
           hovered={hovered}
           alert={alert}
@@ -226,6 +267,7 @@ function Stage({
         enableDamping
         dampingFactor={0.08}
         enablePan={false}
+        enableZoom={zoom}
         minDistance={3.8}
         maxDistance={8.2}
         minPolarAngle={0.45}
@@ -251,8 +293,20 @@ export interface NeuralSceneProps {
   detail: Detail;
   zones: readonly BrainZone[];
   reduced: boolean;
-  /** `false` congela el bucle: fuera de pantalla o tapado por el escáner, no se dibuja nada. */
+  /** `false` deja el bucle a demanda: fuera de pantalla o tapado, no se anima nada. */
   active: boolean;
+  /**
+   * Cuánta vida tiene la red: 1 es el ritmo del escáner; 2, la sala del núcleo,
+   * con impulsos, cascadas, giro y barrido más rápidos. Movimiento reducido lo
+   * apaga todo igualmente.
+   */
+  tempo?: number;
+  /**
+   * Zoom con rueda y pellizco. En la página secuestra el desplazamiento —la
+   * rueda sobre el lienzo acerca el cerebro en vez de mover la página—, así
+   * que sólo se enciende donde la página no se desplaza: dentro del escáner.
+   */
+  zoom?: boolean;
   /** Identificador de la región seleccionada, o null. */
   selected: string | null;
   /** Identificador de la región previsualizada desde la capa HTML, o null. */
@@ -264,6 +318,8 @@ export interface NeuralSceneProps {
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
   onReady: (stats: { neurons: number; synapses: number }) => void;
+  /** Escala de encuadre vigente; cambia al redimensionar el lienzo. */
+  onFit?: (scale: number) => void;
 }
 
 export default function NeuralScene({
@@ -271,6 +327,8 @@ export default function NeuralScene({
   zones,
   reduced,
   active,
+  tempo = 1,
+  zoom = true,
   selected,
   hovered,
   alert,
@@ -278,6 +336,7 @@ export default function NeuralScene({
   onHover,
   onSelect,
   onReady,
+  onFit,
 }: NeuralSceneProps) {
   const data = useMemo(() => buildBrain(detail, zones), [detail, zones]);
   const selectedIndex = selected ? zones.findIndex((zone) => zone.id === selected) : -1;
@@ -292,8 +351,11 @@ export default function NeuralScene({
   return (
     <Canvas
       dpr={detail.dpr}
-      frameloop={active ? 'always' : 'never'}
-      camera={{ position: HOME.toArray(), fov: 34, near: 0.1, far: 60 }}
+      /* A demanda y no `never`: inactiva no se anima, pero sí pinta su primer
+         fotograma y se repinta al redimensionar. Con `never` el lienzo se
+         quedaba en blanco hasta que la sala entraba en pantalla. */
+      frameloop={active ? 'always' : 'demand'}
+      camera={{ position: HOME.toArray(), fov: FOV, near: 0.1, far: 60 }}
       gl={{
         antialias: detail.bloom === 0,
         alpha: true,
@@ -310,18 +372,20 @@ export default function NeuralScene({
       <pointLight position={[-4, -1.5, -3.5]} intensity={28} color={VIOLET} />
       <directionalLight position={[-2, 4, 1]} intensity={0.5} color={WHITE} />
 
-      <Chamber reduced={reduced} />
       <Stage
         data={data}
         detail={detail}
         zones={zones}
         reduced={reduced}
+        tempo={tempo}
+        zoom={zoom}
         selected={selectedIndex}
         hovered={hoveredIndex}
         alert={alertIndex}
         reset={reset}
         onHover={onHover}
         onSelect={onSelect}
+        onFit={onFit}
       />
 
       {detail.bloom > 0 && (

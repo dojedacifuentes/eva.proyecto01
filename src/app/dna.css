@@ -1,57 +1,105 @@
 /*
- * EVA // DIGITAL GENOME
+ * EVA // DIGITAL GENOME — subsección 01.10
  *
- * La columna central de la portada: la hélice y sus cuatro acciones. Ya no se
- * posiciona en absoluto sobre un hueco — es una columna de la rejilla, así que
- * no puede tapar nada ni robarle los clics a nadie.
+ * La hélice es la columna del slide: ocupa todo el alto, sangra por arriba y
+ * por abajo y no vive en una caja. A su lado, la lectura (título, párrafo del
+ * nacimiento) y la consola con las siete acciones. En móvil la escena existe
+ * igual —antes no se montaba por debajo de 768 px— y las acciones son botones
+ * de 44 px.
  *
- * El genoma y el retrato son el mismo sistema visto dos veces: EvaDnaHelix
- * publica su estado en `.hero__grid[data-genome]` y el retrato reacciona desde
- * aquí, sin pasar props entre hermanos.
+ * El estado del genoma ya no se publica en la portada sino en `<html
+ * data-genome>` (`lib/genome-state`): cualquier pieza puede reaccionar desde
+ * CSS sin pasar props entre hermanos.
  */
 
 .dna {
   display: grid;
-  align-content: center;
-  gap: 0.4rem;
+  gap: 1rem;
   min-width: 0;
-  animation: dna-in 1.4s var(--eva-ease) 0.35s both;
+  grid-template-areas:
+    'head'
+    'stage'
+    'console'
+    'copy';
+}
+.dna__head {
+  grid-area: head;
+}
+.dna__copy {
+  grid-area: copy;
+  min-width: 0;
+}
+.dna__console {
+  grid-area: console;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  min-width: 0;
+}
+
+/* Escritorio: la hélice a un lado, a todo el alto; la lectura y la consola al otro. */
+@media (min-width: 64rem) {
+  .dna {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'stage head'
+      'stage copy'
+      'stage console';
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    row-gap: 1.1rem;
+    align-items: start;
+  }
 }
 
 .dna__stage {
+  grid-area: stage;
   position: relative;
-  height: clamp(13rem, 33vh, 21rem);
-}
-/* Sólo el escenario recoge el puntero, y sólo donde hay hélice que girar.
-   pan-y deja pasar el desplazamiento vertical de la página. */
-.dna__stage[data-grab] {
+  height: clamp(20rem, 46svh, 26rem);
+  min-width: 0;
+  /* Sólo el escenario recoge el puntero. pan-y deja pasar el desplazamiento
+     vertical de la página: arrastrar en horizontal gira, en vertical desplaza. */
   pointer-events: auto;
   touch-action: pan-y;
   cursor: grab;
 }
-.dna__stage[data-grab]:active {
+.dna__stage:active {
   cursor: grabbing;
 }
+@media (min-width: 64rem) {
+  .dna__stage {
+    align-self: stretch;
+    height: clamp(26rem, 74vh, 46rem);
+    /* Sangra fuera de su columna: la hélice no termina donde termina la rejilla. */
+    margin-block: -2.5rem;
+  }
+}
 /*
- * Sin halo ni recuadro: la hélice se desvanece por los bordes con una máscara
- * radial, así nace del panel en vez de parecer una lámina pegada encima.
+ * Sin halo ni recuadro. La máscara anterior era un radial con radios del 82 % y
+ * el 86 % del ANCHO y el ALTO completos —no del medio—, así que en el borde
+ * seguía opaca al 81 % y el rectángulo del lienzo se veía, sobre todo con la
+ * neblina del bloom. Ahora son dos degradados lineales cruzados: los cuatro
+ * bordes llegan a transparente del todo, y la hélice puede salirse por arriba
+ * y por abajo sin corte.
  */
 .dna__stage canvas {
   display: block;
   position: relative;
-  opacity: 0.96;
-  mask-image: radial-gradient(ellipse 82% 86% at 50% 50%, #000 52%, transparent 100%);
+  mask-image:
+    linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent),
+    linear-gradient(180deg, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
 }
 
 /* ───────────── Lectura del escáner ───────────── */
 
 .dna__hud {
   display: grid;
-  gap: 0.1rem;
-  text-align: center;
+  gap: 0.15rem;
   color: var(--eva-muted);
-  font-size: 0.48rem;
-  letter-spacing: 0.15em;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.12em;
   line-height: 1.6;
 }
 .dna__hud-title {
@@ -60,12 +108,11 @@
 .dna__hud-core {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 .dna__hud-core i {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--eva-cyan);
   box-shadow: 0 0 6px rgba(128, 217, 239, 0.7);
@@ -73,6 +120,10 @@
 }
 .dna__hud-count {
   color: var(--eva-soft);
+}
+.dna__hud-count b {
+  color: var(--eva-text);
+  font-weight: 600;
 }
 
 /* El estado tiñe la lectura. */
@@ -110,20 +161,22 @@
 
 /* ───────────── Acciones ───────────── */
 
+/* Botones de verdad: 12 px de letra y 40 px de alto (44 en táctil). Antes
+   medían 24 px con letra de 6,7 px, y en móvil ni existían. */
 .dna__actions {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.25rem;
+  gap: 0.4rem;
 }
 .dna__btn {
-  min-height: 24px;
-  padding: 0.2rem 0.25rem;
-  border: 1px solid var(--eva-line);
-  border-radius: 2px;
+  min-height: 40px;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: 3px;
   color: var(--eva-soft);
-  background: rgba(7, 19, 31, 0.55);
-  font-size: 0.42rem;
-  letter-spacing: 0.08em;
+  background: rgba(7, 19, 31, 0.6);
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
   transition:
@@ -140,9 +193,6 @@
 .dna__btn:active {
   translate: 0 1px;
 }
-.dna__btn--wide {
-  grid-column: 1 / -1;
-}
 .dna__btn--ghost {
   color: var(--eva-muted);
   border-style: dashed;
@@ -152,6 +202,16 @@
   color: var(--eva-magenta);
   border-color: var(--eva-magenta);
 }
+@media (pointer: coarse) {
+  .dna__btn {
+    min-height: 44px;
+  }
+}
+@media (max-width: 30rem) {
+  .dna__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 /* ───────────── Respuesta de EVA ───────────── */
 
@@ -159,12 +219,12 @@
   display: grid;
   gap: 0.1rem;
   /* Alto reservado: la respuesta cambia sin mover los botones. */
-  min-height: 2.5rem;
-  padding-left: 0.6rem;
+  min-height: 3.9rem;
+  padding-left: 0.7rem;
   border-left: 1px solid var(--eva-line-strong);
   color: var(--eva-soft);
-  font-size: 0.66rem;
-  line-height: 1.4;
+  font-size: 0.875rem;
+  line-height: 1.45;
   text-wrap: pretty;
 }
 .dna__reply span {
@@ -177,53 +237,34 @@
   animation-delay: 240ms;
 }
 
-/* ───────────── EVA reacciona al genoma ───────────── */
+/* ───────────── La página reacciona al genoma ───────────── */
 
-/* Clonar: el retrato se desdobla en dos fantasmas de color. */
-.hero__grid[data-genome='cloning'] .portrait__frame img {
+/*
+ * El genoma y la página son el mismo tejido. El glitch se reserva para los
+ * cambios de estado: mutar estremece el párrafo del nacimiento, que es lo que
+ * el visitante tiene delante; el fondo se sacude desde `lib/field`. El retrato
+ * de la portada sigue reaccionando, por si alguien muta y sube a mirar.
+ */
+html[data-genome='mutating'] .genome__birth {
+  animation: eva-glitch 620ms steps(1, end) 2;
+}
+html[data-genome='cloning'] .genome__birth {
+  text-shadow:
+    3px 0 0 rgba(240, 122, 185, 0.28),
+    -3px 0 0 rgba(154, 141, 255, 0.28);
+}
+html[data-genome='cloning'] .hero .portrait__frame img,
+html[data-genome='cloning'] .hero .loop__video {
   filter: saturate(0.94) contrast(1.09) drop-shadow(9px 0 0 rgba(240, 122, 185, 0.3))
     drop-shadow(-9px 0 0 rgba(154, 141, 255, 0.3));
 }
-
-/* Utilizar: sube el brillo y el marco se enciende. */
-.hero__grid[data-genome='using'] .portrait__frame img {
+html[data-genome='using'] .hero .portrait__frame img,
+html[data-genome='using'] .hero .loop__video {
   filter: saturate(1.1) contrast(1.14) brightness(1.08);
 }
-.hero__grid[data-genome='using'] .portrait__frame {
-  border-color: var(--eva-violet);
-}
-
-/* Escanear: la franja del retrato acelera, como si la estuvieran leyendo. */
-.hero__grid[data-genome='scanning'] .hero .portrait::after {
-  animation-duration: 1.2s;
-  background: linear-gradient(180deg, transparent, rgba(154, 141, 255, 0.34), transparent);
-}
-.hero__grid[data-genome='scanning'] .portrait__frame {
-  border-color: var(--eva-violet);
-}
-
-/* Mutar: glitch. Desplazamiento a saltos, separación cromática y una banda
-   que rasga la imagen recorriéndola a trompicones. */
-.hero__grid[data-genome='mutating'] .portrait__frame img {
+html[data-genome='mutating'] .hero .portrait__frame img,
+html[data-genome='mutating'] .hero .loop__video {
   animation: eva-glitch 620ms steps(1, end) 2;
-}
-.hero__grid[data-genome='mutating'] .portrait__frame {
-  border-color: var(--eva-magenta);
-}
-.hero .portrait__frame::before {
-  content: '';
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  top: 20%;
-  height: 9%;
-  opacity: 0;
-  pointer-events: none;
-  backdrop-filter: hue-rotate(150deg) saturate(2.2) contrast(1.35);
-}
-.hero__grid[data-genome='mutating'] .portrait__frame::before {
-  animation: eva-tear 620ms steps(1, end) 2;
 }
 
 @keyframes eva-glitch {
@@ -252,240 +293,19 @@
     transform: translate3d(0, 0, 0);
   }
 }
-@keyframes eva-tear {
-  0%,
-  100% {
-    opacity: 0;
-    top: 20%;
-  }
-  10% {
-    opacity: 1;
-    top: 18%;
-  }
-  22% {
-    opacity: 1;
-    top: 54%;
-  }
-  34% {
-    opacity: 1;
-    top: 31%;
-  }
-  46% {
-    opacity: 0;
-    top: 72%;
-  }
-}
 @keyframes reply-in {
   from {
     opacity: 0;
     translate: 0 4px;
   }
 }
-@keyframes dna-in {
-  from {
-    opacity: 0;
-    translate: 0 18px;
-  }
-}
-
-/* ───────────── Adaptación ───────────── */
-
-/* Tablet: la hélice va bajo el acrónimo, sin acciones (lo decide densityFor). */
-@media (min-width: 48rem) and (max-width: 63.99rem) {
-  .dna__stage {
-    height: clamp(9rem, 20vh, 13rem);
-  }
-  .dna__hud {
-    font-size: 0.44rem;
-  }
-}
-
-/*
- * En móvil no hay hueco: la rejilla es de una columna y el retrato ya ocupa la
- * esquina. Aquí no se monta la escena (densityFor devuelve scene:false), así que
- * el paquete de three.js ni siquiera se descarga; queda la lectura del escáner.
- */
-@media (max-width: 47.99rem) {
-  .dna {
-    animation: none;
-  }
-  .dna__stage {
-    display: none;
-  }
-  .dna__hud {
-    text-align: left;
-    font-size: 0.44rem;
-  }
-  .dna__hud-core {
-    justify-content: flex-start;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .dna {
-    animation: none;
-  }
   .dna__reply span,
-  .hero__grid[data-genome='mutating'] .portrait__frame img,
-  .hero__grid[data-genome='mutating'] .portrait__frame::before {
-    animation: none;
-  }
-}
-
-/* ───────────── Actividad cerebral artificial ───────────── */
-
-/*
- * Panel flotante abajo a la derecha: EVA escribiendo lo que piensa. Se despliega
- * solo y se pliega a una barra con el botón, sin desmontarse — el flujo sigue
- * su curso y al reabrirlo no ha empezado de cero.
- */
-.synapse {
-  position: fixed;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
-  z-index: 40;
-  display: grid;
-  gap: 0.45rem;
-  width: min(23rem, calc(100vw - 2rem));
-  padding: 0.7rem 0.85rem;
-  border: 1px solid var(--eva-line-strong);
-  border-radius: var(--eva-radius);
-  background: rgba(5, 13, 22, 0.93);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.55);
-  animation: synapse-in 700ms var(--eva-ease) both;
-}
-
-.synapse__head {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--eva-cyan);
-  font-size: 0.5rem;
-}
-.synapse__title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.synapse__meta {
-  color: var(--eva-muted);
-  white-space: nowrap;
-}
-.synapse__bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  margin-left: auto;
-  height: 11px;
-}
-.synapse__bars i {
-  display: block;
-  width: 2px;
-  height: 100%;
-  background: var(--eva-cyan);
-  opacity: 0.55;
-  transform-origin: bottom;
-  animation: synapse-bar 1.25s ease-in-out infinite;
-}
-.synapse__toggle {
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border: 1px solid var(--eva-line);
-  border-radius: 3px;
-  color: var(--eva-soft);
-  background: transparent;
-  font: inherit;
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color var(--eva-fast) linear, color var(--eva-fast) linear;
-}
-.synapse__toggle:hover,
-.synapse__toggle:focus-visible {
-  border-color: var(--eva-cyan);
-  color: var(--eva-cyan);
-}
-
-.synapse__lines {
-  display: grid;
-  align-content: end;
-  gap: 0.2rem;
-  /* Tres renglones reservados: escribir no cambia el alto del panel. */
-  min-height: 5.2rem;
-  font-family: var(--font-jetbrains), monospace;
-  font-size: 0.68rem;
-  line-height: 1.5;
-}
-/* Plegado: queda sólo la cabecera, como una barra de notificación. */
-.synapse:not([data-open]) .synapse__lines {
-  display: none;
-}
-.synapse:not([data-open]) .synapse__bars {
-  opacity: 0.5;
-}
-
-.synapse__line {
-  display: flex;
-  gap: 0.5rem;
-  color: var(--eva-muted);
-  opacity: 0.5;
-}
-.synapse__line:nth-child(2) {
-  opacity: 0.72;
-}
-.synapse__line--current {
-  color: var(--eva-text);
-  opacity: 1;
-}
-.synapse__prompt {
-  color: var(--eva-cyan);
-  flex: none;
-}
-.synapse__caret {
-  color: var(--eva-cyan);
-  animation: blink 1.1s steps(1) infinite;
-}
-
-@keyframes synapse-in {
-  from {
-    opacity: 0;
-    translate: 0 18px;
-  }
-}
-@keyframes synapse-bar {
-  0%,
-  100% {
-    transform: scaleY(0.25);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-
-@media (max-width: 47.99rem) {
-  .synapse {
-    right: 0.75rem;
-    left: 0.75rem;
-    width: auto;
-    font-size: 0.62rem;
-  }
-  .synapse__meta {
-    display: none;
-  }
-  .synapse__lines {
-    min-height: 4.4rem;
-    font-size: 0.62rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .synapse {
-    animation: none;
-  }
-  .synapse__bars i,
-  .synapse__caret {
+  .dna__hud-core i,
+  html[data-genome='mutating'] .genome__birth,
+  html[data-genome='mutating'] .hero .portrait__frame img,
+  html[data-genome='mutating'] .hero .loop__video {
     animation: none;
   }
 }
@@ -514,22 +334,4 @@
   object-fit: cover;
   object-position: 46% 18%;
   filter: saturate(0.94) contrast(1.09);
-}
-
-/* El vídeo responde al genoma igual que la imagen. */
-.hero__grid[data-genome='cloning'] .loop__video {
-  filter: saturate(0.94) contrast(1.09) drop-shadow(9px 0 0 rgba(240, 122, 185, 0.3))
-    drop-shadow(-9px 0 0 rgba(154, 141, 255, 0.3));
-}
-.hero__grid[data-genome='using'] .loop__video {
-  filter: saturate(1.1) contrast(1.14) brightness(1.08);
-}
-.hero__grid[data-genome='mutating'] .loop__video {
-  animation: eva-glitch 620ms steps(1, end) 2;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__grid[data-genome='mutating'] .loop__video {
-    animation: none;
-  }
 }
