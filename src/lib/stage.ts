@@ -31,3 +31,19 @@ export function isCovered() {
 export function isCoveredOnServer() {
   return false;
 }
+
+/*
+ * Apertura del neuroescáner desde fuera de la portada. El modal vive en
+ * EvaProfile (junto al retrato); cualquier sala puede pedir que se abra sin
+ * pasar estado por la página: se emite un evento y el retrato lo escucha.
+ */
+const NEUROSCAN_EVENT = 'eva:neuroscan';
+
+export function requestNeuroscan() {
+  window.dispatchEvent(new Event(NEUROSCAN_EVENT));
+}
+
+export function subscribeNeuroscan(listener: () => void) {
+  window.addEventListener(NEUROSCAN_EVENT, listener);
+  return () => window.removeEventListener(NEUROSCAN_EVENT, listener);
+}

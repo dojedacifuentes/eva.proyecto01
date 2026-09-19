@@ -61,9 +61,9 @@ export function HeroEva() {
         </div>
 
         <p className="slide__foot mono">
-          <span>Un proyecto en evolución</span>
-          <a href="#sistema" data-sound="open">
-            01 — El sistema <span aria-hidden="true">↓</span>
+          <span>{hero.foot.note}</span>
+          <a href={hero.foot.href} data-sound="open">
+            {hero.foot.next} <span aria-hidden="true">↓</span>
           </a>
         </p>
       </div>

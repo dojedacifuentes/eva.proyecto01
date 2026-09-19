@@ -1,17 +1,13 @@
 import { SoundControl } from '@/components/eva/SoundControl';
-import { modules } from '@/content/modules';
-import { flags, nav, site } from '@/content/site';
+import { navItems } from '@/content/lab';
+import { flags, nav, sections, site } from '@/content/site';
 import { MobileNavigation } from './MobileNavigation';
 import { NavSpy } from './NavSpy';
 
 export function SiteHeader() {
-  const items = modules
-    .filter((module) => module.id !== 'news' || flags.news)
-    .map(({ id, code, name, href, accent }) => ({ id, code, name, href, accent }));
-
   return (
     <header className="header">
-      <NavSpy ids={items.map((module) => module.id)} />
+      <NavSpy ids={navItems.map((item) => item.id)} />
       <div className="wrap header__bar">
         <a href="#inicio" className="wordmark" aria-label={`${site.name}, inicio`}>
           <span aria-hidden="true" className="wordmark__glyph" />
@@ -23,10 +19,10 @@ export function SiteHeader() {
           {nav.status}
         </p>
 
-        <nav className="nav" aria-label="Universos">
-          {items.map((module) => (
-            <a key={module.id} href={module.href} data-accent={module.accent} data-sound="open">
-              {module.name}
+        <nav className="nav" aria-label={sections.footer.navLabel}>
+          {navItems.map((item) => (
+            <a key={item.id} href={item.href} data-accent={item.accent} data-sound="open">
+              {item.name}
             </a>
           ))}
         </nav>
@@ -42,7 +38,7 @@ export function SiteHeader() {
           >
             {nav.contact.label}
           </a>
-          <MobileNavigation modules={items} />
+          <MobileNavigation items={[...navItems]} />
         </div>
       </div>
     </header>

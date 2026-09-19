@@ -2,12 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { nav } from '@/content/site';
-import type { Module } from '@/lib/types';
-
-type NavModule = Pick<Module, 'id' | 'code' | 'name' | 'href' | 'accent'>;
+import type { NavItem } from '@/lib/types';
 
 /** Menú móvil: botón con aria-expanded, cierre con Escape y al elegir destino. */
-export function MobileNavigation({ modules }: { modules: NavModule[] }) {
+export function MobileNavigation({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLElement>(null);
@@ -83,16 +81,16 @@ export function MobileNavigation({ modules }: { modules: NavModule[] }) {
       </button>
 
       <nav ref={menuRef} id="menu-movil" className="mobile-menu" aria-label="Menú principal" hidden={!open}>
-        {modules.map((module) => (
+        {items.map((item) => (
           <a
-            key={module.id}
-            href={module.href}
-            data-accent={module.accent}
+            key={item.id}
+            href={item.href}
+            data-accent={item.accent}
             data-sound="open"
-            onClick={() => selectDestination(module.href)}
+            onClick={() => selectDestination(item.href)}
           >
-            <span className="mono">{module.code}</span>
-            {module.name}
+            <span className="mono">{item.code}</span>
+            {item.name}
           </a>
         ))}
         <a

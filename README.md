@@ -1,8 +1,9 @@
 # EVA — landing v2.0
 
-Portada de **EVA, Entidad de Vigilancia y Autonomía**: la interfaz que conecta cuatro universos
-sobre inteligencia artificial, Derecho y educación — **EVA Academy**, **EVA News**,
-**EVA Arcade** y **EVA Lab**.
+El laboratorio de **EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció
+dentro de una red se cuenta a sí misma — origen, cerebro sintético, redes neuronales, causas y
+bitácora — en una landing de ciencia ficción interactiva. EVA es un personaje; no hay servicios
+ni productos.
 
 ## Stack
 
@@ -28,8 +29,8 @@ Despliegue: Vercel, sin configuración. Con dominio propio, definir `NEXT_PUBLIC
 Sitio: https://evaproyecto01.vercel.app/ · rama de producción: `main`.
 Runtime: Node 24.x. Next.js y eslint-config-next: 16.3.5.
 
-El botón de contacto usa el Instagram público de EVA. Las noticias siguen marcadas como
-demostración. El favicon reutiliza el rombo de la cabecera.
+El botón «Escribir a EVA» usa el Instagram público de EVA. El favicon reutiliza el rombo de la
+cabecera.
 
 Las antiguas rutas `/cursos`, `/informes`, `/prototipos`, `/eva`, `/estudios-juridicos`
 y `/panel` redirigen a la nueva portada. GitHub Actions comprueba lint, build, tipos y
@@ -47,19 +48,18 @@ src/
     eva/               EvaField (fondo), EvaSignalCursor, SoundControl, EvaPortraitFrame, EvaDnaHelix,
                        EvaNeuroscan; dna/ (hélice 3D) y neural/ (núcleo neural 3D del escáner)
     layout/            SiteHeader, MobileNavigation, SiteFooter
-    sections/          HeroEva, ModuleGrid, FeaturedProject, AboutEva, ModuleSection,
-                       NewsPreview, ArchiveStats, InstitutionalCTA
-    ui/                EntryCard, StatusBadge, ExternalLink
-  content/             ← todo lo editable: site, modules, projects, resources, news, assets
-  lib/                 types, content (proyecciones y contadores), sound, site
+    sections/          HeroEva y las salas: LabSection, OriginSection, BrainSection,
+                       NetworksSection, CausesSection, LogSection
+  content/             ← todo lo editable: site, lab (las salas), neuroscan, assets
+  lib/                 types, sound, site, stage (capas y apertura del escáner), genome
   styles/tokens.css    colores, radios, tiempos
 docs/                  auditorías, roadmap, guía de contenido, referencias y licencias
 ```
 
 ## Cómo se edita
 
-Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: textos y conmutadores en
-`src/content/site.ts`, proyectos en `projects.ts`, noticias en `news.ts`, retratos en
+Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: textos globales y conmutadores
+en `src/content/site.ts`, las salas en `lab.ts`, el escáner en `neuroscan.ts`, retratos en
 `assets.ts`, colores en `src/styles/tokens.css`.
 
 ## Documentación

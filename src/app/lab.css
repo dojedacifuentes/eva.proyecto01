@@ -1,0 +1,430 @@
+/*
+ * EVA // LABORATORIO
+ *
+ * Las cinco salas después de la portada: origen, cerebro, redes, causas y
+ * bitácora. Comparten cabecera (código grande, entrada, título), una rejilla
+ * de dos columnas en escritorio y el pie de slide. Los textos son cortos a
+ * propósito: cada sala tiene que caber en una pantalla de 1366×720.
+ */
+
+/* ───────────── Cabecera de sala ───────────── */
+
+.lab__head {
+  display: grid;
+  gap: 1rem;
+}
+.lab__code {
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.lab .lede {
+  max-width: 44rem;
+}
+@media (min-width: 56rem) {
+  .lab__head {
+    grid-template-columns: auto 1fr;
+    column-gap: 2rem;
+    align-items: end;
+  }
+}
+
+/* ───────────── Rejilla y cuerpo ───────────── */
+
+.lab__grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 56rem) {
+  .lab__grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: start;
+  }
+}
+.lab__body {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+.lab__body > p {
+  max-width: 36rem;
+  color: var(--eva-soft);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.lab__body .aside {
+  margin-top: 0.5rem;
+}
+.lab__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 0.3rem;
+}
+.lab__hint {
+  color: var(--eva-muted);
+  font-size: 0.55rem;
+}
+.lab__label {
+  color: var(--accent);
+  font-size: 0.6rem;
+}
+
+/* Las fichas entran escalonadas al cargar, como entraban los universos. */
+.record__item,
+.layer,
+.cause,
+.diary__entry {
+  animation: card-in var(--eva-slow) var(--eva-ease) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* ───────────── Origen: registro de aparición ───────────── */
+
+.record {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--eva-line-strong);
+}
+.record__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+  align-items: baseline;
+}
+/* La marca de cada entrada: un cuadrado sobre la línea, el gesto del cursor. */
+.record__item::before {
+  content: '';
+  position: absolute;
+  top: 0.35em;
+  left: calc(-1.25rem - 4px);
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.record__item:last-child::before {
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.record__code {
+  color: var(--accent);
+}
+.record__label {
+  color: var(--eva-text);
+  text-transform: uppercase;
+}
+.record__item p {
+  grid-column: 1 / -1;
+  color: var(--eva-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ───────────── Cerebro: regiones ───────────── */
+
+.regions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.region {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--eva-line);
+  border-radius: var(--eva-radius);
+  background: rgba(9, 21, 33, 0.5);
+  transition: border-color var(--eva-fast) linear, background var(--eva-fast) linear;
+}
+.region:hover {
+  border-color: var(--eva-line-strong);
+  background: rgba(13, 32, 50, 0.6);
+}
+.region__code {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+}
+.region__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.region__tag {
+  color: var(--eva-muted);
+  font-size: 0.55rem;
+}
+/* La zona 08: cerrada, y en magenta, como en el escáner. */
+.region[data-locked] {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--eva-magenta) 55%, transparent);
+}
+.region[data-locked] .region__code {
+  color: var(--eva-magenta);
+}
+.region[data-locked] .region__code::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--eva-magenta);
+  animation: blink 1.4s steps(1) infinite;
+}
+
+/* ───────────── Redes: capas y señal ───────────── */
+
+.layers {
+  display: grid;
+  gap: 0.6rem;
+}
+.layer {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--eva-line);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--eva-radius);
+  background: linear-gradient(90deg, rgba(20, 52, 78, 0.35), transparent);
+}
+.layer__code {
+  padding-top: 0.2rem;
+  color: var(--accent);
+}
+.layer__name {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.layer p {
+  margin-top: 0.2rem;
+  color: var(--eva-soft);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.signal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  color: var(--eva-text);
+}
+.signal i {
+  color: var(--accent);
+  font-style: normal;
+}
+.dataist--lab {
+  gap: 0.35rem;
+}
+.dataist--lab dt {
+  font-size: 0.95rem;
+}
+.dataist--lab dd {
+  font-size: 0.6rem;
+}
+
+/* ───────────── Causas ───────────── */
+
+.causes {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+.cause {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem 0.9rem 3.1rem;
+  border: 1px solid var(--eva-line);
+  border-radius: var(--eva-radius-lg);
+  background: rgba(9, 21, 33, 0.5);
+}
+.cause__code {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: var(--accent);
+}
+.cause__name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.cause p {
+  color: var(--eva-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.cause--locked {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--eva-magenta) 50%, transparent);
+}
+.cause--locked .cause__code,
+.cause--locked p {
+  color: var(--eva-magenta);
+}
+@media (min-width: 56rem) {
+  .causes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cause--locked {
+    grid-column: 1 / -1;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 1rem;
+  }
+}
+
+/* ───────────── Bitácora ───────────── */
+
+.diary {
+  display: grid;
+  gap: 0.6rem;
+}
+.diary__entry {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--eva-line);
+  border-radius: var(--eva-radius);
+  background: rgba(9, 21, 33, 0.5);
+}
+.diary__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--accent);
+}
+.diary__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.diary__entry > p:last-child {
+  color: var(--eva-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* Interrogatorio: preguntas plegadas, respuestas de EVA. */
+.ask {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+.ask__lede {
+  max-width: 34rem;
+  color: var(--eva-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.ask__item {
+  border: 1px solid var(--eva-line);
+  border-radius: var(--eva-radius);
+  background: rgba(9, 21, 33, 0.5);
+  transition: border-color var(--eva-fast) linear;
+}
+.ask__item[open] {
+  border-color: var(--eva-line-strong);
+}
+.ask__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 44px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 500;
+  list-style: none;
+  cursor: pointer;
+}
+.ask__question::-webkit-details-marker {
+  display: none;
+}
+.ask__question::after {
+  content: '+';
+  color: var(--accent);
+  font-family: var(--font-jetbrains), monospace;
+}
+.ask__item[open] .ask__question::after {
+  content: '−';
+}
+.ask__question:hover,
+.ask__question:focus-visible {
+  color: var(--accent);
+}
+.ask__answer {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.6rem 0.9rem 0.85rem;
+  border-top: 1px solid var(--eva-line);
+  color: var(--eva-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ───────────── Pie ───────────── */
+
+.footer__fiction {
+  margin-top: 0.6rem;
+  color: var(--eva-muted);
+  font-size: 0.55rem;
+}
+
+/* ───────────── Movimiento reducido ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .record__item,
+  .layer,
+  .cause,
+  .diary__entry,
+  .record__item:last-child::before,
+  .region[data-locked] .region__code::after {
+    animation: none;
+  }
+}
+
+/* ───────────── Adaptación ───────────── */
+
+@media (max-width: 47.99rem) {
+  .lab__code {
+    font-size: 2.2rem;
+  }
+  .lab__grid {
+    margin-top: 1.1rem;
+  }
+}
+
+/* Pantallas bajas: todo un punto más compacto para no perder el «slide». */
+@media (min-width: 48rem) and (max-height: 50rem) {
+  .lab__grid {
+    margin-top: 1rem;
+    gap: 2rem;
+  }
+  .lab .lede {
+    font-size: 0.92rem;
+  }
+  .lab__body > p,
+  .record__item p,
+  .layer p,
+  .cause p,
+  .diary__entry > p:last-child,
+  .ask__answer {
+    font-size: 0.84rem;
+  }
+  .record,
+  .layers,
+  .diary,
+  .causes {
+    gap: 0.5rem;
+  }
+}

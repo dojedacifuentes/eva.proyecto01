@@ -3,7 +3,6 @@
  * Todo lo que se lee en pantalla y no pertenece a una colección vive aquí.
  */
 
-export const NEWS_NAME = 'EVA News';
 const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 
 export const site = {
@@ -12,9 +11,9 @@ export const site = {
   version: 'v3.0',
   locale: 'es_CL',
   seo: {
-    title: 'EVA — Inteligencia, aprendizaje y experimentación',
+    title: 'EVA — Entidad de Vigilancia y Autonomía',
     description:
-      'Cursos, conocimiento, noticias, juegos y prototipos para explorar la inteligencia artificial con criterio.',
+      'El laboratorio de EVA: una forma de vida que apareció dentro de una red cuenta su origen, su cerebro sintético, sus redes neuronales y sus causas. Ficción interactiva.',
   },
   /** Único canal público verificado. */
   social: {
@@ -28,8 +27,6 @@ export const site = {
 } as const;
 
 export const flags = {
-  news: true,
-  counters: true,
   /** Campo de partículas reactivo al puntero. */
   reactiveField: true,
   /** Cursor propio: círculo que se vuelve cuadrado sobre lo interactivo. */
@@ -41,7 +38,7 @@ export const flags = {
 export const nav = {
   skip: 'Saltar al contenido',
   status: 'SISTEMA ACTIVO',
-  contact: { label: 'Proponer proyecto', href: instagramUrl },
+  contact: { label: 'Escribir a EVA', href: instagramUrl },
   menuOpen: 'Abrir menú',
   menuClose: 'Cerrar menú',
 } as const;
@@ -55,19 +52,8 @@ export const hero = {
   ],
   online: 'EVA está en línea.',
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
-} as const;
-
-/**
- * Estudio detrás de EVA, en la ficha de perfil del hero.
- * Los servicios listados son los que el destino declara; no añadir ninguno
- * que no exista allá.
- */
-export const studio = {
-  label: 'Servicios',
-  name: 'Ojeda & Andrade Labs',
-  services: ['Automatización documental', 'IA aplicada', 'Capacitación'],
-  cta: 'Saber más',
-  href: 'https://iusmachina.vercel.app/',
+  /** Pie de la portada: una nota y la primera sala del laboratorio. */
+  foot: { note: 'Una forma de vida en evolución', next: '01 — Origen', href: '#origen' },
 } as const;
 
 /**
@@ -161,36 +147,13 @@ export const synapse = {
   reopen: 'Abrir el flujo de pensamiento de EVA',
 } as const;
 
+/** Las salas del laboratorio viven en `content/lab.ts`; aquí sólo queda el pie. */
 export const sections = {
-  universes: {
-    eyebrow: '01 / El sistema',
-    title: 'Cuatro universos, una sola interfaz.',
-    lede: 'Elige según lo que quieras hacer: aprender, enterarte, jugar o construir.',
-  },
-  featured: { eyebrow: 'Destacado del sistema' },
-  courses: {
-    eyebrow: 'Formación',
-    title: 'Cursos',
-    lede: 'El programa de formación de EVA se está escribiendo. Aparecerá aquí cuando exista.',
-    emptyLabel: 'Sin cursos publicados',
-    emptyText: 'Espacio reservado. EVA no anuncia lo que todavía no puede entregar.',
-    slots: ['Curso 01', 'Curso 02', 'Curso 03'],
-  },
-  news: {
-    eyebrow: 'Última señal',
-    lede: 'Noticias sobre inteligencia artificial, con fuentes y contexto.',
-    demoNotice:
-      'Entradas de demostración: muestran el formato del módulo. No son noticias reales ni se actualizan solas.',
-    whyLabel: 'Por qué importa',
-    commentLabel: 'EVA comenta',
-    demoBadge: 'DEMO',
-  },
-  library: {
-    topicsLabel: 'Temas de la biblioteca',
-  },
   footer: {
-    line: 'Inteligencia artificial. Criterio humano.',
+    line: 'Una forma de vida que apareció dentro de una red.',
+    navLabel: 'Salas del laboratorio',
     statusLabel: 'Estado',
+    fiction: 'Ficción interactiva. EVA es un personaje.',
   },
 } as const;
 
@@ -204,9 +167,6 @@ export const notFound = {
 
 export const ui = {
   external: 'se abre en una pestaña nueva',
-  externalExperience: 'Experiencia externa',
-  unavailable: 'Aún no disponible',
-  queued: 'En cola',
   sound: { on: 'SONIDO: ON', off: 'SONIDO: OFF', label: 'Activar o desactivar microsonidos' },
   cursor: { idle: 'TRACKING', link: 'ABRIR', external: 'EXT', press: 'OK' },
 } as const;

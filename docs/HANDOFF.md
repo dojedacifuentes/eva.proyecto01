@@ -28,8 +28,13 @@ Una landing de una sola ruta (`src/app/page.tsx`) partida en secciones que
 `min-height: 100svh` y `scroll-snap-align`. Si añades contenido a una sección,
 comprueba que sigue cupiendo a 1440×900 y a 1366×720 antes de darla por buena.
 
-Orden actual: portada → cuatro universos → destacado → Academy → **Cursos**
-(vacía a propósito) → News → Arcade → Lab.
+Orden actual (rama `feat/eva-neural-core`): portada → **Origen** → **Cerebro** →
+**Redes** → **Causas** → **Bitácora**. Son las cinco salas del laboratorio de EVA:
+ella contándose. Los cuatro universos (Academy, News, Arcade, Lab), el destacado
+y la sección Cursos salieron de la página por decisión del propietario: esto es
+el laboratorio personal de un personaje, no un catálogo de servicios ni de
+productos. Su código y sus colecciones quedan en el historial (último commit con
+ellos: `751d6ca`) por si «luego reorganizamos la info».
 
 EVA es un personaje, no un chatbot real. Todo lo que «hace» en pantalla —clonar
 su genoma, escanearse el cerebro, pensar en voz alta— es ficción declarada. No
@@ -51,17 +56,24 @@ hay backend, no hay IA detrás, no se guarda nada. Mantenlo así o dilo en panta
 ## 3. Cómo está armado
 
 **Todo el texto vive en `src/content/`.** Los componentes no llevan literales ni
-URLs. `site.ts` es el grande: `flags`, `nav`, `hero`, `studio`, `genome`,
-`synapse`, `sections`, `ui`. El resto: `modules`, `projects`, `resources`,
-`news`, `neuroscan`, `assets`. Guía de estilo editorial en `CONTENT_GUIDE.md`.
+URLs. `site.ts` lleva lo global: `flags`, `nav`, `hero`, `genome`, `synapse`,
+`sections.footer`, `ui`. `lab.ts` lleva las cinco salas (`rooms`, `navItems`,
+`lab.origin/brain/networks/causes/log`). `neuroscan.ts` lleva el escáner y es la
+fuente de todo lo que las salas repiten (regiones, declaración dataísta,
+respuestas del interrogatorio): EVA no se contradice entre salas. `assets.ts`,
+los retratos. Guía de estilo editorial en `CONTENT_GUIDE.md`.
 
-**Estilos.** Tokens en `src/styles/tokens.css`. Cuatro hojas en `src/app/`:
+**Estilos.** Tokens en `src/styles/tokens.css`. Cinco hojas en `src/app/`:
 `globals.css` (base y secciones), `interface.css` (slides, cursor, portada),
-`neuroscan.css` (el escáner) y `dna.css` (genoma, panel de pensamiento y vídeo).
-El acento de cada universo se fija con `data-accent`.
+`neuroscan.css` (el escáner), `dna.css` (genoma, panel de pensamiento y vídeo) y
+`lab.css` (las salas). El acento de cada sala se fija con `data-accent` desde
+`rooms`.
 
 **Servidor por defecto.** Sólo son cliente los componentes de
-`src/components/eva/` más `MobileNavigation`, `NavSpy` y `SoundControl`.
+`src/components/eva/` más `MobileNavigation`, `NavSpy` y `SoundControl`. Las
+salas (`components/sections/*Section.tsx`, sobre `LabSection`) son de servidor;
+el único botón vivo que llevan es `NeuroscanTrigger`, que pide abrir el escáner
+con un evento (`lib/stage.ts`) y `EvaProfile` lo atiende.
 
 ### La portada, pieza por pieza
 
@@ -143,18 +155,19 @@ apareció dos veces en sitios distintos.
    de 116 kB— pero no resuelto. A 720p sin audio debería bajar a 600–900 kB.
 2. **Permiso de publicación de retratos y vídeo**: todo figura como «por
    confirmar por el propietario» en `ASSET_LICENSES.md`. Hay que cerrarlo.
-3. `site.contact.href` está vacío; el botón de cierre sale desactivado. No
-   inventar datos.
-4. Noticias reales con `source` + `sourceUrl` y `demo: false` en `content/news.ts`.
-5. Capturas reales de Prompt Lab y FORO [in]VISIBLE; falta el tratamiento de
-   imagen en `EntryCard`.
-6. Isotipo en `src/app/icon.svg` y Open Graph definitiva.
-7. URL del repositorio del juego (`TODO_GAME_REPOSITORY_URL`, hoy no se muestra).
-8. Revisión de los textos de humor de EVA por el propietario.
+3. El contacto es el Instagram público («Escribir a EVA»). No inventar otro canal.
+4. Isotipo en `src/app/icon.svg` y Open Graph definitiva.
+5. Revisión de los textos de humor de EVA por el propietario, ahora también los
+   de `lab.ts`.
+6. Las colecciones de los universos (proyectos, noticias, rutas) ya no están en
+   el árbol; si vuelven a hacer falta, están en `751d6ca`.
+7. Capturas y tratamiento de imagen quedan sin objeto mientras no haya fichas.
+8. Sección de contacto propia: hoy no existe y las redirecciones antiguas van a `/`.
 9. `prefers-reduced-motion` está implementado en todas las piezas pero **nunca se
    ha probado de punta a punta**. Igual Safari iOS y lector de pantalla.
-10. La sección **Cursos** sigue vacía a propósito. Rellenarla sólo cuando existan
-    cursos de verdad.
+10. **Reorganizar la información del laboratorio** con el propietario: las cinco
+    salas son una primera pasada («luego reorganizaremos la info»). Los textos
+    nuevos de `lab.ts` también esperan su revisión de humor y de tono.
 
 Detalle histórico: `LANDING_ROADMAP.md`, `AUDITORIA_FINAL_LANDING_EVA.md`,
 `RELEASE_2026-09-19.md`.
@@ -163,12 +176,12 @@ Detalle histórico: `LANDING_ROADMAP.md`, `AUDITORIA_FINAL_LANDING_EVA.md`,
 
 ## 6. Reglas editoriales que conviene mantener
 
-- Cuatro universos exactos; el nombre es «EVA News»; sin «Legal» ni «Studio».
-- Sin nombres de personas en la página ni «Creado por».
+- **Es el laboratorio de EVA, no una oferta.** Nada de servicios, productos,
+  cursos ni «universos». Cada sala cuenta algo de ella: origen, cerebro, redes,
+  causas, bitácora. Si algo suena a catálogo, sobra.
+- Sin nombres de personas en la página ni «Creado por». La ficha del estudio y
+  sus servicios salieron del pie por lo mismo.
 - Nada sin destino real lleva enlace; nunca `href="#"`.
-- **No anunciar servicios que el destino no declara.** La ficha del estudio lista
-  sólo lo que aparece en iusmachina.vercel.app. Se pidió añadir
-  «sostenibilidad» y no se añadió porque allá no existe.
 - No copiar código ni assets de repos externos sin registrarlo en
   `ASSET_LICENSES.md` y `MATRIZ_REFERENCIAS_REACT_LANDING.md`. El genoma se
   escribió de cero por esto; un pack de Freepik se descartó por su obligación de
@@ -214,7 +227,10 @@ sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selecci
   buscando sobriedad. Fue un error de lectura del encargo.
 - **v3** — recupera la capa interactiva, introduce el sistema de slides y la
   sección Cursos; saca cifras, cierre institucional y asistente flotante.
-- **v4** (esta) — portada reconstruida: acrónimo como malla neuronal, genoma 3D
+- **v4** — portada reconstruida: acrónimo como malla neuronal, genoma 3D
   con siete funciones, retrato en vídeo, escáner neurodigital y el pensamiento de
   EVA como panel flotante. Fuera el texto introductorio, los botones, el rotador
   y la franja de Misión / Visión / Objetivos.
+- **v5** (esta rama) — el escáner cambia el dibujo por un cerebro sintético en
+  WebGL (§7) y la página deja de ser un catálogo: fuera los cuatro universos, el
+  destacado y Cursos; entran las cinco salas del laboratorio de EVA.

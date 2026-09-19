@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { images } from '@/content/assets';
 import { neuroscan } from '@/content/neuroscan';
 import { hero } from '@/content/site';
+import { subscribeNeuroscan } from '@/lib/stage';
 import { EvaNeuroscan } from './EvaNeuroscan';
 import { EvaPortraitFrame } from './EvaPortraitFrame';
 import { EvaPortraitLoop } from './EvaPortraitLoop';
@@ -14,6 +15,9 @@ import { EvaPortraitLoop } from './EvaPortraitLoop';
  */
 export function EvaProfile() {
   const [open, setOpen] = useState(false);
+
+  /* Las salas del laboratorio también pueden abrirlo: la sala del cerebro y la bitácora lo piden. */
+  useEffect(() => subscribeNeuroscan(() => setOpen(true)), []);
 
   return (
     <div className="profile">

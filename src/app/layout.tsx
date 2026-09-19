@@ -4,6 +4,7 @@ import './globals.css';
 import './interface.css';
 import './neuroscan.css';
 import './dna.css';
+import './lab.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { EvaThoughtStream } from '@/components/eva/EvaThoughtStream';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';
