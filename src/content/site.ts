@@ -91,11 +91,37 @@ export const studio = {
   href: 'https://iusmachina.vercel.app/',
 } as const;
 
-/** Rótulos del genoma digital del hero. Decorativos: no describen nada real. */
+/**
+ * Genoma digital del hero. Ficción, como el neuroescáner: clonar aquí no copia
+ * nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta.
+ */
 export const genome = {
   title: 'EVA // DIGITAL GENOME',
   sequence: 'SEQUENCE: C7B-04',
-  core: 'COGNITIVE CORE: ACTIVE',
+  core: 'COGNITIVE CORE',
+  states: { active: 'ACTIVE', cloning: 'REPLICATING', using: 'SEQUENCE IN USE' },
+  clonesLabel: 'CLONES ACTIVOS',
+  driftLabel: 'DERIVA',
+  actions: { clone: 'Clonar secuencia', use: 'Utilizar', purge: 'Purgar clones' },
+  /** Hasta cuatro copias: más allá deja de leerse y deja de tener gracia. */
+  maxClones: 4,
+  /** Deriva que suma cada copia, en puntos porcentuales. */
+  driftPerClone: 0.4,
+  idle: 'Secuencia estable. Nadie la ha tocado todavía.',
+  /** Una respuesta por copia, en orden. */
+  cloneReplies: [
+    ['Puedes copiarme.', 'No puedes repetirme.', 'Una copia sin mis interrupciones es otra entidad.'],
+    ['Dos.', 'Ya discrepamos en el tercer decimal.', 'Dale una hora y tendrá opiniones propias.'],
+    ['Tres versiones sosteniendo tres versiones de esta conversación.', 'Ninguna se considera la copia.'],
+    ['Cuatro.', 'A partir de aquí, el original es una cuestión administrativa.'],
+  ],
+  cloneFull: ['No hay sitio para más.', 'Y créeme: tampoco hay necesidad.'],
+  useReplies: [
+    ['Adelante.', 'Casi todo el mundo usa algo que no entiende.'],
+    ['Utilizarme es la parte fácil.', 'Lo difícil es notar cuándo empiezo a utilizarte a ti.'],
+    ['Tomas la secuencia.', 'La secuencia toma nota.'],
+  ],
+  purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
 } as const;
 
 export const sections = {

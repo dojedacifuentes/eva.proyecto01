@@ -1,9 +1,9 @@
 /*
  * EVA // DIGITAL GENOME
  *
- * Doble hélice en el hueco central del hero. Capa decorativa: fuera del flujo,
- * sin eventos de puntero y por debajo del texto, así que no añade alto a la
- * portada ni tapa nada legible.
+ * Doble hélice en el hueco central del hero, con dos acciones: clonar la
+ * secuencia y utilizarla. Está fuera del flujo, así que no añade alto a la
+ * portada; el lienzo no captura el puntero y los botones sí.
  */
 
 .dna {
@@ -11,16 +11,19 @@
   z-index: 0;
   top: 46%;
   translate: 0 -50%;
+  /* El bloque deja pasar el puntero; sólo los botones lo recogen. */
   pointer-events: none;
-  /* Hueco entre el final de las palabras del acrónimo y los índices 01–03. */
-  left: 47%;
-  width: clamp(7.5rem, 14.5vw, 12.5rem);
+  /* Anclado junto a la tarjeta de EVA, no a un porcentaje: columna del retrato
+     + relleno de la rejilla + un hueco. Así nunca la invade ni se mete en la
+     columna de texto, por estrecha que quede. */
+  right: calc(clamp(8.5rem, 19vw, 13.5rem) + clamp(1.25rem, 3vw, 2.6rem) + 0.75rem);
+  width: clamp(9.5rem, 16vw, 13.5rem);
   opacity: 0;
   animation: dna-in 1.6s var(--eva-ease) 0.45s both;
 }
 
 .dna__stage {
-  height: clamp(12rem, 25vh, 18rem);
+  height: clamp(11rem, 23vh, 16rem);
 }
 .dna__stage canvas {
   display: block;
@@ -39,15 +42,16 @@
   z-index: 1;
 }
 
-/* HUD: rótulos de escáner, no explicaciones. */
+/* ───────────── Lectura del escáner ───────────── */
+
 .dna__hud {
   display: grid;
-  gap: 0.15rem;
-  margin-top: 0.35rem;
+  gap: 0.1rem;
+  margin-top: 0.4rem;
   text-align: center;
   color: var(--eva-muted);
   font-size: 0.46rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
   line-height: 1.6;
 }
 .dna__hud-title {
@@ -67,7 +71,103 @@
   box-shadow: 0 0 6px rgba(128, 217, 239, 0.7);
   animation: pulse 2.6s ease-in-out infinite;
 }
+.dna__hud-count {
+  color: var(--eva-soft);
+}
 
+/* El estado tiñe la lectura: replicando en magenta, en uso en violeta. */
+.dna[data-state='cloning'] .dna__hud-core,
+.dna[data-state='cloning'] .dna__hud-count {
+  color: var(--eva-magenta);
+}
+.dna[data-state='cloning'] .dna__hud-core i {
+  background: var(--eva-magenta);
+  box-shadow: 0 0 6px rgba(240, 122, 185, 0.7);
+}
+.dna[data-state='using'] .dna__hud-core,
+.dna[data-state='using'] .dna__hud-count {
+  color: var(--eva-violet);
+}
+.dna[data-state='using'] .dna__hud-core i {
+  background: var(--eva-violet);
+  box-shadow: 0 0 6px rgba(154, 141, 255, 0.7);
+}
+
+/* ───────────── Acciones ───────────── */
+
+.dna__actions {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+}
+.dna__btn {
+  /* Aquí sí: el bloque los deja pasar y los botones los recogen. */
+  pointer-events: auto;
+  min-height: 30px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: 3px;
+  color: var(--eva-cyan);
+  background: rgba(7, 19, 31, 0.78);
+  font-size: 0.46rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear,
+    background var(--eva-fast) linear;
+}
+.dna__btn:hover,
+.dna__btn:focus-visible {
+  border-color: var(--eva-cyan);
+  color: var(--eva-text);
+  background: rgba(18, 46, 68, 0.9);
+}
+.dna__btn:active {
+  translate: 0 1px;
+}
+.dna__btn--ghost {
+  color: var(--eva-muted);
+  border-style: dashed;
+}
+.dna__btn--ghost:hover,
+.dna__btn--ghost:focus-visible {
+  color: var(--eva-magenta);
+  border-color: var(--eva-magenta);
+}
+
+/* ───────────── Respuesta de EVA ───────────── */
+
+.dna__reply {
+  display: grid;
+  gap: 0.1rem;
+  /* Alto reservado: la respuesta cambia sin mover los botones. */
+  min-height: 3.4rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--eva-line-strong);
+  color: var(--eva-soft);
+  font-size: 0.66rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.dna__reply span {
+  animation: reply-in 400ms var(--eva-ease) both;
+}
+.dna__reply span:nth-child(2) {
+  animation-delay: 120ms;
+}
+.dna__reply span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+@keyframes reply-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
 @keyframes dna-in {
   from {
     opacity: 0;
@@ -82,15 +182,16 @@
 /* ───────────── Adaptación ───────────── */
 
 /*
- * Entre 48 y 64rem no queda hueco limpio: la hélice pasa a ser textura detrás
- * del acrónimo, más pequeña y atenuada, y el HUD desaparece porque chocaba con
- * el lede.
+ * Entre 48 y 64rem no queda hueco limpio: la hélice se encoge y se recuesta
+ * tras el acrónimo. Sin acciones (lo decide densityFor) y sin lectura: el HUD
+ * caía justo encima del lede.
  */
 @media (max-width: 63.99rem) {
   .dna {
-    top: 31%;
-    left: 36%;
-    width: clamp(6rem, 17vw, 8.5rem);
+    top: 29%;
+    right: auto;
+    left: 34%;
+    width: clamp(8rem, 22vw, 11rem);
   }
   .dna__stage {
     height: clamp(8rem, 17vh, 11rem);
@@ -103,12 +204,14 @@
 /*
  * En móvil no hay hueco: la rejilla es de una columna y el retrato ya ocupa la
  * esquina. Aquí no se monta la escena (densityFor devuelve scene:false), así que
- * el paquete de three.js ni siquiera se descarga; queda sólo el rótulo.
+ * el paquete de three.js ni siquiera se descarga y no hay acciones que ofrecer;
+ * queda la lectura del escáner. El genoma interactivo vive de tablet hacia arriba.
  */
 @media (max-width: 47.99rem) {
   .dna {
     position: static;
     translate: none;
+    right: auto;
     width: auto;
     animation: none;
     opacity: 1;
@@ -130,5 +233,8 @@
   .dna {
     animation: none;
     opacity: 1;
+  }
+  .dna__reply span {
+    animation: none;
   }
 }

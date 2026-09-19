@@ -300,6 +300,14 @@ html {
 .hero__head {
   min-width: 0;
 }
+@media (min-width: 64rem) {
+  /* Acotada al ancho de su contenido: estirada hasta el borde de la columna,
+     su caja tapaba los botones del genoma aunque estuviera vacía ahí. 28rem es
+     lo mínimo para que los dos botones del hero quepan en una línea. */
+  .hero__head {
+    max-width: 28rem;
+  }
+}
 .hero__label {
   color: var(--eva-cyan);
 }
@@ -307,6 +315,9 @@ html {
 /* El acrónimo vuelve a mandar en la portada, un punto más chico que en v2. */
 .acronym {
   margin-top: 0.9rem;
+  /* Acotado para que los índices 01–03 no se vayan al otro extremo de la
+     columna: dejan libre la banda donde vive el genoma. */
+  max-width: 26rem;
   border-left: 1px solid var(--eva-line-strong);
 }
 .acronym__row {

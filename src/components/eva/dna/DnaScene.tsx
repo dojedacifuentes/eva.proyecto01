@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { pointerSignal } from '@/lib/pointer';
 
@@ -16,6 +16,7 @@ const TUBE_RADIUS = 0.058;
 const CYAN = '#5fd8f4';
 const VIOLET = '#9a8dff';
 const WHITE = '#dff4ff';
+const MAGENTA = '#f07ab9';
 
 /**
  * Generador pseudoaleatorio con semilla. El polvo debe salir idéntico en cada
@@ -29,8 +30,8 @@ function seeded(seed: number) {
   };
 }
 
-/** Un filamento: puntos sobre una hélice y un tubo a lo largo de la curva. */
-function strandGeometry(phase: number) {
+/** Curva de un filamento: una hélice muestreada y suavizada. */
+function helixCurve(phase: number) {
   const points: THREE.Vector3[] = [];
   for (let i = 0; i <= SAMPLES; i++) {
     const t = i / SAMPLES;
@@ -39,50 +40,43 @@ function strandGeometry(phase: number) {
       new THREE.Vector3(Math.cos(angle) * RADIUS, (t - 0.5) * HEIGHT, Math.sin(angle) * RADIUS),
     );
   }
-  return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), SAMPLES, TUBE_RADIUS, 10, false);
+  return new THREE.CatmullRomCurve3(points);
 }
 
-interface HelixProps {
-  pairs: number;
-  particles: number;
-  reduced: boolean;
-  /** 0–1: cuánto se acerca el puntero al área. Lo escribe el envoltorio. */
-  nearRef: RefObject<number>;
+interface Geometries {
+  curveA: THREE.CatmullRomCurve3;
+  curveB: THREE.CatmullRomCurve3;
+  tubeA: THREE.TubeGeometry;
+  tubeB: THREE.TubeGeometry;
+  rod: THREE.CylinderGeometry;
+  node: THREE.SphereGeometry;
+  spark: THREE.SphereGeometry;
 }
 
-function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
-  const group = useRef<THREE.Group>(null);
+function useGeometries(): Geometries {
+  return useMemo(() => {
+    const curveA = helixCurve(0);
+    const curveB = helixCurve(Math.PI);
+    // El cilindro nace sobre Y; se tumba sobre X una sola vez.
+    const rod = new THREE.CylinderGeometry(0.022, 0.022, RADIUS * 2, 6, 1);
+    rod.rotateZ(Math.PI / 2);
+    return {
+      curveA,
+      curveB,
+      tubeA: new THREE.TubeGeometry(curveA, SAMPLES, TUBE_RADIUS, 10, false),
+      tubeB: new THREE.TubeGeometry(curveB, SAMPLES, TUBE_RADIUS, 10, false),
+      rod,
+      node: new THREE.SphereGeometry(0.075, 10, 8),
+      spark: new THREE.SphereGeometry(0.11, 12, 10),
+    };
+  }, []);
+}
+
+/** Barras y nodos de un cuerpo: se calculan una vez, nunca por fotograma. */
+function useBasePairs(pairs: number) {
   const rods = useRef<THREE.InstancedMesh>(null);
   const nodes = useRef<THREE.InstancedMesh>(null);
-  const strandMaterial = useRef<THREE.MeshStandardMaterial>(null);
-  const nodeMaterial = useRef<THREE.MeshStandardMaterial>(null);
-  const glow = useRef(0);
 
-  const strandA = useMemo(() => strandGeometry(0), []);
-  const strandB = useMemo(() => strandGeometry(Math.PI), []);
-
-  /** El cilindro nace sobre Y; se tumba sobre X una sola vez. */
-  const rodGeometry = useMemo(() => {
-    const geometry = new THREE.CylinderGeometry(0.022, 0.022, RADIUS * 2, 6, 1);
-    geometry.rotateZ(Math.PI / 2);
-    return geometry;
-  }, []);
-  const nodeGeometry = useMemo(() => new THREE.SphereGeometry(0.075, 10, 8), []);
-
-  const dust = useMemo(() => {
-    const random = seeded(0x5eed);
-    const positions = new Float32Array(particles * 3);
-    for (let i = 0; i < particles; i++) {
-      const angle = random() * Math.PI * 2;
-      const radius = RADIUS * (1.3 + random() * 2.2);
-      positions[i * 3] = Math.cos(angle) * radius;
-      positions[i * 3 + 1] = (random() - 0.5) * HEIGHT * 1.35;
-      positions[i * 3 + 2] = Math.sin(angle) * radius;
-    }
-    return positions;
-  }, [particles]);
-
-  /* Las matrices de barras y nodos se calculan una vez, no por fotograma. */
   useLayoutEffect(() => {
     const matrix = new THREE.Matrix4();
     const quaternion = new THREE.Quaternion();
@@ -99,42 +93,93 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
       quaternion.setFromAxisAngle(axis, -angle);
       rods.current?.setMatrixAt(i, matrix.compose(position, quaternion, scale));
 
-      // Un nodo en cada extremo de la barra.
       for (const sign of [1, -1] as const) {
         position.set(Math.cos(angle) * RADIUS * sign, y, Math.sin(angle) * RADIUS * sign);
-        nodes.current?.setMatrixAt(i * 2 + (sign === 1 ? 0 : 1), matrix.compose(position, quaternion, scale));
+        nodes.current?.setMatrixAt(
+          i * 2 + (sign === 1 ? 0 : 1),
+          matrix.compose(position, quaternion, scale),
+        );
       }
     }
     if (rods.current) rods.current.instanceMatrix.needsUpdate = true;
     if (nodes.current) nodes.current.instanceMatrix.needsUpdate = true;
   }, [pairs]);
 
+  return { rods, nodes };
+}
+
+/* ───────────── Cuerpo principal ───────────── */
+
+interface BodyProps {
+  geo: Geometries;
+  pairs: number;
+  particles: number;
+  reduced: boolean;
+  nearRef: RefObject<number>;
+  /** 0–1: la carga que deja «Utilizar», decae sola. */
+  energyRef: RefObject<number>;
+}
+
+function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps) {
+  const group = useRef<THREE.Group>(null);
+  const strandMaterial = useRef<THREE.MeshStandardMaterial>(null);
+  const nodeMaterial = useRef<THREE.MeshStandardMaterial>(null);
+  const sparkA = useRef<THREE.Mesh>(null);
+  const sparkB = useRef<THREE.Mesh>(null);
+  const travel = useRef(0);
+  const glow = useRef(0);
+
+  const { rods, nodes } = useBasePairs(pairs);
+
+  const dust = useMemo(() => {
+    const random = seeded(0x5eed);
+    const positions = new Float32Array(particles * 3);
+    for (let i = 0; i < particles; i++) {
+      const angle = random() * Math.PI * 2;
+      const radius = RADIUS * (1.3 + random() * 2.2);
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = (random() - 0.5) * HEIGHT * 1.35;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+    }
+    return positions;
+  }, [particles]);
+
   useFrame((state, delta) => {
     const node = group.current;
     if (!node) return;
-
     const step = Math.min(delta, 0.05);
+    const energy = energyRef.current ?? 0;
+
     if (!reduced) {
-      node.rotation.y += step * 0.24;
+      node.rotation.y += step * (0.24 + energy * 0.5);
       node.position.y = Math.sin(state.clock.elapsedTime * 0.55) * 0.14;
     }
 
     // Inclinación leve hacia el puntero, con inercia.
     const nx = (pointerSignal.x / window.innerWidth) * 2 - 1;
     const ny = (pointerSignal.y / window.innerHeight) * 2 - 1;
-    const active = pointerSignal.active && !reduced;
-    node.rotation.x += ((active ? ny * 0.22 : 0) - node.rotation.x) * 0.06;
-    node.rotation.z += ((active ? nx * -0.12 : 0) - node.rotation.z) * 0.06;
+    const tilting = pointerSignal.active && !reduced;
+    node.rotation.x += ((tilting ? ny * 0.22 : 0) - node.rotation.x) * 0.06;
+    node.rotation.z += ((tilting ? nx * -0.12 : 0) - node.rotation.z) * 0.06;
 
-    // Cerca del puntero, la hélice se enciende un poco más.
+    // Chispa recorriendo cada filamento: la vida de fondo de la hélice.
+    travel.current = (travel.current + step * (0.11 + energy * 0.5)) % 1;
+    const point = geo.curveA.getPointAt(travel.current);
+    sparkA.current?.position.copy(point);
+    sparkB.current?.position.copy(geo.curveB.getPointAt(travel.current));
+    const sparkScale = 0.8 + energy * 1.4;
+    sparkA.current?.scale.setScalar(sparkScale);
+    sparkB.current?.scale.setScalar(sparkScale);
+
     glow.current += ((nearRef.current ?? 0) - glow.current) * 0.08;
-    if (strandMaterial.current) strandMaterial.current.emissiveIntensity = 1.15 + glow.current * 1.1;
-    if (nodeMaterial.current) nodeMaterial.current.emissiveIntensity = 1.5 + glow.current * 1.4;
+    const lift = glow.current * 1.1 + energy * 1.8;
+    if (strandMaterial.current) strandMaterial.current.emissiveIntensity = 1.15 + lift;
+    if (nodeMaterial.current) nodeMaterial.current.emissiveIntensity = 1.5 + lift * 1.3;
   });
 
   return (
-    <group ref={group} scale={0.98}>
-      <mesh geometry={strandA}>
+    <group ref={group}>
+      <mesh geometry={geo.tubeA}>
         <meshStandardMaterial
           ref={strandMaterial}
           color={CYAN}
@@ -144,7 +189,7 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
           roughness={0.22}
         />
       </mesh>
-      <mesh geometry={strandB}>
+      <mesh geometry={geo.tubeB}>
         <meshStandardMaterial
           color={VIOLET}
           emissive={VIOLET}
@@ -154,7 +199,7 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
         />
       </mesh>
 
-      <instancedMesh ref={rods} args={[rodGeometry, undefined, pairs]}>
+      <instancedMesh ref={rods} args={[geo.rod, undefined, pairs]}>
         <meshStandardMaterial
           color={WHITE}
           emissive={CYAN}
@@ -166,7 +211,7 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
         />
       </instancedMesh>
 
-      <instancedMesh ref={nodes} args={[nodeGeometry, undefined, pairs * 2]}>
+      <instancedMesh ref={nodes} args={[geo.node, undefined, pairs * 2]}>
         <meshStandardMaterial
           ref={nodeMaterial}
           color={WHITE}
@@ -176,6 +221,13 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
           roughness={0.15}
         />
       </instancedMesh>
+
+      <mesh ref={sparkA} geometry={geo.spark}>
+        <meshBasicMaterial color={WHITE} toneMapped={false} />
+      </mesh>
+      <mesh ref={sparkB} geometry={geo.spark}>
+        <meshBasicMaterial color={CYAN} toneMapped={false} />
+      </mesh>
 
       <points>
         <bufferGeometry>
@@ -195,16 +247,100 @@ function Helix({ pairs, particles, reduced, nearRef }: HelixProps) {
   );
 }
 
-export interface DnaSceneProps {
+/* ───────────── Copias ───────────── */
+
+/**
+ * Una copia: sólo los dos filamentos, translúcidos y desplazados. Sin barras ni
+ * nodos — se lee igual como copia y cuesta una fracción.
+ */
+function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduced: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  const side = index % 2 === 0 ? 1 : -1;
+  const rank = Math.floor(index / 2) + 1;
+
+  useFrame((state, delta) => {
+    const node = group.current;
+    if (!node) return;
+    if (!reduced) node.rotation.y += Math.min(delta, 0.05) * (0.24 + index * 0.05) * side;
+    // Se separa del original y vuelve, como si no terminara de cuajar.
+    const wander = Math.sin(state.clock.elapsedTime * 0.35 + index) * 0.22;
+    node.position.x = side * rank * (1.5 + wander * 0.4);
+    node.position.z = -rank * 0.9;
+    node.position.y = wander;
+  });
+
+  const opacity = Math.max(0.12, 0.34 - index * 0.05);
+
+  return (
+    <group ref={group} scale={0.82 - index * 0.05}>
+      <mesh geometry={geo.tubeA}>
+        <meshBasicMaterial color={MAGENTA} transparent opacity={opacity} toneMapped={false} />
+      </mesh>
+      <mesh geometry={geo.tubeB}>
+        <meshBasicMaterial color={VIOLET} transparent opacity={opacity} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ───────────── Escena ───────────── */
+
+function Stage({ pairs, particles, reduced, clones, pulse, nearRef }: SceneProps) {
+  const geo = useGeometries();
+  const energyRef = useRef(0);
+  /* Encuadre: la escena se encoge a medida que aparecen copias, en vez de mover
+     la cámara (que es valor de hook y no se puede mutar). */
+  const frame = useRef<THREE.Group>(null);
+
+  /* Cada «Utilizar» recarga la energía; el fotograma la va apagando. */
+  useEffect(() => {
+    if (pulse > 0) energyRef.current = 1;
+  }, [pulse]);
+
+  useFrame((_, delta) => {
+    const step = Math.min(delta, 0.05);
+    energyRef.current = Math.max(0, energyRef.current - step * 0.42);
+    const node = frame.current;
+    if (node) {
+      const target = 1 / (1 + clones * 0.16);
+      node.scale.setScalar(node.scale.x + (target - node.scale.x) * Math.min(1, step * 2.4));
+    }
+  });
+
+  return (
+    <group ref={frame}>
+      <Body
+        geo={geo}
+        pairs={pairs}
+        particles={particles}
+        reduced={reduced}
+        nearRef={nearRef}
+        energyRef={energyRef}
+      />
+      {Array.from({ length: clones }, (_, index) => (
+        <Clone key={index} geo={geo} index={index} reduced={reduced} />
+      ))}
+    </group>
+  );
+}
+
+export interface SceneProps {
   pairs: number;
   particles: number;
   reduced: boolean;
-  /** `never` congela el bucle cuando la hélice sale de pantalla. */
-  active: boolean;
+  /** Copias activas además del original. */
+  clones: number;
+  /** Contador de pulsaciones de «Utilizar»: al subir, enciende la hélice. */
+  pulse: number;
   nearRef: RefObject<number>;
 }
 
-export default function DnaScene({ pairs, particles, reduced, active, nearRef }: DnaSceneProps) {
+export interface DnaSceneProps extends SceneProps {
+  /** `never` congela el bucle cuando la hélice sale de pantalla. */
+  active: boolean;
+}
+
+export default function DnaScene({ active, clones, ...scene }: DnaSceneProps) {
   return (
     <Canvas
       dpr={[1, 1.6]}
@@ -218,7 +354,7 @@ export default function DnaScene({ pairs, particles, reduced, active, nearRef }:
       <pointLight position={[-3.5, -2, 2]} intensity={18} color={VIOLET} />
       <pointLight position={[0, 0, -5]} intensity={12} color={WHITE} />
 
-      <Helix pairs={pairs} particles={particles} reduced={reduced} nearRef={nearRef} />
+      <Stage clones={clones} {...scene} />
 
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={0.9} luminanceThreshold={0.18} luminanceSmoothing={0.35} mipmapBlur />
