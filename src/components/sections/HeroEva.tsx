@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { EvaAcronymMesh } from '@/components/eva/EvaAcronymMesh';
 import { EvaDnaHelix } from '@/components/eva/EvaDnaHelix';
 import { EvaProfile } from '@/components/eva/EvaProfile';
 import { EvaThoughtStream } from '@/components/eva/EvaThoughtStream';
@@ -31,16 +32,21 @@ export function HeroEva() {
               <h1 id="hero-titulo" className="sr-only">
                 {site.name} — {site.expansion}
               </h1>
+              {/* Las letras son una red de nodos dibujada en un lienzo; las
+                  palabras van al lado, en su fila. */}
               <div className="acronym" aria-hidden="true">
-                {hero.acronym.map((row, index) => (
-                  <div key={row.letter} className="acronym__row" data-rise style={rise(index + 1)}>
-                    <span className="acronym__letter">{row.letter}</span>
-                    <span className="acronym__word">
-                      {row.word}
+                <EvaAcronymMesh
+                  letters={hero.acronym.map((row) => row.letter)}
+                  fontVar="--font-orbitron"
+                />
+                <div className="acronym__words">
+                  {hero.acronym.map((row, index) => (
+                    <div key={row.letter} className="acronym__row" data-rise style={rise(index + 1)}>
+                      <span className="acronym__word">{row.word}</span>
                       <span className="acronym__index mono">0{index + 1}</span>
-                    </span>
-                  </div>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

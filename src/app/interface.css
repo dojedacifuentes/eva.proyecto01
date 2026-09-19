@@ -240,7 +240,26 @@ html {
 /* ───────────── Portada ───────────── */
 
 .hero {
+  position: relative;
   padding-block: clamp(0.75rem, 2vh, 1.75rem);
+}
+/* Este slide va más oscuro que el resto: la malla y la hélice necesitan negro
+   detrás para que el cian y el magenta tengan de dónde salir. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -8% 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(1, 4, 8, 0.92), transparent 78%);
+}
+.hero .wrap {
+  position: relative;
+  z-index: 1;
+}
+.hero .panel {
+  background: linear-gradient(115deg, rgba(5, 12, 20, 0.96), rgba(3, 8, 14, 0.97) 60%, rgba(8, 17, 28, 0.94));
+  box-shadow: 0 18px 90px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(209, 240, 255, 0.05);
 }
 /* La tarjeta de portada respira: es lo primero que se ve y ahora lleva tres
    piezas más la franja de pensamiento. */
@@ -306,33 +325,49 @@ html {
   color: var(--eva-cyan);
 }
 
-/* El acrónimo vuelve a mandar en la portada, un punto más chico que en v2. */
+/*
+ * El acrónimo: las letras son una red de nodos pintada en un lienzo (las
+ * rasteriza EvaAcronymMesh a partir de Orbitron) y las palabras van al lado,
+ * una por fila. Las dos columnas comparten alto, así que las filas casan.
+ */
 .acronym {
+  display: grid;
+  grid-template-columns: clamp(6rem, 14vw, 11rem) minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: clamp(0.75rem, 2vw, 1.75rem);
   margin-top: 0.9rem;
+  min-height: clamp(13rem, 36vh, 22rem);
   border-left: 1px solid var(--eva-line-strong);
-}
-.acronym__row {
-  grid-template-columns: clamp(3rem, 7.5vw, 6.2rem) 1fr;
-  column-gap: clamp(0.5rem, 1.4vw, 1.1rem);
   padding-left: clamp(0.6rem, 1.4vw, 1.1rem);
 }
-/* Orbitron sólo aquí: tres letras de display, el resto sigue en Grotesk. */
-.acronym__letter {
-  font-family: var(--font-orbitron), var(--font-grotesk), sans-serif;
-  font-size: clamp(2.6rem, min(6.6vw, 13vh), 5.6rem);
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  line-height: 1;
+.acronym__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.acronym__words {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+.acronym__row {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1.4vw, 1.1rem);
+  padding: 0;
+  min-width: 0;
 }
 .acronym__word {
+  display: flex;
+  align-items: center;
   gap: clamp(0.45rem, 1.1vw, 0.85rem);
-  font-size: clamp(0.95rem, 1.9vw, 1.45rem);
+  font-size: clamp(0.88rem, 1.65vw, 1.25rem);
   text-wrap: nowrap;
 }
 .acronym__word::before {
-  flex-basis: clamp(0.5rem, 1.4vw, 1.25rem);
+  flex-basis: clamp(0.9rem, 2.6vw, 2.4rem);
 }
 .acronym__index {
+  margin-left: auto;
   font-size: 0.58rem;
 }
 /* EVA, a la derecha y al lado del acrónimo. Marco estrecho: ocupa menos y lee
@@ -927,7 +962,7 @@ html {
 /* Escritorio: acrónimo, genoma y EVA, uno al lado del otro. */
 @media (min-width: 64rem) {
   .hero__grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr) clamp(10rem, 16vw, 16rem);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 
