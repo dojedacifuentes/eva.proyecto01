@@ -8,7 +8,7 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Textos de cada lugar (núcleo, genoma, cuerpo) | `content/ejes.ts` | `ejes.nucleo`, `ejes.genoma`, `ejes.cuerpo` |
 | **Cuerpo**: biolectura (rótulo `EVA-07`, estados, botones, respuestas, nombres de los puntos de lectura) | `content/ejes.ts` | `ejes.cuerpo.exterior` |
 | **Cuerpo**: interior (órganos, su lectura, sus estados y su acción; acciones del cuerpo y respuestas) | `content/ejes.ts` | `ejes.cuerpo.interior` (el orden de `organs` da su código binario) |
-| Cuerpo: posición de los puntos de lectura sobre cada imagen y umbral de bordes | `components/eva/cuerpo/bio-data.ts` | `BIO_VIEWS` (son coordenadas atadas a cada recurso; revisar si cambia la imagen) |
+| Cuerpo: posición de los puntos de lectura sobre cada vídeo y umbral de bordes | `components/eva/cuerpo/bio-data.ts` | `BIO_VIEWS` (son coordenadas atadas a cada recurso; revisar si cambia la imagen) |
 | Cuerpo: forma del modelo interior (silueta, vasos, órganos) | `components/eva/cuerpo/interior-data.ts` | `GHOST`, `VESSELS`, `ORGANS` |
 | El nombre de la portada, letra a letra, y el rótulo de las puertas | `content/site.ts` | `hero.acronym`, `hero.doorsLabel`, `hero.doorsEyebrow` |
 | El canal de EVA (SINAPSIS): rótulos, aviso y guion de cada lugar | `content/channel.ts` | `channel`, `scripts`, `idleCalcs` |
@@ -19,7 +19,7 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Lecturas del núcleo neural 3D | `content/neuroscan.ts` | `brain.core` |
 | Salas en reserva (cerebro, redes, causas, bitácora) | `content/lab.ts` | `lab.brain`, `lab.networks`, `lab.causes`, `lab.log` — no se muestran |
 | Pie de página | `content/site.ts` | `sections.footer` |
-| Retratos de EVA, el vídeo de perfil y la imagen de la cápsula | `content/assets.ts` | `images.*` (`src`, `width`, `height`, `focus`, `alt`), `heroLoop`, `capsuleLoop` |
+| Retratos de EVA y los vídeos (portada, perfil y cápsula) con sus pósteres | `content/assets.ts` | `images.*` (`src`, `width`, `height`, `focus`, `alt`), `heroLoop`, `capsuleLoop`, `capsuleFrontLoop` |
 | Contacto («Escribir a EVA») e Instagram | `content/site.ts` | `nav.contact`, `site.social.instagram` |
 | Activar/desactivar efectos | `content/site.ts` | `flags` |
 | Colores, radios, tiempos, suelo tipográfico | `src/styles/tokens.css` | Variables `--eva-*` |
@@ -73,7 +73,7 @@ salieron en la v7; para devolverlas, o para añadir cualquier otro lugar:
 - **Idioma:** todo en español. En inglés sólo los rótulos de sistema: `EVA // DIGITAL GENOME`,
   `EVA NEURAL CORE`, `EVA // NEURAL READOUT`, `EVA // THOUGHT STREAM INTERCEPTED` y las lecturas
   técnicas del flujo del escáner. Los rótulos del Cuerpo van en español (`BIOLECTURA`,
-  `INTERIOR / SISTEMA BIO-SINTÉTICO`); los que se ven en inglés dentro de la imagen de la cápsula
+  `INTERIOR / SISTEMA BIO-SINTÉTICO`); los que se ven en inglés dentro del vídeo de la cápsula
   son de la imagen.
 - **Ficción declarada:** el pie, el escáner, el genoma y el canal dicen que EVA es un personaje.
   Mantenerlo.

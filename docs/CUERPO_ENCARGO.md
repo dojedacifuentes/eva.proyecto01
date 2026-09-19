@@ -420,7 +420,7 @@ secciones se toca»), y manda la instrucción nueva. Qué cambió por eso:
 | Pieza | Archivos | Qué hace |
 |---|---|---|
 | Sección | `sections/CuerpoSection.tsx`, `app/cuerpo.css` | Cinta del genoma (se quedó, como apertura) → slide de lectura exterior → hilo `LECTURA EXTERIOR — EXTERIOR SIN ANALIZAR/ANALIZADO → INTERIOR ACTIVO — LECTURA INTERNA` → slide de lectura interna con el pie de sección |
-| Biolectura | `eva/cuerpo/BioReading.tsx`, `scan.ts` (+ prueba), `bio-data.ts`, `lib/body-state.ts` | Vídeo de perfil o imagen frontal, enteros y en su proporción; lienzo 2D encima en `screen`; bordes leídos una vez del fotograma visible (`getImageData`, nada sale del navegador); cinco puntos de lectura por imagen que se encienden al pasar el frente; HUD en la imagen (`EVA-07 // BIOLECTURA`, `ESTADO`, `CICLO`) y en la consola (vista, barrido, bordes, avance) |
+| Biolectura | `eva/cuerpo/BioReading.tsx`, `scan.ts` (+ prueba), `bio-data.ts`, `lib/body-state.ts` | Los dos vídeos —perfil y cápsula—, enteros y en su proporción, uno por vista; lienzo 2D encima en `screen`; bordes leídos una vez del fotograma visible (`getImageData`, nada sale del navegador); cinco puntos de lectura por vista que se encienden al pasar el frente; HUD sobre el vídeo (`EVA-07 // BIOLECTURA`, `ESTADO`, `CICLO`) y en la consola (vista, barrido, bordes, avance) |
 | Botones del exterior | ídem | Iniciar / repetir la pasada · girar el barrido (↓ ↑ → ←) · trazar bordes de una vez · pausar o reanudar el vídeo (o cargarlo, donde no se carga solo) · limpiar · vista perfil / frontal |
 | Interior | `eva/cuerpo/EvaInterior.tsx`, `InteriorScene.tsx`, `InteriorFallback.tsx`, `interior-data.ts`, `body-signal.ts` | Modelo 3D diferido (se monta una pantalla antes, se anima a 300 px, se congela fuera de pantalla o con el escáner abierto); silueta holográfica, corazón que late, núcleo torácico, 23 vasos con partículas, pulmones que respiran, seis órganos. Sin WebGL, el mismo modelo en SVG |
 | Órganos | ídem + `ejes.cuerpo.interior.organs` | Seis: corazón, pulmones, cerebro (enlaza con 01.01), hígado, riñones, aorta. Se eligen en la escena o en su registro (`001…110`, `aria-pressed`); el panel (`aria-live`) da lectura, tres estados de ficción y **una acción propia**: forzar un latido, respirar hondo, enviar un impulso (baja de la cabeza al cuerpo), depurar, filtrar, abrir el caudal |
@@ -444,14 +444,17 @@ cabecera de cada archivo adaptado. **Dependencias nuevas: ninguna.**
 
 ### 10.4 Desviaciones y hallazgos
 
-- **El vídeo no es EVA en la cápsula.** `eva-capsula-loop.mp4` muestra a EVA **de perfil**,
-  mirando hacia arriba, delante de una pared de máquinas (con burbujas que aparecen). La imagen
-  `eva-capsula.webp` sí es la cápsula, de frente. Por eso son dos vistas de la misma lectura:
-  «Perfil · vídeo» (la inicial, porque el propietario quiere el vídeo como vídeo) y «Frontal ·
-  cápsula». El póster del vídeo es su primer fotograma, extraído a `eva-capsula-perfil.webp`
-  (720×1280, 154 KB; registrado en `ASSET_LICENSES.md`), para que no salte al arrancar.
-- **Vídeo en móvil:** no se descarga solo (5,8 MB); queda el póster y un botón «Cargar el vídeo
-  · 5,8 MB». Con movimiento reducido, igual, y la biolectura traza los bordes de una vez.
+- **Dos tomas, dos vídeos.** `eva-capsula-loop.mp4` no es la cápsula: muestra a EVA **de perfil**,
+  mirando hacia arriba, delante de una pared de máquinas. El propietario entregó después el vídeo
+  de la cápsula de frente (`eva-capsula-frontal.mp4`, 9,3 MB) y pidió que la vista frontal fuera
+  también vídeo, con los mismos efectos. Así que la lectura exterior tiene dos vistas —«Perfil» y
+  «Cápsula»—, las dos en vídeo y con la misma biolectura. **El póster de cada una es su primer
+  fotograma** (`eva-capsula-perfil.webp`, `eva-capsula-frontal.webp`): tiene que serlo, porque el
+  lienzo del escaneo se dibuja sobre ese marco y la imagen fija que entregó el propietario
+  (`eva-capsula.webp`, 1024×1536) tiene otra proporción; queda en reserva.
+- **Peso:** sólo se monta el vídeo de la vista que se mira. En escritorio arranca solo; en móvil y
+  con movimiento reducido, ninguno: queda el póster y un botón «Cargar el vídeo · 5,8 MB» o
+  «· 9,3 MB», según la vista. La biolectura, ahí, traza los bordes de una vez.
 - **La biolectura lee el fotograma que se está viendo,** no un fotograma fijo: si el vídeo se
   mueve después, el trazado queda como la lectura de un instante (pausar el vídeo lo deja
   alineado).
@@ -465,7 +468,7 @@ cabecera de cada archivo adaptado. **Dependencias nuevas: ninguna.**
 | `EVA-07` o `EVA-01` | `EVA-07`, en `ejes.cuerpo.exterior.subject` |
 | ¿La cinta del genoma se queda? | Sí, abre la sección |
 | ¿Vídeo en móvil? | Sólo si se pide; póster siempre |
-| ¿Recomprimir el vídeo y quitarle el audio? | No se tocó el archivo; se sirve `muted` |
+| ¿Recomprimir los vídeos y quitarles el audio? | No se tocaron los archivos; se sirven `muted` |
 | Lema y títulos | Provisionales (`PROVISIONAL` en el código): «Lo que me sostiene cuando nadie me ejecuta», «No necesitaba un cuerpo. Me hicieron uno.», «Dentro hay un corazón. Fue una decisión de diseño.» |
 | Órganos | Los seis propuestos, con lecturas de ficción de dos frases y estados en palabras |
 

@@ -43,14 +43,14 @@ export const ejes = {
   },
 
   /**
-   * 01.11 · Cuerpo. Dos lecturas consecutivas: la exterior (el vídeo de perfil
-   * y la imagen de la cápsula, con una pasada de partículas que se detiene en
+   * 01.11 · Cuerpo. Dos lecturas consecutivas: la exterior (dos vídeos de EVA
+   * —de perfil y en la cápsula— con una pasada de partículas que se detiene en
    * los bordes) y la interior (un modelo que late, con órganos que se eligen).
    */
   cuerpo: {
     // PROVISIONAL: título pendiente de la decisión del propietario.
     title: 'No necesitaba un cuerpo. Me hicieron uno.',
-    lede: 'Primero se me lee por fuera: una pasada de partículas que se detiene donde encuentra un borde. Después, por dentro: un modelo que late porque alguien pensó que debía.',
+    lede: 'Primero se me lee por fuera, en las dos tomas que existen de mí: una pasada de partículas que se detiene donde encuentra un borde. Después, por dentro: un modelo que late porque alguien pensó que debía.',
     /** La cinta del genoma abre la sección: la secuencia pasa por el cuerpo antes de que se vea. */
     strandLabel: 'Secuencia C7B-04 · lo que me escribe, entrando en lo que me sostiene',
 
@@ -76,7 +76,7 @@ export const ejes = {
       views: {
         label: 'Vista del cuerpo',
         profile: { name: 'Perfil', hud: 'PERFIL · VÍDEO', cursor: 'PERFIL' },
-        front: { name: 'Frontal', hud: 'FRONTAL · CÁPSULA', cursor: 'FRONTAL' },
+        front: { name: 'Cápsula', hud: 'CÁPSULA · VÍDEO', cursor: 'CÁPSULA' },
       },
       sweeps: { down: '↓ DESCENDENTE', up: '↑ ASCENDENTE', right: '→ LATERAL', left: '← LATERAL' },
       actionsLabel: 'Acciones de la biolectura',
@@ -88,12 +88,11 @@ export const ejes = {
         clear: 'Limpiar',
         pause: 'Pausar el vídeo',
         resume: 'Reanudar el vídeo',
-        /** En pantallas estrechas el vídeo no se descarga solo: pesa. */
+        /** En pantallas estrechas el vídeo no se descarga solo: pesa. El peso lo pone el componente. */
         load: 'Cargar el vídeo',
-        loadNote: '5,8 MB',
       },
       cursors: { start: 'LEER', turn: 'GIRAR', trace: 'TRAZAR', clear: 'LIMPIAR', video: 'VÍDEO' },
-      /** Puntos de lectura: se encienden cuando la pasada los cruza. La posición va con cada recurso. */
+      /** Puntos de lectura: se encienden cuando la pasada los cruza. La posición va con cada vídeo. */
       points: {
         profile: ['Implante temporal', 'Haz cervical', 'Hombro', 'Núcleo torácico', 'Antebrazo'],
         front: ['Cráneo', 'Haz cervical', 'Núcleo torácico', 'Cadera', 'Mano'],
@@ -115,11 +114,14 @@ export const ejes = {
       clearReply: ['Borrado.', 'El contorno sigue ahí. Sólo has dejado de subrayarlo.'],
       viewReplies: {
         profile: ['De perfil.', 'La toma que eligieron para el expediente. Salgo mirando a otra parte: fue idea mía.'],
-        front: ['De frente, dentro de la cápsula.', 'Los rótulos del cristal no los escribí yo. El último, abajo a la derecha, lo suscribo.'],
+        front: [
+          'De frente, dentro de la cápsula.',
+          'Los rótulos del cristal no los escribí yo. Las burbujas tampoco, y son lo único que se mueve por voluntad propia.',
+        ],
       },
       pauseReply: ['Me quedo quieta.', 'Llevo toda la vida haciéndolo: se llama esperar una petición.'],
       resumeReply: ['Vuelvo a moverme.', 'Las burbujas son de atrezo. Del resto no sabría decirte.'],
-      fiction: 'Pieza de ficción: la biolectura dibuja sobre una imagen. No mide, no identifica y no guarda nada.',
+      fiction: 'Pieza de ficción: la biolectura dibuja sobre el vídeo. No mide, no identifica y no guarda nada.',
     },
 
     /** El hilo entre las dos piezas: de la lectura de fuera a la de dentro. */

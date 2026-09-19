@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` = v6 (`900e5e5`), **publicada** en https://evaproyecto01.vercel.app/ · rama `feat/cuerpo` = **v7, sin integrar ni publicar**: la subsección 01.11 es **CUERPO** (biolectura sobre el vídeo de perfil y la imagen de la cápsula + interior bio-sintético con corazón, vasos, seis órganos y ECG) y, a pedido del propietario, **Vigilancia (10) y Autonomía (11) salieron del recorrido**: la landing es la Entidad y sus tres partes. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024, 390×844 y 360 px, con movimiento reducido y sin WebGL (§0). Pendiente: el «sí» del propietario y sus decisiones de §5.
+**Estado:** `main` = v6 (`900e5e5`), **publicada** en https://evaproyecto01.vercel.app/ · rama `feat/cuerpo` = **v7, sin integrar ni publicar**: la subsección 01.11 es **CUERPO** (biolectura sobre los dos vídeos de EVA, de perfil y en la cápsula, + interior bio-sintético con corazón, vasos, seis órganos y ECG) y, a pedido del propietario, **Vigilancia (10) y Autonomía (11) salieron del recorrido**: la landing es la Entidad y sus tres partes. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024, 390×844 y 360 px, con movimiento reducido y sin WebGL (§0). Pendiente: el «sí» del propietario y sus decisiones de §5.
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -28,13 +28,15 @@ En corto:
 
 - **01.11 · Cuerpo** (`sections/CuerpoSection.tsx`, piezas en `eva/cuerpo/`):
   abre la cinta del genoma; después, dos slides unidos por un hilo de señal.
-  1. **Lectura exterior** (`BioReading`): el vídeo de EVA de perfil —se
-     conserva como vídeo— o la imagen frontal de la cápsula, enteros y en su
-     proporción, con la **biolectura**: filas de partículas que se clavan en
-     los bordes (técnica de collidingScopes/scanlines, MIT, en `scan.ts`),
-     cinco puntos de lectura por imagen y un HUD `EVA-07 · BIOLECTURA ·
-     ESTADO · CICLO`. Botones: iniciar/repetir, girar el barrido, trazar
-     bordes, pausar/cargar el vídeo, limpiar, y la vista (perfil o frontal).
+  1. **Lectura exterior** (`BioReading`): los dos vídeos de EVA —de perfil y
+     en la cápsula—, enteros y en su proporción, uno por vista, con la
+     **biolectura**: filas de partículas que se clavan en los bordes (técnica
+     de collidingScopes/scanlines, MIT, en `scan.ts`), cinco puntos de lectura
+     por vista y un HUD `EVA-07 · BIOLECTURA · ESTADO · CICLO`. Botones:
+     iniciar/repetir, girar el barrido, trazar bordes, pausar/cargar el vídeo,
+     limpiar, y la vista (Perfil o Cápsula). Sólo se monta el vídeo de la vista
+     que se mira; el póster de cada uno es su primer fotograma, así que el
+     lienzo del escaneo casa con lo que se ve.
   2. **Lectura interna** (`EvaInterior` + `InteriorScene`): un modelo que
      late (técnicas de HÆMA, MIT): corazón, 23 vasos con partículas, silueta,
      seis órganos que se eligen en la escena o en su registro (`001…110`),
@@ -328,12 +330,13 @@ apareció dos veces en sitios distintos.
    - rótulo `EVA-07` (encargo) o `EVA-01` (imagen): va `EVA-07`, en
      `ejes.cuerpo.exterior.subject`;
    - título y lema del Cuerpo e interior: provisionales, marcados en el código;
-   - el vídeo pesa 5,8 MB, sin recomprimir y con audio que no se usa: en
-     escritorio se descarga al llegar; en móvil y con movimiento reducido, sólo
-     si se pide («Cargar el vídeo · 5,8 MB»). Recomprimirlo lo dejaría en ~1 MB;
-   - el vídeo es de EVA **de perfil, fuera de la cápsula**; la imagen de la
-     cápsula es la vista frontal. Si la toma buena es otra, se cambia en
-     `content/assets.ts` y los puntos en `cuerpo/bio-data.ts`;
+   - los vídeos pesan 5,8 MB (perfil) y 9,3 MB (cápsula), sin recomprimir y con
+     audio que no se usa: en escritorio se descarga el de la vista que se mira;
+     en móvil y con movimiento reducido, sólo si se pide («Cargar el vídeo ·
+     9,3 MB»). Recomprimirlos los dejaría en torno a 1–2 MB cada uno;
+   - la imagen fija de la cápsula (`eva-capsula.webp`, 1024×1536) quedó **en
+     reserva**: la vista frontal usa el vídeo y su propio primer fotograma,
+     porque el póster tiene que tener la proporción del vídeo;
    - revisión de tono de todos los textos nuevos del Cuerpo y de «Expresar».
 1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
    con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
@@ -420,7 +423,7 @@ sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selecci
   proporción; genoma con su propia subsección y usable en móvil; regiones y
   métricas en español; salas antiguas en reserva.
 - **v7** (esta, rama `feat/cuerpo`) — una sola Entidad en tres partes: la
-  reserva 01.11 pasa a ser el **Cuerpo** (biolectura sobre el vídeo de perfil
-  y la imagen de la cápsula, e interior bio-sintético con corazón, vasos, seis
+  reserva 01.11 pasa a ser el **Cuerpo** (biolectura sobre los dos vídeos de
+  EVA, e interior bio-sintético con corazón, vasos, seis
   órganos y ECG, adaptados de dos repos MIT); fuera Vigilancia y Autonomía; la
   portada enseña el nombre y tres puertas; el genoma gana «Expresar».

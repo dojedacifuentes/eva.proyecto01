@@ -24,19 +24,43 @@ export const heroLoop = {
 } as const;
 
 /**
- * EVA de perfil, en vídeo: la toma exterior del Cuerpo (01.11). El propietario
- * pidió conservarla como vídeo. Trae pista de audio, que no se usa: se sirve
- * `muted` y sin control de sonido. Su póster es `images.capsuleProfile`, el
- * primer fotograma del propio vídeo.
+ * Las dos tomas del Cuerpo (01.11), las dos en vídeo: el propietario pidió
+ * conservarlas así. Traen pista de audio, que no se usa: se sirven `muted` y
+ * sin control de sonido. El póster de cada una es su primer fotograma, para
+ * que no salte nada al arrancar; la biolectura se dibuja sobre ese mismo marco,
+ * así que **el póster tiene que ser del vídeo**, no una imagen parecida.
+ *
+ * Sólo se monta el vídeo de la vista que se está mirando; el otro ni se
+ * descarga. En pantallas estrechas y con movimiento reducido, ninguno: queda
+ * el póster y un botón para pedirlo.
  */
-export const capsuleLoop = {
+export interface EvaLoop {
+  src: string;
+  type: string;
+  width: number;
+  height: number;
+  /** Peso real del archivo: se enseña donde el vídeo hay que pedirlo. */
+  bytes: number;
+}
+
+export const capsuleLoop: EvaLoop = {
   src: '/eva/eva-capsula-loop.mp4',
   type: 'video/mp4',
   width: 720,
   height: 1280,
-  /** Sin recomprimir: por eso en pantallas estrechas sólo se descarga si se pide. */
+  /** Sin recomprimir. */
   bytes: 5_765_937,
-} as const;
+};
+
+/** La cápsula, de frente y en movimiento: mismas medidas, más peso. */
+export const capsuleFrontLoop: EvaLoop = {
+  src: '/eva/eva-capsula-frontal.mp4',
+  type: 'video/mp4',
+  width: 720,
+  height: 1280,
+  /** Sin recomprimir. */
+  bytes: 9_334_571,
+};
 
 export const images: Record<
   | 'heroPortrait'
@@ -44,6 +68,7 @@ export const images: Record<
   | 'humanPortrait'
   | 'aboutPortrait'
   | 'capsuleProfile'
+  | 'capsuleFront'
   | 'capsulePortrait',
   EvaImage
 > = {
@@ -86,7 +111,19 @@ export const images: Record<
     height: 1280,
     focus: '50% 50%',
   },
-  /** EVA de frente, dentro de la cápsula. Los rótulos forman parte de la imagen. */
+  /** Primer fotograma de `capsuleFrontLoop`: su póster, y el marco de la biolectura frontal. */
+  capsuleFront: {
+    src: '/eva/eva-capsula-frontal.webp',
+    alt: 'EVA de frente y de cuerpo entero, suspendida en una cápsula cilíndrica de líquido verdoso con burbujas, conectada por tubos que bajan hacia su cabeza. El cuerpo es sintético: placas blancas sobre fibras rojizas y un núcleo circular azul en el pecho. Sobre el cristal se leen rótulos en inglés: «Orpheus Biotech», «EVA-01, synthetic human interface» y «Humanity beyond its end».',
+    width: 720,
+    height: 1280,
+    focus: '50% 50%',
+  },
+  /**
+   * La misma toma frontal como imagen fija, tal como la entregó el propietario
+   * (1024×1536, con más margen a los lados). En reserva desde que la vista
+   * frontal es vídeo: su proporción no casa con la del vídeo.
+   */
   capsulePortrait: {
     src: '/eva/eva-capsula.webp',
     alt: 'EVA de frente y de cuerpo casi entero, suspendida en una cápsula cilíndrica de líquido verdoso con burbujas, conectada por tubos que bajan hacia su cabeza y su espalda. El cuerpo es sintético: placas blancas sobre fibras rojizas y un núcleo circular azul en el pecho. Sobre el cristal se leen rótulos en inglés: «Orpheus Biotech», «EVA-01, synthetic human interface» y «Some things still remember».',

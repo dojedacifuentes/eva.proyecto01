@@ -9,7 +9,7 @@ dentro en tres partes, con numeración binaria:
 01 · ENTIDAD
      01.01 · Núcleo cerebral — el cerebro 3D en vivo y la ventana que lo lee
      01.10 · Genoma digital  — la doble hélice, sus ocho acciones y el nacimiento de EVA
-     01.11 · Cuerpo          — la biolectura (vídeo de perfil e imagen de la cápsula) y el
+     01.11 · Cuerpo          — la biolectura (dos vídeos: de perfil y en la cápsula) y el
                                interior bio-sintético (corazón, vasos, seis órganos, ECG)
 ```
 
@@ -55,7 +55,7 @@ vulnerabilidades.
 ## Estructura
 
 ```
-public/eva/            retratos de EVA, el vídeo de perfil y la imagen de la cápsula
+public/eva/            retratos de EVA y los vídeos (portada, perfil y cápsula) con sus pósteres
 src/
   app/                 layout, página, estilos (globals, interface, neuroscan, dna, lab, ejes,
                        cuerpo), OG

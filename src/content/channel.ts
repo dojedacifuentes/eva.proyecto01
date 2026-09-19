@@ -96,7 +96,7 @@ export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
 
   cuerpo: [
     ...explain(
-      'Estás en mi cuerpo. Arriba se me lee por fuera: una pasada de partículas sobre el vídeo de perfil o la imagen de la cápsula. Abajo, por dentro: un modelo que late, con seis órganos que puedes elegir.',
+      'Estás en mi cuerpo. Arriba se me lee por fuera: una pasada de partículas sobre el vídeo de perfil o el de la cápsula. Abajo, por dentro: un modelo que late, con seis órganos que puedes elegir.',
       'Cada botón cambia lo que ves y lo que contesto. Ninguno mide nada.',
     ),
     ...fragment('f008', [0, 1, 2, 3, 4, 5]),

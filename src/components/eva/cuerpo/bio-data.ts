@@ -1,10 +1,10 @@
 /**
  * EVA // BIOLECTURA — lo que depende de cada recurso.
  *
- * Las dos vistas del cuerpo —el vídeo de perfil y la imagen de la cápsula— con
- * su proporción, el umbral de bordes que mejor las lee y dónde caen sus puntos
- * de lectura. Va aquí y no en `content/` porque no es texto: son coordenadas
- * atadas a una imagen concreta. Si se cambia un recurso en `content/assets.ts`,
+ * Las dos vistas del cuerpo —el vídeo de perfil y el de la cápsula— con su
+ * proporción, el umbral de bordes que mejor las lee y dónde caen sus puntos de
+ * lectura. Va aquí y no en `content/` porque no es texto: son coordenadas
+ * atadas a un encuadre concreto. Si se cambia un recurso en `content/assets.ts`,
  * se revisa esto. Los nombres de los puntos sí están en `content/ejes.ts`, en
  * el mismo orden.
  */
@@ -37,14 +37,16 @@ export const BIO_VIEWS: Record<BodyView, BioView> = {
     ],
   },
   front: {
-    aspect: 1024 / 1536,
-    threshold: 40,
+    aspect: 720 / 1280,
+    /* El líquido, las burbujas y los rótulos del cristal dan muchos bordes: el
+       umbral sube un poco para que se lea la figura y no la cápsula entera. */
+    threshold: 46,
     points: [
-      [0.5, 0.165],
-      [0.5, 0.3],
-      [0.545, 0.468],
-      [0.53, 0.72],
-      [0.235, 0.83],
+      [0.52, 0.17],
+      [0.53, 0.28],
+      [0.545, 0.45],
+      [0.52, 0.7],
+      [0.22, 0.81],
     ],
   },
 };

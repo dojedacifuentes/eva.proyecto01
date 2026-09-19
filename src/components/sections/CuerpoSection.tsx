@@ -8,8 +8,8 @@ import { NodeFoot, NodeHead } from './NodeParts';
 /**
  * 01.11 · Cuerpo. La tercera parte de la Entidad, en dos lecturas seguidas:
  *
- *   1. LECTURA EXTERIOR — el vídeo de EVA de perfil y la imagen de la cápsula,
- *      con la biolectura: una pasada de partículas que se detiene en los bordes.
+ *   1. LECTURA EXTERIOR — los dos vídeos de EVA, de perfil y en la cápsula, con
+ *      la biolectura: una pasada de partículas que se detiene en los bordes.
  *   2. LECTURA INTERNA — un modelo que late: corazón, vasos y seis órganos que
  *      se eligen, cada uno con su lectura y su acción.
  *

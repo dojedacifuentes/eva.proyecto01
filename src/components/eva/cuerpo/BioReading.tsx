@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { capsuleLoop, images } from '@/content/assets';
+import { capsuleFrontLoop, capsuleLoop, images, type EvaImage, type EvaLoop } from '@/content/assets';
 import { ejes, type BodyView, type SweepDirection } from '@/content/ejes';
 import { bin, bitsFor } from '@/lib/binary';
 import { clearBody, publishBody } from '@/lib/body-state';
@@ -14,6 +14,15 @@ import { BIO_VIEWS, PASS, SIM_WIDTH } from './bio-data';
 import { FROZEN, HIT, OUT, createScan, detectEdges, traceEdges, type Scan } from './scan';
 
 const copy = ejes.cuerpo.exterior;
+
+/** Cada vista, su vídeo y su póster. Los dos son el mismo cuerpo, desde fuera. */
+const MEDIA: Record<BodyView, { video: EvaLoop; poster: EvaImage }> = {
+  profile: { video: capsuleLoop, poster: images.capsuleProfile },
+  front: { video: capsuleFrontLoop, poster: images.capsuleFront },
+};
+
+/** Megabytes con coma decimal: es una medida, así que va en decimal. */
+const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1).replace('.', ',')} MB`;
 
 const SWEEPS: readonly SweepDirection[] = ['down', 'up', 'right', 'left'];
 /** El contador de pasadas se escribe en cuatro bits: es un nombre, no una medida. */
@@ -73,7 +82,7 @@ function paintStill(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement
 
 /**
  * BIOLECTURA: la lectura exterior del cuerpo de EVA. Sobre el vídeo de perfil
- * —o sobre la imagen de la cápsula— pasa una tanda de filas de partículas que
+ * —o sobre el de la cápsula— pasa una tanda de filas de partículas que
  * se detienen donde encuentran un borde y así van dibujando el contorno. El
  * motor es `scan.ts` (técnica de collidingScopes/scanlines, MIT); aquí están el
  * lienzo, los dos recursos, el HUD y los botones.
@@ -82,9 +91,10 @@ function paintStill(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement
  * fotograma que se está viendo, en un lienzo fuera de pantalla. No hay cámara,
  * no se sube nada y no se guarda nada. Es ficción, como el genoma.
  *
- * El vídeo se conserva como vídeo: en escritorio arranca solo al entrar en
- * pantalla; en pantallas estrechas y con movimiento reducido se queda su primer
- * fotograma como póster, y sólo se descarga si el visitante lo pide.
+ * Las dos vistas son vídeo y se comportan igual: en escritorio arrancan solas
+ * al entrar en pantalla; en pantallas estrechas y con movimiento reducido se
+ * quedan en su primer fotograma, que hace de póster, y sólo se descargan si el
+ * visitante lo pide. Sólo se monta el vídeo de la vista que se mira.
  */
 export function BioReading({ head, foot }: BioReadingProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -111,7 +121,8 @@ export function BioReading({ head, foot }: BioReadingProps) {
   const [videoReady, setVideoReady] = useState(false);
   const [reply, setReply] = useState<readonly string[]>([copy.idle]);
 
-  const showVideo = view === 'profile' && onScreen && (requested || (wide && !reduced));
+  const media = MEDIA[view];
+  const showVideo = onScreen && (requested || (wide && !reduced));
 
   /* El vídeo sólo existe con la pieza a la vista: fuera de pantalla ni descarga ni decodifica. */
   useEffect(() => {
@@ -334,12 +345,15 @@ export function BioReading({ head, foot }: BioReadingProps) {
     setReply(copy.turnReplies[next]);
   };
 
-  /** Cada vista tiene sus bordes: al cambiar, lo leído en la otra ya no vale. */
+  /** Cada vista tiene su vídeo y sus bordes: al cambiar, lo leído en la otra ya no vale. */
   const onView = (next: BodyView) => {
     if (next === view) return;
     play('open');
     wipe();
     setVideoReady(false);
+    // El vídeo de la otra vista pesa lo suyo: donde no se cargan solos, se vuelve a pedir.
+    setRequested(false);
+    setPaused(false);
     setView(next);
     setStatus('idle');
     setReply(copy.viewReplies[next]);
@@ -361,7 +375,7 @@ export function BioReading({ head, foot }: BioReadingProps) {
     setPaused(!paused);
   };
 
-  const image = view === 'profile' ? images.capsuleProfile : images.capsulePortrait;
+  const image = media.poster;
   const names = copy.points[view];
   const busy = status === 'scanning';
   const videoLabel = !showVideo ? copy.actions.load : paused ? copy.actions.resume : copy.actions.pause;
@@ -376,8 +390,9 @@ export function BioReading({ head, foot }: BioReadingProps) {
             <span key={corner} aria-hidden="true" className={`bio__corner bio__corner--${corner}`} />
           ))}
 
+          {/* La clave lleva la vista: al cambiar de toma, póster y vídeo se montan de nuevo. */}
           <Image
-            key={view}
+            key={`poster-${view}`}
             ref={imageRef}
             className="bio__image"
             src={image.src}
@@ -395,10 +410,11 @@ export function BioReading({ head, foot }: BioReadingProps) {
              * sin controles de sonido: la pista de audio del archivo no se usa.
              */
             <video
+              key={`video-${view}`}
               ref={videoRef}
               className="bio__video"
               data-ready={videoReady || undefined}
-              src={capsuleLoop.src}
+              src={media.video.src}
               muted
               loop
               playsInline
@@ -513,12 +529,10 @@ export function BioReading({ head, foot }: BioReadingProps) {
           >
             {copy.actions.trace}
           </button>
-          {view === 'profile' && (
-            <button type="button" className="dna__btn mono" onClick={onVideo} data-cursor-label={copy.cursors.video}>
-              {videoLabel}
-              {!showVideo && <small> · {copy.actions.loadNote}</small>}
-            </button>
-          )}
+          <button type="button" className="dna__btn mono" onClick={onVideo} data-cursor-label={copy.cursors.video}>
+            {videoLabel}
+            {!showVideo && <small> · {megabytes(media.video.bytes)}</small>}
+          </button>
           {status !== 'idle' && (
             <button
               type="button"
