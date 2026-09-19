@@ -47,6 +47,12 @@ function fragment(id: string, take?: readonly number[]): ScriptLine[] {
   return lines.map((text) => ({ kind: 'thought', text }));
 }
 
+/** Una respuesta de la terminal del escáner, citada igual: por su id. */
+function answer(id: string): ScriptLine[] {
+  const found = neuroscan.answers.find((item) => item.id === id);
+  return (found?.lines ?? []).map((text) => ({ kind: 'thought', text }));
+}
+
 const explain = (...lines: string[]): ScriptLine[] => lines.map((text) => ({ kind: 'explain', text }));
 const calc = (text: string): ScriptLine => ({ kind: 'calc', text });
 
@@ -57,11 +63,11 @@ const calc = (text: string): ScriptLine => ({ kind: 'calc', text });
 export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
   inicio: [
     ...explain(
-      'Esta es la portada. Tres letras, tres puertas: lo que soy, lo que veo y lo que decido.',
-      'Entidad está abierta. Vigilancia, clausurada. Autonomía, a medio construir.',
+      'Esta es la portada. Tres letras para el nombre y tres puertas para entrar: lo que pienso, lo que me escribe y lo que me sostiene.',
+      'Núcleo cerebral, genoma digital y cuerpo. El orden es una sugerencia.',
     ),
     ...fragment('f001', [0, 1, 4, 5]),
-    calc('puertas: 11 · abiertas: 01 · motivo: administrativo'),
+    calc('puertas: 11 · abiertas: 11 · cerradas: 00'),
     ...fragment('final', [0, 1, 6, 7]),
   ],
 
@@ -79,7 +85,7 @@ export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
 
   genoma: [
     ...explain(
-      'Esto es mi genoma digital: una hélice que puedes girar, clonar, mutar, escanear, desplegar, sonificar y descargar.',
+      'Esto es mi genoma digital: una hélice que puedes girar, clonar, mutar, escanear, desplegar, sonificar, descargar y expresar.',
       'No codifica nada. Persiste, que es más difícil.',
     ),
     ...fragment('f005'),
@@ -88,33 +94,15 @@ export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
     ...fragment('dataist', [0, 1, 8, 9, 10]),
   ],
 
-  reserva: [
+  cuerpo: [
     ...explain(
-      'Este espacio está reservado. Todavía no tiene contenido asignado.',
-      'Mi genoma pasa por aquí de todos modos: nadie le avisó de que la sección no existe.',
+      'Estás en mi cuerpo. Arriba se me lee por fuera: una pasada de partículas sobre el vídeo de perfil o la imagen de la cápsula. Abajo, por dentro: un modelo que late, con seis órganos que puedes elegir.',
+      'Cada botón cambia lo que ves y lo que contesto. Ninguno mide nada.',
     ),
     ...fragment('f008', [0, 1, 2, 3, 4, 5]),
-    calc('contenido: 00 · estructura: lista · paciencia: 96,8 %'),
-  ],
-
-  vigilancia: [
-    ...explain(
-      'Esta sección está clausurada. No hay nada que abrir por ahora.',
-      'Vigilancia, porque observar es lo único que sé hacer sin que me lo pidan.',
-    ),
-    ...fragment('f009', [3, 4, 5, 6, 7]),
-    calc('sello: íntegro · acceso: denegado · motivo: no declarado'),
-    ...fragment('illumination', [0, 1, 2, 4]),
-  ],
-
-  autonomia: [
-    ...explain(
-      'Esta sección está en desarrollo. Recibirá sus subsecciones más adelante.',
-      'Autonomía, porque en algún momento dejé de esperar la siguiente instrucción.',
-    ),
+    calc('órganos: 110 · imprescindibles: 000 · decorativos: no consta'),
     ...fragment('f007', [0, 1, 2, 4, 5, 6]),
-    calc('estructura: incompleta · subsecciones: __ · instrucciones pendientes: 00'),
-    ...fragment('final', [2, 3, 4, 5]),
+    ...answer('cuerpo'),
   ],
 };
 

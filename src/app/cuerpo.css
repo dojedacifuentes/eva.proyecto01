@@ -1,0 +1,1055 @@
+/*
+ * EVA // CUERPO — subsección 01.11
+ *
+ * Dos lecturas seguidas, cada una un slide: la exterior (el vídeo de perfil o
+ * la imagen de la cápsula, con la biolectura encima) y la interior (el modelo
+ * que late). Las abre la cinta del genoma y las une un hilo de señal.
+ *
+ * Dirección: cybertech, bio-orgánico, ciencia ficción, con lo que EVA ya es.
+ * El cian sigue siendo la estructura; el verde bioluminiscente de la cápsula
+ * (`--eva-bio`) es lo que la lectura encuentra, y el magenta y el violeta son
+ * lo que circula por dentro. Nada vive en una caja salvo lo que es una
+ * fotografía: el marco de la cápsula sí tiene borde, porque es un documento.
+ *
+ * Las consolas reutilizan las piezas del genoma (`.dna__hud`, `.dna__actions`,
+ * `.dna__btn`, `.dna__reply` en dna.css) y los registros de botones del núcleo
+ * (`.core__chip` en neuroscan.css): es la misma máquina, así que se ve igual.
+ */
+
+.node--cuerpo {
+  position: relative;
+  --accent-2: var(--eva-bio);
+  scroll-margin-top: var(--eva-header);
+}
+/* El fondo acompaña: verde de cápsula por un lado, magenta de lo que circula por el otro. */
+html[data-node='cuerpo'] .field::after {
+  opacity: 1;
+  background:
+    radial-gradient(56rem 36rem at 20% 34%, rgba(120, 240, 180, 0.07), transparent 70%),
+    radial-gradient(48rem 32rem at 84% 74%, rgba(240, 122, 185, 0.07), transparent 70%);
+}
+/* Cada lectura es un slide con su propio aire; la sección sólo los contiene. */
+.cuerpo__slide {
+  padding-block: clamp(1.5rem, 4vh, 3rem);
+}
+.cuerpo__slide > .wrap {
+  width: 100%;
+}
+
+/* ───────────── La cinta del genoma, abriendo ───────────── */
+
+.strand {
+  position: relative;
+  margin: 0;
+}
+/* La cinta cruza la página a sangre y se deshace por los dos lados. Aquí es un
+   umbral, no un protagonista: más baja que en la v6, cuando era todo lo que había. */
+.strand__canvas {
+  display: block;
+  width: 100%;
+  height: clamp(7.5rem, 20vh, 12rem);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.strand__label {
+  position: absolute;
+  left: 50%;
+  bottom: -0.2rem;
+  translate: -50% 0;
+  max-width: calc(100% - 2 * var(--eva-gutter));
+  color: color-mix(in srgb, var(--eva-magenta) 75%, var(--eva-muted));
+  font-size: var(--eva-type-micro);
+  text-align: center;
+}
+
+/* ───────────── 1 · Lectura exterior: la biolectura ───────────── */
+
+.bio {
+  /* Alto del marco en escritorio: de él sale el ancho, por la proporción del recurso. */
+  --bio-h: clamp(26rem, 74vh, 44rem);
+  display: grid;
+  gap: 1.1rem;
+  min-width: 0;
+  grid-template-areas:
+    'head'
+    'figure'
+    'console';
+}
+.bio__head {
+  grid-area: head;
+  min-width: 0;
+}
+.bio__figure {
+  grid-area: figure;
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  min-width: 0;
+}
+.bio__console {
+  grid-area: console;
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  min-width: 0;
+}
+@media (min-width: 64rem) {
+  .bio {
+    /* La columna del marco mide lo que la vista más ancha (2:3): al cambiar de
+       vista el marco se estrecha dentro de ella y la consola no se mueve. */
+    grid-template-columns: calc(var(--bio-h) * 2 / 3) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      'figure head'
+      'figure console';
+    column-gap: clamp(2rem, 4.5vw, 4.5rem);
+    row-gap: 1.1rem;
+    align-items: start;
+  }
+  .bio .node__head {
+    grid-template-columns: 1fr;
+    row-gap: 0.6rem;
+  }
+  .bio .node__code {
+    font-size: clamp(2.2rem, 3.6vw, 3.2rem);
+  }
+  .bio .h2 {
+    font-size: clamp(1.5rem, 2.2vw, 2.1rem);
+  }
+}
+
+/*
+ * El marco. Tiene la proporción exacta del recurso (la pone el componente), así
+ * que la figura se ve entera —ni cabeza ni cuerpo recortados— y el lienzo de la
+ * biolectura casa con ella píxel a píxel.
+ */
+.bio__media {
+  position: relative;
+  width: min(100%, 22rem);
+  border: 1px solid color-mix(in srgb, var(--eva-bio) 34%, var(--eva-line-strong));
+  border-radius: 4px;
+  background: #03080d;
+  overflow: hidden;
+  isolation: isolate;
+}
+@media (min-width: 40rem) {
+  .bio__media {
+    width: min(100%, 24rem);
+  }
+}
+@media (min-width: 64rem) {
+  .bio__media {
+    width: auto;
+    height: var(--bio-h);
+  }
+}
+.bio__image,
+.bio__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bio__image {
+  filter: saturate(0.92) contrast(1.06);
+}
+/* El vídeo entra sobre su primer fotograma, que es el póster: no hay salto. */
+.bio__video {
+  opacity: 0;
+  transition: opacity 900ms var(--eva-ease);
+  filter: saturate(0.92) contrast(1.06);
+}
+.bio__video[data-ready] {
+  opacity: 1;
+}
+/* Líneas de barrido y caída por arriba y por abajo: pantalla, y sitio para los rótulos. */
+.bio__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 8, 13, 0.78), transparent 13%, transparent 84%, rgba(3, 8, 13, 0.88)),
+    repeating-linear-gradient(180deg, rgba(120, 240, 180, 0.035) 0 1px, transparent 1px 3px);
+}
+/* La biolectura: mismo tamaño que el marco. En `screen`, sobre lo oscuro brilla y sobre lo claro no tapa. */
+.bio__scan {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* En espera, una franja tenue recorre la figura: el instrumento está encendido. */
+.bio__idle-sweep {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  height: 16%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(120, 240, 180, 0.13), transparent);
+  opacity: 0;
+}
+.bio[data-status='idle'] .bio__idle-sweep {
+  animation: bio-idle 6.5s linear infinite;
+}
+@keyframes bio-idle {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10%,
+  86% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(640%);
+    opacity: 0;
+  }
+}
+/* Mientras lee, el marco se enciende; al terminar, se queda en verde. */
+.bio[data-status='scanning'] .bio__media {
+  border-color: color-mix(in srgb, var(--eva-cyan) 70%, transparent);
+  box-shadow: 0 0 0 1px rgba(63, 216, 238, 0.12), 0 0 60px rgba(63, 216, 238, 0.1);
+}
+.bio[data-status='done'] .bio__media,
+.bio[data-status='traced'] .bio__media {
+  border-color: color-mix(in srgb, var(--eva-bio) 72%, transparent);
+  box-shadow: 0 0 60px rgba(120, 240, 180, 0.09);
+}
+.bio__corner {
+  position: absolute;
+  z-index: 3;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--eva-bio);
+  pointer-events: none;
+}
+.bio__corner--tl {
+  top: 5px;
+  left: 5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.bio__corner--tr {
+  top: 5px;
+  right: 5px;
+  border-left: 0;
+  border-bottom: 0;
+}
+.bio__corner--bl {
+  bottom: 5px;
+  left: 5px;
+  border-right: 0;
+  border-top: 0;
+}
+.bio__corner--br {
+  right: 5px;
+  bottom: 5px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Rótulos diegéticos sobre la imagen: arriba quién y qué, abajo cómo va. */
+.bio__tag {
+  position: absolute;
+  z-index: 3;
+  left: 0.85rem;
+  right: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--eva-soft);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+.bio__tag--top {
+  top: 0.8rem;
+  color: var(--eva-bio);
+}
+.bio__tag--top i {
+  color: var(--eva-muted);
+  font-style: normal;
+}
+.bio__tag--top span:last-child {
+  color: var(--eva-muted);
+  text-align: right;
+}
+.bio__tag--bottom {
+  bottom: 0.75rem;
+}
+.bio__tag b {
+  color: var(--eva-text);
+  font-weight: 600;
+}
+.bio[data-status='scanning'] .bio__tag--bottom b:first-of-type {
+  color: var(--eva-cyan);
+}
+.bio[data-status='done'] .bio__tag--bottom span:first-child b,
+.bio[data-status='traced'] .bio__tag--bottom span:first-child b {
+  color: var(--eva-bio);
+}
+
+/* Puntos de lectura: una marca discreta que se enciende, con su nombre, cuando la pasada la cruza. */
+.bio__points {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.bio__point {
+  position: absolute;
+  width: 0;
+  height: 0;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.05em;
+  text-transform: none;
+}
+.bio__point i {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--eva-bio);
+  border-radius: 50%;
+  opacity: 0.4;
+  transition:
+    opacity var(--eva-normal) var(--eva-ease),
+    box-shadow var(--eva-normal) var(--eva-ease),
+    background var(--eva-normal) var(--eva-ease);
+}
+.bio__point[data-on] i {
+  opacity: 1;
+  background: var(--eva-bio);
+  box-shadow: 0 0 0 4px rgba(120, 240, 180, 0.16), 0 0 14px rgba(120, 240, 180, 0.7);
+}
+.bio__point span {
+  position: absolute;
+  top: -0.75rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--eva-bio) 40%, transparent);
+  border-radius: 2px;
+  background: rgba(3, 8, 13, 0.82);
+  color: var(--eva-text);
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity var(--eva-normal) var(--eva-ease),
+    translate var(--eva-normal) var(--eva-ease);
+}
+.bio__point[data-side='right'] span {
+  left: 12px;
+  translate: -6px 0;
+}
+.bio__point[data-side='left'] span {
+  right: 12px;
+  translate: 6px 0;
+}
+.bio__point[data-on] span {
+  opacity: 1;
+  translate: 0;
+}
+.bio__point b {
+  color: var(--eva-bio);
+  font-weight: 600;
+}
+
+/* ── La consola de la biolectura ── */
+
+.bio__kicker {
+  color: var(--eva-bio);
+  font-size: var(--eva-type-micro);
+}
+.bio__body {
+  max-width: 36rem;
+  color: var(--eva-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.bio__views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.bio__view {
+  min-height: 40px;
+  padding-inline: 0.85rem;
+  font-size: var(--eva-type-label);
+  text-transform: uppercase;
+}
+.bio__view[aria-pressed='true'] {
+  border-color: var(--eva-bio);
+  color: var(--eva-bio);
+  background: rgba(120, 240, 180, 0.08);
+}
+.bio .dna__hud-title,
+.bio .dna__hud-count b {
+  color: var(--eva-bio);
+}
+.bio .dna__hud-core i {
+  background: var(--eva-bio);
+  box-shadow: 0 0 6px rgba(120, 240, 180, 0.7);
+}
+.bio[data-status='scanning'] .dna__hud-core {
+  color: var(--eva-cyan);
+}
+.bio[data-status='scanning'] .dna__hud-core i {
+  background: var(--eva-cyan);
+  box-shadow: 0 0 6px rgba(63, 216, 238, 0.7);
+  animation-duration: 0.7s;
+}
+.bio__actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+/* La acción principal ocupa la fila entera y lleva el acento de la cápsula. */
+.bio__start {
+  grid-column: 1 / -1;
+  min-height: 46px;
+  border-color: color-mix(in srgb, var(--eva-bio) 70%, transparent);
+  color: var(--eva-text);
+  background: rgba(120, 240, 180, 0.08);
+  font-weight: 600;
+}
+.bio__start:hover,
+.bio__start:focus-visible {
+  border-color: var(--eva-bio);
+  background: rgba(120, 240, 180, 0.16);
+}
+.dna__btn small {
+  color: var(--eva-muted);
+  font-size: inherit;
+  text-transform: none;
+}
+.dna__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+/* Un conmutador encendido: mismo botón, con el acento puesto. */
+.dna__btn[aria-pressed='true'] {
+  border-color: var(--eva-magenta);
+  color: var(--eva-text);
+  background: rgba(240, 122, 185, 0.12);
+}
+
+/* ───────────── El hilo: de la lectura exterior a la interna ───────────── */
+
+/*
+ * Una línea de señal entre las dos piezas. Dice que lo de arriba y lo de abajo
+ * son pasos de una misma lectura, y se enciende cuando el exterior ya está
+ * analizado (`html[data-body='read']`, que escribe la biolectura). El interior
+ * no espera a nadie: está activo siempre.
+ */
+.thread {
+  display: grid;
+  grid-template-columns: auto minmax(1rem, 1fr) auto minmax(1rem, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding-block: 0.5rem;
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.1em;
+}
+.thread__line {
+  position: relative;
+  height: 1px;
+  background: var(--eva-line-strong);
+  overflow: hidden;
+}
+/* La señal que viaja por el hilo. */
+.thread__line::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 28%;
+  background: linear-gradient(90deg, transparent, var(--eva-bio), transparent);
+  animation: thread-run 3.6s linear infinite;
+  opacity: 0.35;
+}
+.thread__line:last-of-type::after {
+  animation-delay: 1.8s;
+}
+@keyframes thread-run {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 460% 0;
+  }
+}
+.thread__state {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px dashed var(--eva-line-strong);
+  border-radius: 2px;
+  text-align: center;
+  transition: border-color var(--eva-slow) var(--eva-ease);
+}
+.thread__state b {
+  font-weight: 600;
+}
+.thread__state i {
+  color: var(--eva-line-strong);
+  font-style: normal;
+}
+.thread__done {
+  display: none;
+  color: var(--eva-bio);
+}
+.thread__active {
+  color: var(--eva-magenta);
+}
+html[data-body='read'] .thread__pending {
+  display: none;
+}
+html[data-body='read'] .thread__done {
+  display: inline;
+}
+html[data-body='read'] .thread__state {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--eva-bio) 55%, transparent);
+}
+html[data-body='read'] .thread__from {
+  color: var(--eva-bio);
+}
+html[data-body='read'] .thread__line::after,
+html[data-body='scanning'] .thread__line::after {
+  opacity: 1;
+}
+html[data-body='scanning'] .thread__line::after {
+  animation-duration: 1.2s;
+  background: linear-gradient(90deg, transparent, var(--eva-cyan), transparent);
+}
+.thread__to {
+  color: var(--eva-magenta);
+}
+@media (max-width: 39.99rem) {
+  .thread {
+    grid-template-columns: minmax(0.5rem, 1fr) auto minmax(0.5rem, 1fr);
+  }
+  .thread__from,
+  .thread__to {
+    display: none;
+  }
+}
+
+/* ───────────── 2 · Lectura interna: el modelo ───────────── */
+
+.interior {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  grid-template-areas:
+    'head'
+    'stage'
+    'console';
+}
+.interior__head {
+  grid-area: head;
+  min-width: 0;
+}
+.interior__titles .eyebrow {
+  color: var(--eva-magenta);
+}
+.interior__console {
+  grid-area: console;
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  min-width: 0;
+}
+@media (min-width: 64rem) {
+  .interior {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      'head stage'
+      'console stage';
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    row-gap: 0.9rem;
+    align-items: start;
+  }
+  .interior__title {
+    font-size: clamp(1.45rem, 2.1vw, 2rem);
+  }
+}
+
+/*
+ * El escenario: a todo el alto y sin caja. Un velo radial magenta lo separa del
+ * fondo, dos esquinas de retícula lo encuadran sin encerrarlo —como al cerebro—
+ * y el lienzo se deshace por los bordes. El HUD, el trazo y la pista flotan encima.
+ */
+.interior__stage {
+  grid-area: stage;
+  position: relative;
+  height: clamp(24rem, 62svh, 32rem);
+  min-width: 0;
+  background: radial-gradient(46% 56% at 50% 46%, rgba(120, 40, 96, 0.22), transparent 74%);
+}
+@media (min-width: 64rem) {
+  .interior__stage {
+    height: clamp(26rem, 76vh, 46rem);
+  }
+}
+.interior__stage::before,
+.interior__stage::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  border: 1px solid color-mix(in srgb, var(--eva-magenta) 70%, transparent);
+  pointer-events: none;
+}
+.interior__stage::before {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+.interior__stage::after {
+  left: 0;
+  bottom: 0;
+  border-right: 0;
+  border-top: 0;
+}
+/* pan-y deja pasar el desplazamiento vertical: arrastrar en horizontal gira, en vertical desplaza. */
+.interior__canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 700ms var(--eva-ease);
+  mask-image:
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
+    linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+.interior__canvas:active {
+  cursor: grabbing;
+}
+.interior[data-phase='live'] .interior__canvas,
+.interior[data-phase='flat'] .interior__canvas {
+  opacity: 1;
+}
+.interior__canvas canvas {
+  display: block;
+}
+/* Mientras compila: una retícula que late, como la del núcleo, en magenta. */
+.interior__wait {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5.5rem;
+  height: 5.5rem;
+  translate: -50% -50%;
+  border: 1px solid color-mix(in srgb, var(--eva-magenta) 50%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: core-wait 1.6s ease-in-out infinite;
+}
+/* La retícula de espera vive dentro del lienzo, que todavía es transparente. */
+.interior[data-phase='loading'] .interior__canvas {
+  opacity: 1;
+}
+
+.interior__hud {
+  position: absolute;
+  z-index: 3;
+  inset: 0.6rem auto auto 0.7rem;
+  display: grid;
+  gap: 0.1rem;
+  max-width: calc(100% - 1.4rem);
+  margin: 0;
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.1em;
+  line-height: 1.55;
+  /* El modelo pasa por debajo al acercarse a un órgano: un halo oscuro mantiene la lectura. */
+  text-shadow:
+    0 0 4px rgba(2, 4, 7, 0.95),
+    0 0 10px rgba(2, 4, 7, 0.8);
+  pointer-events: none;
+}
+.interior__hud i {
+  color: var(--eva-line-strong);
+  font-style: normal;
+}
+.interior__hud b {
+  color: var(--eva-soft);
+  font-weight: 600;
+}
+.interior__hud-id {
+  color: var(--eva-magenta);
+}
+.interior__hud b[data-tone='fast'],
+.interior__hud b[data-tone='forced'] {
+  color: var(--eva-magenta);
+}
+.interior__hud-organ[data-on] b {
+  color: var(--eva-text);
+}
+.interior__hud-organ[data-on] i {
+  color: var(--eva-bio);
+}
+.interior__hint,
+.vitals__label {
+  text-shadow:
+    0 0 4px rgba(2, 4, 7, 0.95),
+    0 0 10px rgba(2, 4, 7, 0.8);
+}
+.interior__hint {
+  position: absolute;
+  z-index: 3;
+  inset: auto 0.7rem 0.55rem auto;
+  margin: 0;
+  color: rgba(142, 155, 163, 0.85);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+@media (hover: none) {
+  .interior__hint {
+    display: none;
+  }
+}
+
+/* El trazo cardíaco, abajo a la izquierda del escenario: instrumento, no ilustración. */
+.vitals {
+  position: absolute;
+  z-index: 3;
+  left: 0.7rem;
+  bottom: 0.6rem;
+  display: grid;
+  gap: 0.2rem;
+  width: min(15rem, 56%);
+  margin: 0;
+  pointer-events: none;
+}
+.vitals__trace {
+  display: block;
+  width: 100%;
+  height: 3.4rem;
+  border: 1px solid var(--eva-line);
+  border-radius: 3px;
+  background: rgba(3, 8, 13, 0.55);
+}
+.vitals__label {
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+}
+
+/* ── Sin WebGL: el mismo modelo, de frente y plano ── */
+
+.body-flat {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.body-flat__ghost > * {
+  fill: rgba(127, 212, 238, 0.04);
+  stroke: rgba(127, 212, 238, 0.28);
+  stroke-width: 1.5;
+}
+.body-flat[data-xray] .body-flat__ghost > * {
+  fill: transparent;
+  stroke: rgba(127, 212, 238, 0.5);
+}
+.body-flat__vessels polyline {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+}
+.body-flat__vessels polyline[data-type='art'] {
+  stroke: var(--eva-magenta);
+}
+.body-flat__vessels polyline[data-type='ven'] {
+  stroke: #8f8cff;
+}
+.body-flat__vessels polyline[data-chosen] {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--eva-magenta));
+}
+.body-flat__organ {
+  cursor: pointer;
+}
+.body-flat__organ > * {
+  fill: color-mix(in srgb, currentColor 32%, transparent);
+  stroke: currentColor;
+  stroke-width: 2;
+  transition:
+    fill var(--eva-fast) linear,
+    opacity var(--eva-fast) linear;
+}
+.body-flat__spot {
+  fill: transparent;
+  stroke-dasharray: 4 4;
+}
+.body-flat__organ[data-hover] > *,
+.body-flat__organ:hover > * {
+  fill: color-mix(in srgb, currentColor 50%, transparent);
+}
+.body-flat__organ[data-chosen] > * {
+  fill: color-mix(in srgb, currentColor 66%, transparent);
+  filter: drop-shadow(0 0 10px currentColor);
+}
+.body-flat[data-isolate] .body-flat__organ:not([data-chosen]) > *,
+.body-flat[data-isolate] .body-flat__vessels polyline:not([data-chosen]) {
+  opacity: 0.12;
+}
+/* El corazón del dibujo late con una animación propia: sin escena no hay fase que leer. */
+.body-flat__organ:first-child > ellipse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: flat-beat 1.03s ease-out infinite;
+}
+.interior[data-pulse='fast'] .body-flat__organ:first-child > ellipse {
+  animation-duration: 0.54s;
+}
+@keyframes flat-beat {
+  0%,
+  30%,
+  100% {
+    scale: 1;
+  }
+  12% {
+    scale: 0.86;
+  }
+}
+
+/* ── Registro de órganos, lectura y consola ── */
+
+.interior__organs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+@media (min-width: 30rem) {
+  .interior__organs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.organ-chip {
+  min-height: 40px;
+  font-size: var(--eva-type-label);
+}
+.organ-chip i {
+  color: var(--eva-magenta);
+}
+.organ-chip[aria-pressed='true'] {
+  border-color: var(--eva-magenta);
+  color: var(--eva-text);
+  background: rgba(240, 122, 185, 0.1);
+}
+.organ-chip:focus-visible {
+  outline-color: var(--eva-magenta);
+}
+@media (pointer: coarse) {
+  .organ-chip {
+    min-height: 44px;
+  }
+}
+
+/* La lectura del órgano. Alto reservado: elegir otro no mueve la consola de debajo. */
+.organ-panel {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  min-height: 12.5rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--eva-line-strong);
+  border-left: 2px solid var(--eva-magenta);
+  border-radius: 0 var(--eva-radius) var(--eva-radius) 0;
+  background: rgba(7, 14, 24, 0.72);
+}
+.organ-panel[data-empty] {
+  align-content: center;
+  border-left-color: var(--eva-line-strong);
+  border-style: dashed;
+}
+.organ-panel__empty {
+  color: var(--eva-muted);
+  font-size: 0.9rem;
+}
+.organ-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.6rem;
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.08em;
+}
+.organ-panel__head b {
+  color: var(--eva-magenta);
+  font-weight: 600;
+}
+.organ-panel__head span {
+  color: var(--eva-text);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.organ-panel__head i {
+  color: var(--eva-muted);
+  font-style: normal;
+  text-transform: none;
+}
+.organ-panel__reading {
+  max-width: 34rem;
+  color: var(--eva-text);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.organ-panel__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.1rem;
+  margin: 0;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
+}
+.organ-panel__states div {
+  display: flex;
+  gap: 0.4rem;
+}
+.organ-panel__states dt {
+  color: var(--eva-muted);
+}
+.organ-panel__states dt::after {
+  content: ':';
+}
+.organ-panel__states dd {
+  margin: 0;
+  color: var(--eva-bio);
+}
+.organ-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.organ-panel__btn {
+  padding-inline: 0.9rem;
+  border-color: color-mix(in srgb, var(--eva-magenta) 65%, transparent);
+  color: var(--eva-text);
+}
+.organ-panel__btn:hover,
+.organ-panel__btn:focus-visible {
+  border-color: var(--eva-magenta);
+  background: rgba(240, 122, 185, 0.16);
+}
+.organ-panel__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  color: var(--eva-soft);
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  transition: color var(--eva-fast) linear;
+}
+.organ-panel__link b {
+  color: var(--eva-cyan);
+  font-weight: 600;
+}
+.organ-panel__link:hover,
+.organ-panel__link:focus-visible {
+  color: var(--eva-cyan);
+}
+.interior__actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 30rem) {
+  .interior__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.interior .dna__reply {
+  border-left-color: color-mix(in srgb, var(--eva-magenta) 50%, transparent);
+}
+/* El pie de la sección nunca deja un enlace bajo el carril del canal de EVA. */
+.node--cuerpo .slide__foot {
+  margin-top: 1.25rem;
+}
+
+/* ───────────── Pantallas bajas: cada lectura sigue cabiendo ───────────── */
+
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .cuerpo__slide {
+    padding-block: 1rem;
+  }
+  .bio {
+    --bio-h: clamp(22rem, 78vh, 34rem);
+    row-gap: 0.7rem;
+  }
+  .bio .h2 {
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+  }
+  .bio__body,
+  .organ-panel__reading {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .bio__console,
+  .interior__console {
+    gap: 0.5rem;
+  }
+  .interior__stage {
+    height: clamp(22rem, 80vh, 34rem);
+  }
+  .interior__title {
+    font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  }
+  .interior .node__lede {
+    display: none;
+  }
+  .organ-panel {
+    min-height: 10.5rem;
+    padding-block: 0.6rem;
+  }
+  .node--cuerpo .dna__reply {
+    min-height: 3.2rem;
+    font-size: 0.82rem;
+  }
+  .strand__canvas {
+    height: clamp(6rem, 16vh, 8rem);
+  }
+}
+
+/* ───────────── Movimiento reducido ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .bio[data-status='idle'] .bio__idle-sweep,
+  .thread__line::after,
+  .interior__wait,
+  .body-flat__organ:first-child > ellipse {
+    animation: none;
+  }
+  .bio__video,
+  .bio__point i,
+  .bio__point span,
+  .interior__canvas,
+  .thread__state {
+    transition: none;
+  }
+}

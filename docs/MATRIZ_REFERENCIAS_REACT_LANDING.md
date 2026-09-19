@@ -59,3 +59,18 @@ sinapsis generada con la misma semilla en cada apertura.
 **Dependencias nuevas:** ninguna. Se reutilizan `three`, `@react-three/fiber`,
 `@react-three/drei` (`OrbitControls`) y `@react-three/postprocessing` (`Bloom`). El módulo
 3D del escáner se carga en diferido al abrir el neuroescáner.
+
+## Ampliación — 01.11 · Cuerpo (19 de septiembre de 2026)
+
+Los dos repositorios los autorizó el propietario en el encargo (`docs/CUERPO_ENCARGO.md`). Esta
+vez **sí se adaptó código**, con su licencia MIT conservada en la cabecera de cada archivo y
+registrada en `ASSET_LICENSES.md`. Se leyeron los fuentes (bajados con `curl` fuera del
+proyecto); no se instaló ni se cargó nada de ellos.
+
+| Fuente | Licencia | Qué se tomó | Dónde vive en EVA | Qué no se tomó | Decisión | Atribución |
+|---|---|---|---|---|---|---|
+| [collidingScopes/scanlines](https://github.com/collidingScopes/scanlines) (`main.js`) | MIT — © 2025 Alan Ang | `detectEdges` (luminancia 0,299/0,587/0,114, diferencia con el píxel derecho y el inferior, umbral binario); filas de partículas que miran unos píxeles por delante según su número; probabilidad de congelarse en un borde; enfriamiento tras un choque; ondulación senoidal de las que chocaron; salto al chocar | `src/components/eva/cuerpo/scan.ts` (motor puro, probado con `node --test`) y `BioReading.tsx` (lienzo, HUD, botones) | dat.gui, paletas aleatorias, exportación de vídeo (`mp4-muxer`), subida de imágenes, atajos de teclado, fondo negro, bucle infinito | **Adaptar** (técnica reescrita: pasada finita por tiempo, avance píxel a píxel, arrays planos, semilla, fondo transparente) | En código y en `ASSET_LICENSES.md` |
+| [christianpasinrey/human-blood-system](https://github.com/christianpasinrey/human-blood-system) («HÆMA»: `js/scene.js`, `js/vitals.js`, `js/data.js`, `js/audio.js`) | MIT — © 2026 Christian Pasín Rey | Corazón de dos esferas + cuerpo + punta invertida con contracción brusca y vuelta suave; destello sincronizado; vasos como `TubeGeometry` sobre `CatmullRomCurve3(…, 'catmullrom', 0.4)`; fluido como `Points` repartido por largo de vaso que avanza por la curva (aquí, con tablas de puntos precalculadas); órganos como icosaedros deformados; ECG PQRST como suma de gaussianas; «lub-dub» procedural | `src/components/eva/cuerpo/InteriorScene.tsx`, `pulse.ts`, `interior-data.ts`, `InteriorVitals.tsx`; el latido sonoro en `src/lib/sound.ts` | three 0.170 por CDN, `OrbitControls`, tweens de cámara, sliders de bpm/flujo, teclas de vista, textos y cifras anatómicas reales, colores rojo/azul como base, niebla | **Adaptar** (R3F + three 0.186 ya instalados; coordenadas, paleta y textos propios; datos de ficción) | En código y en `ASSET_LICENSES.md` |
+
+**Dependencias nuevas:** ninguna. La escena interior llega en un fragmento aparte por
+`next/dynamic` y se monta una pantalla antes de verse; la biolectura es Canvas 2D.

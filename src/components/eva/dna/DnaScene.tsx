@@ -433,7 +433,7 @@ function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduce
 
 /* ───────────── Escena ───────────── */
 
-function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind, nearRef }: SceneProps) {
+function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind, express, nearRef }: SceneProps) {
   const geo = useGeometries();
   const frame = useRef<THREE.Group>(null);
   const narrow = useThree((state) => state.size.width < state.size.height);
@@ -457,6 +457,12 @@ function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind,
   useEffect(() => {
     if (unwind > 0) unwindPhase.current = 0;
   }, [unwind]);
+  /* Expresar: la hélice entera se enciende y un barrido la recorre de abajo arriba. */
+  useEffect(() => {
+    if (express === 0) return;
+    energy.current = 1;
+    scanProgress.current = 0;
+  }, [express]);
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 0.05);
@@ -519,6 +525,7 @@ export interface SceneProps {
   mutate: number;
   scan: number;
   unwind: number;
+  express: number;
   nearRef: RefObject<number>;
 }
 

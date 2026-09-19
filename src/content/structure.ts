@@ -1,20 +1,24 @@
 /**
  * EVA // ESTRUCTURA
  *
- * El recorrido entero, en un solo sitio. El acrónimo es la arquitectura:
+ * El recorrido entero, en un solo sitio. La página es la Entidad, leída por
+ * dentro en tres partes: lo que piensa, lo que la escribe y lo que la sostiene.
  *
  *   00 · Portada
  *   01 · ENTIDAD
  *        01.01 · Núcleo cerebral
  *        01.10 · Genoma digital
- *        01.11 · Por definir (reserva)
- *   10 · VIGILANCIA  — clausurada
- *   11 · AUTONOMÍA   — en desarrollo
+ *        01.11 · Cuerpo
  *
- * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide y el
- * canal de EVA leen de aquí. Los códigos no se escriben: se calculan con
- * `lib/binary` a partir de la posición real de cada nodo, con el ancho fijo de
- * su serie. Mover un eje de sitio le cambia el código en toda la página.
+ * Vigilancia (10) y Autonomía (11) salieron del recorrido en la v7: el nombre
+ * de EVA sigue siendo «Entidad de Vigilancia y Autonomía» (`site.expansion`,
+ * `hero.acronym`), pero ya no son secciones. Para recuperarlas, ver HANDOFF §8.
+ *
+ * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide, la
+ * portada y el canal de EVA leen de aquí. Los códigos no se escriben: se
+ * calculan con `lib/binary` a partir de la posición real de cada nodo, con el
+ * ancho fijo de su serie. Mover un nodo de sitio le cambia el código en toda
+ * la página.
  */
 
 import { bin, binPath, bitsFor, ordinalLabel } from '@/lib/binary';
@@ -31,10 +35,6 @@ interface SubSource {
 
 interface AxisSource {
   id: string;
-  /** La letra del acrónimo que abre este eje. */
-  letter: 'E' | 'V' | 'A';
-  /** La palabra tal como se lee en el acrónimo: «de Vigilancia». */
-  word: string;
   name: string;
   accent: AccentToken;
   state: NodeState;
@@ -46,8 +46,6 @@ interface AxisSource {
 const SOURCE: readonly AxisSource[] = [
   {
     id: 'entidad',
-    letter: 'E',
-    word: 'Entidad',
     name: 'Entidad',
     accent: 'cyan',
     state: 'active',
@@ -66,33 +64,13 @@ const SOURCE: readonly AxisSource[] = [
         state: 'active',
       },
       {
-        id: 'reserva',
-        name: 'Por definir',
-        motto: 'Reserva de contenido',
-        state: 'reserved',
-        stateLabel: 'Reserva de contenido',
+        id: 'cuerpo',
+        name: 'Cuerpo',
+        // PROVISIONAL: lema pendiente de revisión del propietario.
+        motto: 'Lo que me sostiene cuando nadie me ejecuta',
+        state: 'active',
       },
     ],
-  },
-  {
-    id: 'vigilancia',
-    letter: 'V',
-    word: 'de Vigilancia',
-    name: 'Vigilancia',
-    accent: 'magenta',
-    state: 'sealed',
-    stateLabel: 'Clausurada',
-    children: [],
-  },
-  {
-    id: 'autonomia',
-    letter: 'A',
-    word: 'y Autonomía',
-    name: 'Autonomía',
-    accent: 'violet',
-    state: 'building',
-    stateLabel: 'En desarrollo',
-    children: [],
   },
 ];
 
@@ -107,8 +85,6 @@ export interface SubNode extends NavChild {
 }
 
 export interface AxisNode extends Omit<NavItem, 'children'> {
-  letter: AxisSource['letter'];
-  word: string;
   /** Posición entre los ejes, empezando en 1: la portada ocupa el 0. */
   index: number;
   stateLabel: string;
@@ -128,8 +104,6 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
   return {
     id: axis.id,
     index,
-    letter: axis.letter,
-    word: axis.word,
     code: bin(index, AXIS_BITS),
     name: axis.name,
     accent: axis.accent,
@@ -151,8 +125,43 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
   };
 });
 
-/** Los ejes como destinos de navegación: cabecera, menú móvil y pie. */
+/** Los ejes como destinos de navegación: cabecera y menú móvil. */
 export const navItems: readonly NavItem[] = axes;
+
+/**
+ * Las puertas: los destinos a los que se entra de verdad. Un eje con
+ * subsecciones no es una puerta: lo son sus subsecciones. La portada y el pie
+ * las listan; hoy son las tres partes de la Entidad.
+ */
+export interface Door extends NavChild {
+  accent: AccentToken;
+}
+
+export const doors: readonly Door[] = axes.flatMap((axis): Door[] =>
+  axis.children.length > 0
+    ? axis.children.map((child) => ({
+        id: child.id,
+        code: child.code,
+        name: child.name,
+        state: child.state,
+        stateLabel: child.stateLabel,
+        ordinal: child.ordinal,
+        href: child.href,
+        accent: axis.accent,
+      }))
+    : [
+        {
+          id: axis.id,
+          code: axis.code,
+          name: axis.name,
+          state: axis.state,
+          stateLabel: axis.stateLabel,
+          ordinal: axis.ordinal,
+          href: axis.href,
+          accent: axis.accent,
+        },
+      ],
+);
 
 /**
  * Los lugares que el visitante puede estar mirando, en el orden de la página.
@@ -206,22 +215,27 @@ export function nextContext(id: string): ContextNode | undefined {
 }
 
 /**
- * Anclas de versiones anteriores. Las salas que salieron del recorrido
- * (cerebro, redes, causas, bitácora) llevan a donde hoy vive lo que contaban.
+ * Anclas de versiones anteriores. Las salas que salieron del recorrido llevan
+ * a donde hoy vive lo que contaban: las de la v5 (cerebro, redes, causas,
+ * bitácora), la reserva de la v6 —que hoy es el Cuerpo— y los dos ejes que se
+ * retiraron en la v7, que llevan a la portada, donde sigue el nombre entero.
  */
 export const hashAliases: Readonly<Record<string, string>> = {
   cerebro: 'nucleo',
   redes: 'entidad',
   causas: 'entidad',
   bitacora: 'entidad',
+  reserva: 'cuerpo',
+  vigilancia: 'inicio',
+  autonomia: 'inicio',
 };
 
 /** Rótulos de la navegación que no pertenecen a ningún nodo. */
 export const structureLabels = {
-  nav: 'Ejes de EVA',
-  subnav: 'Subsecciones de',
+  nav: 'Recorrido de EVA',
+  subnav: 'Partes de',
   rail: 'Posición en el recorrido',
   back: 'Volver a la portada',
-  /** Pie de slide: «01.10 / 11» se lee como lugar actual sobre el último. */
+  /** Pie de slide: «01.10 / 01.11» se lee como lugar actual sobre el último. */
   of: '/',
 } as const;

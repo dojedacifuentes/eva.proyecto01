@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` = v6 (`900e5e5`, la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS), **publicada** en https://evaproyecto01.vercel.app/ el 19-09-2026, revisada en navegador a 1440×900, 1366×720, 768×1024 y 390×844 · **encargo abierto: la subsección 01.11 pasa a ser CUERPO** (vídeo de la cápsula + biolectura + interior bio-sintético). Todo lo necesario está en `docs/CUERPO_ENCARGO.md`; rama de trabajo `feat/cuerpo`.
+**Estado:** `main` = v6 (`900e5e5`), **publicada** en https://evaproyecto01.vercel.app/ · rama `feat/cuerpo` = **v7, sin integrar ni publicar**: la subsección 01.11 es **CUERPO** (biolectura sobre el vídeo de perfil y la imagen de la cápsula + interior bio-sintético con corazón, vasos, seis órganos y ECG) y, a pedido del propietario, **Vigilancia (10) y Autonomía (11) salieron del recorrido**: la landing es la Entidad y sus tres partes. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024, 390×844 y 360 px, con movimiento reducido y sin WebGL (§0). Pendiente: el «sí» del propietario y sus decisiones de §5.
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -21,7 +21,41 @@ npm run build      # obligatorio antes de subir: el dev server perdona cosas que
 
 ---
 
-## 0. Encargo resuelto en v6: la página por ejes (19 sept. 2026)
+## 0. Encargo resuelto en v7: el Cuerpo, y una sola Entidad (19 sept. 2026)
+
+El encargo íntegro y cómo se resolvió están en `docs/CUERPO_ENCARGO.md` (§10).
+En corto:
+
+- **01.11 · Cuerpo** (`sections/CuerpoSection.tsx`, piezas en `eva/cuerpo/`):
+  abre la cinta del genoma; después, dos slides unidos por un hilo de señal.
+  1. **Lectura exterior** (`BioReading`): el vídeo de EVA de perfil —se
+     conserva como vídeo— o la imagen frontal de la cápsula, enteros y en su
+     proporción, con la **biolectura**: filas de partículas que se clavan en
+     los bordes (técnica de collidingScopes/scanlines, MIT, en `scan.ts`),
+     cinco puntos de lectura por imagen y un HUD `EVA-07 · BIOLECTURA ·
+     ESTADO · CICLO`. Botones: iniciar/repetir, girar el barrido, trazar
+     bordes, pausar/cargar el vídeo, limpiar, y la vista (perfil o frontal).
+  2. **Lectura interna** (`EvaInterior` + `InteriorScene`): un modelo que
+     late (técnicas de HÆMA, MIT): corazón, 23 vasos con partículas, silueta,
+     seis órganos que se eligen en la escena o en su registro (`001…110`),
+     cada uno con su lectura, sus estados y su acción; seis acciones del
+     cuerpo (acelerar, radiografía, aislar, invertir el flujo, sonificar,
+     restablecer) y el trazo ECG en 2D. Sin WebGL, el mismo modelo en SVG.
+- **Fuera Vigilancia y Autonomía**: sus secciones se borraron; el nombre de
+  EVA no cambia. La portada enseña el acrónimo como nombre (ya no son
+  enlaces) y, debajo, **tres puertas**: `01.01`, `01.10`, `01.11`. Con un solo
+  eje, la cabecera muestra siempre sus tres partes con nombre. Las anclas
+  `#vigilancia` y `#autonomia` llevan a la portada; `#reserva`, al Cuerpo.
+- **Genoma:** octava acción, **Expresar**: la hélice se enciende, la recorre
+  el barrido y la respuesta enlaza con el Cuerpo. La purga de clones pasó a
+  estar junto a su contador, para que la botonera no gane una fila.
+- **Revisión:** este panel de navegador no pinta sin foco (trampas 4 y 17), así
+  que la v7 se recorrió en Chrome sin interfaz manejado por el protocolo
+  DevTools (trampa 26): capturas a 1440×900, 1366×720, 768×1024, 390×844 y
+  360 px; con movimiento reducido (sin vídeo, bordes ya trazados, modelo
+  quieto) y con WebGL desactivado (vista plana). Consola sin errores.
+
+## 0 bis. Encargo resuelto en v6: la página por ejes (19 sept. 2026)
 
 El encargo abierto de la v5.1 (afinar la sala 01: aparición, hiperactividad,
 tamaño del cerebro y letra de la ventana) quedó resuelto dentro de una
@@ -53,20 +87,26 @@ Una landing de una sola ruta (`src/app/page.tsx`) organizada por el acrónimo,
 con numeración binaria real (`lib/binary.ts`):
 
 ```
-00 · Portada — el acrónimo como tres puertas, y el retrato que abre el escáner
+00 · Portada — el nombre de EVA (acrónimo), tres puertas y el retrato que abre el escáner
 01 · ENTIDAD
      01.01 · Núcleo cerebral — cerebro 3D en vivo + ventana de lectura + 8 regiones
-     01.10 · Genoma digital  — hélice 3D, 7 acciones, párrafo del nacimiento (se teclea una vez)
-     01.11 · Por definir     — banda de reserva: el genoma a la vista (→ será CUERPO, ver docs/CUERPO_ENCARGO.md)
-10 · VIGILANCIA — clausurada (la «V» quieta con faja de clausura; el fondo se frena)
-11 · AUTONOMÍA  — en desarrollo (la «A» a medio ensamblar; registro listo para subsecciones)
+     01.10 · Genoma digital  — hélice 3D, 8 acciones, párrafo del nacimiento (se teclea una vez)
+     01.11 · Cuerpo          — cinta del genoma · lectura exterior (biolectura) · hilo ·
+                               lectura interna (modelo que late, 6 órganos, ECG)
 ```
+
+Vigilancia (10) y Autonomía (11) existieron en la v6 como secciones de
+estado (clausurada y en desarrollo); en la v7 salieron del recorrido. Si
+vuelven, `CONTENT_GUIDE.md` («Añadir un lugar al recorrido») dice qué tocar, y
+el historial de git tiene sus componentes (`VigilanciaSection`,
+`AutonomiaSection`, los modos `sealed`/`building` de la malla).
 
 **Todo el recorrido sale de `src/content/structure.ts`:** cabecera, riel de
 bits, menú móvil, pie, pies de slide, portada y canal leen de ahí. Los códigos
 se calculan; no se escriben a mano. Cada sección es `.slide` con
-`min-height: 100svh` y `scroll-snap-align` (salvo la banda 01.11); si añades
-contenido, comprueba que sigue cabiendo a 1440×900 y a 1366×720.
+`min-height: 100svh` y `scroll-snap-align` (el Cuerpo es una sección con dos
+slides dentro); si añades contenido, comprueba que sigue cabiendo a 1440×900 y
+a 1366×720.
 
 **SINAPSIS // EVA** (`EvaSynapse`, reglas en `lib/channel.ts`) sustituye al
 antiguo panel de pensamiento, que se abría solo a los 2,2 s: empieza cerrado
@@ -80,8 +120,7 @@ una hoja inferior. Guiones en `content/channel.ts`.
 
 Las salas de la v5 (Cerebro, Redes, Causas, Bitácora) salieron del recorrido:
 sus textos siguen en `content/lab.ts` y sus componentes en
-`components/sections/reserva/`, compilando pero sin montar, para reutilizarlos
-cuando Vigilancia, Autonomía o 01.11 tengan contenido. No asignarlos sin
+`components/sections/reserva/`, compilando pero sin montar. No asignarlos sin
 decisión del propietario.
 
 EVA es un personaje, no un chatbot real. Todo lo que «hace» en pantalla —clonar
@@ -114,12 +153,14 @@ de lectura. `assets.ts`, los retratos. Guía editorial y reglas del binario en
 `CONTENT_GUIDE.md`.
 
 **Estilos.** Tokens en `src/styles/tokens.css` (incluye el suelo tipográfico:
-nada por debajo de 11 px, y el carril del canal, `--eva-dock`). Seis hojas en
-`src/app/`: `globals.css` (base), `interface.css` (slides, cursor, portada),
-`neuroscan.css` (escáner y núcleo), `dna.css` (genoma y vídeo), `lab.css` (salas
-en reserva) y `ejes.css` (todo lo de v6: ejes, navegación, riel, secciones,
-canal). El acento de cada lugar sale de `structure.ts`; Vigilancia y Autonomía
-lo redefinen con `[data-axis]`.
+nada por debajo de 11 px, el carril del canal, `--eva-dock`, y el verde de la
+cápsula, `--eva-bio`). Siete hojas en `src/app/`: `globals.css` (base),
+`interface.css` (slides, cursor, portada), `neuroscan.css` (escáner y núcleo),
+`dna.css` (genoma y vídeo), `lab.css` (salas en reserva), `ejes.css` (lo de
+v6: navegación, riel, puertas, secciones, canal) y `cuerpo.css` (01.11). El
+acento de cada lugar sale de `structure.ts`. Las consolas del Cuerpo reutilizan
+las piezas del genoma (`.dna__hud`, `.dna__btn`, `.dna__reply`) y los registros
+del núcleo (`.core__chip`): es la misma máquina.
 
 **Servidor por defecto.** Son cliente los componentes de `src/components/eva/`
 más `MobileNavigation`, `ContextSpy`, `BitRail` y `SoundControl`. Las secciones
@@ -134,15 +175,19 @@ cualquier sitio con un evento (`lib/stage.ts`) que atiende `EvaProfile`.
 | Estructura | `content/structure.ts` + `lib/binary.ts` | El árbol del recorrido y sus códigos. `contextNodes` son los lugares que se pueden estar mirando; `hashAliases`, las anclas antiguas. |
 | Dónde está el visitante | `layout/ContextSpy.tsx` + `lib/context.ts` | Observa la franja central de la pantalla, espera 400 ms y publica el lugar. Marca `aria-current`, escribe `html[data-axis]` y `html[data-node]`, tiñe y frena el fondo, cierra el canal al pulsar un enlace interno. |
 | Canal | `eva/EvaSynapse.tsx` + `lib/channel.ts` + `content/channel.ts` | Máquina de estados pura y probada; la mecanografía escribe directo en el DOM y reserva el alto de cada línea. |
-| Acrónimo | `eva/EvaAcronymMesh.tsx` | Malla de nodos a partir de Orbitron. Modos `alive` (portada), `sealed` (Vigilancia: quieta, con estremecimientos) y `building` (Autonomía: aristas que se conectan y se sueltan); paletas `signal`, `seal`, `growth`. Se detiene fuera de pantalla. |
-| Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice con siete acciones y purga. Ahora también en móvil (`quality='low'`: sin bloom). Publica su estado en `<html data-genome>` (`lib/genome-state`) y sacude el fondo (`lib/field`). |
-| Cinta del genoma | `eva/GenomeStrand.tsx` | La misma secuencia de 600 bases, en 2D, magenta y violeta, cruzando la banda 01.11. |
+| Acrónimo | `eva/EvaAcronymMesh.tsx` | Malla de nodos a partir de Orbitron, sólo en la portada. (Los modos `sealed` y `building` de la v6 salieron con Vigilancia y Autonomía.) Se detiene fuera de pantalla. |
+| Puertas | `sections/HeroEva.tsx` + `doors` en `structure.ts` | Las tres partes de la Entidad como enlaces bajo el nombre. |
+| Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice con ocho acciones (la octava, Expresar, enlaza con el Cuerpo) y purga junto al contador. También en móvil (`quality='low'`: sin bloom). Publica su estado en `<html data-genome>` (`lib/genome-state`) y sacude el fondo (`lib/field`). |
+| Cinta del genoma | `eva/GenomeStrand.tsx` | La misma secuencia de 600 bases, en 2D, magenta y violeta: abre el Cuerpo. |
+| Biolectura | `eva/cuerpo/BioReading.tsx` + `scan.ts` + `bio-data.ts` | Lectura exterior del Cuerpo. Motor puro y probado (`scan.test.ts`); lienzo 2D en `screen` sobre el vídeo o la imagen; bordes leídos una vez del fotograma visible. Publica `<html data-body>` (`lib/body-state`): el hilo se enciende al terminar. |
+| Interior | `eva/cuerpo/EvaInterior.tsx` → `InteriorScene.tsx` (R3F, diferida) · `InteriorFallback.tsx` (SVG) · `interior-data.ts` | Capa HTML con los órganos y las acciones como botones; la escena sólo dibuja. Estado de cada fotograma en `body-signal.ts`. |
+| Trazo cardíaco | `eva/cuerpo/InteriorVitals.tsx` + `pulse.ts` | ECG en 2D y **dueño del latido**: avanza la fase que la escena lee, así corazón y trazo van al compás con WebGL o sin él. El latido suena sólo si se pide y el sonido de la cabecera está encendido. |
 | Párrafo del nacimiento | `eva/TypedParagraph.tsx` | Se teclea una vez por visita; el texto completo está en el DOM desde el principio (invisible lo no escrito), así no salta nada y se lee sin JavaScript. |
 | Retrato | `eva/EvaProfile.tsx` → `EvaPortraitFrame.tsx` → `EvaPortraitLoop.tsx` | Igual que en v5; abre el escáner. |
 | Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa. Cierra el canal al abrirse y devuelve el foco a quien lo abrió. El cerebro va primero y en la columna más ancha. |
 | Núcleo neural | `eva/neural/*` | Ver §0 y §7. Encuadre en `neural-frame.ts`. |
 | Riel de bits | `layout/BitRail.tsx` | A partir de 1.280 px: cuatro celdas que se encienden con el código del lugar, y una marca por lugar. |
-| Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts`, `lib/field.ts` | Como en v5, más el tinte por eje, la quietud de Vigilancia y las sacudidas del genoma. |
+| Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts`, `lib/field.ts` | Como en v5, más el tinte por lugar (el Cuerpo tiñe de verde cápsula y magenta), la quietud de los lugares clausurados (hoy no hay) y las sacudidas del genoma y del cuerpo. |
 
 ---
 
@@ -241,17 +286,55 @@ apareció dos veces en sitios distintos.
     falla y **la página entera se desmonta** (de rebote, un `<Canvas>` a
     medio configurar conecta eventos sobre `null`). El bucle sólo desahucia
     líneas suyas (`typed`) y las retira al pasar a movimiento reducido.
+24. **Un tubo translúcido que escribe profundidad esconde lo que va dentro.**
+    Las partículas del interior viajan por el eje de cada vaso; con el
+    `depthWrite` por defecto, el tubo se pintaba antes y las tapaba: se veían
+    tubos lisos y ningún flujo. Los vasos llevan `depthWrite={false}` y los
+    puntos, `renderOrder={2}`.
+25. **Una simulación con tope de `dt` se ralentiza en equipos lentos.** Con el
+    tope en 0,05 s, a menos de 20 fotogramas por segundo la pasada de la
+    biolectura iba a cámara lenta (en SwiftShader, un 23 % en nueve
+    segundos). `scan.ts` avanza píxel a píxel dentro de cada paso —si no, a
+    más de un píxel por fotograma las partículas se saltan los bordes, que
+    miden uno— y así el tope puede ser 0,12 s; `scan.test.ts` comprueba que el
+    resultado no depende de los fotogramas por segundo.
+26. **Revisar sin el panel del navegador.** Por las trampas 4 y 17, en esta
+    sesión el panel no pintaba nada tras un desplazamiento. La v7 se revisó con
+    Chrome sin interfaz manejado por el protocolo DevTools desde un script de
+    Node 24 (tiene `WebSocket` global; no hace falta Puppeteer): lanzar
+    `chrome --headless=new --remote-debugging-port=<p> --use-angle=swiftshader
+    --enable-unsafe-swiftshader --autoplay-policy=no-user-gesture-required`,
+    pedir `PUT /json/new`, y usar `Emulation.setDeviceMetricsOverride`,
+    `Emulation.setEmulatedMedia` (movimiento reducido), `Runtime.evaluate` y
+    `Page.captureScreenshot`. Con `--disable-3d-apis` se prueba la vista sin
+    WebGL. SwiftShader va lento: esperar por estado, no por tiempo.
+27. **Leer píxeles de un vídeo exige mismo origen.** La biolectura saca los
+    bordes del fotograma visible con `getImageData`. Mientras el vídeo y la
+    imagen se sirvan desde `public/`, funciona; si pasan a un CDN, necesitan
+    CORS (`crossOrigin` y cabeceras) o el lienzo queda «manchado» y la lectura
+    no arranca (el código lo captura y no hace nada, sin error visible).
+28. Ruido conocido en la consola de desarrollo, inofensivo: el aviso de
+    `THREE.Clock` obsoleto sale de R3F, no del código de EVA, y el aviso de
+    LCP de `next/image` sólo aparece si se carga la página ya desplazada hasta
+    el Cuerpo.
 
 ---
 
 ## 5. Pendiente, por impacto
 
-0. **Subsección 01.11 · CUERPO.** Encargo del propietario del 19-09-2026, íntegro y
-   estructurado en `docs/CUERPO_ENCARGO.md`: el vídeo de EVA en la cápsula
-   (`public/eva/eva-capsula-loop.mp4`, ya en el repo) con una biolectura de
-   partículas (técnica de collidingScopes/scanlines, MIT) y, debajo, el interior
-   bio-sintético (corazón, vasos, órganos seleccionables y ECG, adaptado de
-   christianpasinrey/human-blood-system, MIT). Rama `feat/cuerpo`. Sin publicar.
+0. **Visto bueno de la v7 y decisiones del Cuerpo** (rama `feat/cuerpo`, sin
+   integrar). Lo que decide el propietario, con el valor puesto mientras tanto
+   (detalle en `CUERPO_ENCARGO.md` §10):
+   - rótulo `EVA-07` (encargo) o `EVA-01` (imagen): va `EVA-07`, en
+     `ejes.cuerpo.exterior.subject`;
+   - título y lema del Cuerpo e interior: provisionales, marcados en el código;
+   - el vídeo pesa 5,8 MB, sin recomprimir y con audio que no se usa: en
+     escritorio se descarga al llegar; en móvil y con movimiento reducido, sólo
+     si se pide («Cargar el vídeo · 5,8 MB»). Recomprimirlo lo dejaría en ~1 MB;
+   - el vídeo es de EVA **de perfil, fuera de la cápsula**; la imagen de la
+     cápsula es la vista frontal. Si la toma buena es otra, se cambia en
+     `content/assets.ts` y los puntos en `cuerpo/bio-data.ts`;
+   - revisión de tono de todos los textos nuevos del Cuerpo y de «Expresar».
 1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
    con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
    encargo entera: cerebro, hélice, canal (cerrado al cargar, aviso, abrir,
@@ -260,8 +343,8 @@ apareció dos veces en sitios distintos.
    reducido. Falta mirarla en Safari iOS y con lector de pantalla (punto 7).
    Nota: las anclas dejan unos 90 px de la sección anterior a la vista en
    móvil (`scroll-padding-top` + `scroll-margin-top`, CSS heredado de v5).
-2. **Contenido de Vigilancia y Autonomía**: decisión del propietario.
-   Las salas en reserva están disponibles.
+2. **Vigilancia y Autonomía** salieron en la v7 por decisión del propietario.
+   Si vuelven, ver `CONTENT_GUIDE.md` («Añadir un lugar al recorrido»).
 3. **Revisión de tono** de los textos nuevos: párrafo del nacimiento
    (`ejes.genoma.birth`), explicaciones del canal (`channel.scripts`) y líneas
    de estado.
@@ -331,8 +414,13 @@ sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selecci
 - **v5** — el escáner cambia el dibujo por un cerebro sintético en
   WebGL (§7) y la página deja de ser un catálogo: fuera los cuatro universos, el
   destacado y Cursos; entran las cinco salas del laboratorio de EVA.
-- **v6** (esta) — la página por ejes: Entidad (núcleo cerebral, genoma
+- **v6** — la página por ejes: Entidad (núcleo cerebral, genoma
   digital, reserva), Vigilancia y Autonomía, con numeración binaria real; el
   canal SINAPSIS sustituye al panel que se abría solo; cerebro encuadrado por
   proporción; genoma con su propia subsección y usable en móvil; regiones y
   métricas en español; salas antiguas en reserva.
+- **v7** (esta, rama `feat/cuerpo`) — una sola Entidad en tres partes: la
+  reserva 01.11 pasa a ser el **Cuerpo** (biolectura sobre el vídeo de perfil
+  y la imagen de la cápsula, e interior bio-sintético con corazón, vasos, seis
+  órganos y ECG, adaptados de dos repos MIT); fuera Vigilancia y Autonomía; la
+  portada enseña el nombre y tres puertas; el genoma gana «Expresar».

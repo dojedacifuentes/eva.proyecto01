@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { genome, site } from '@/content/site';
+import { subById } from '@/content/structure';
 import { bin } from '@/lib/binary';
 import { clearGenome, publishGenome, type GenomeState } from '@/lib/genome-state';
 import { sequenceId, toFasta, toNotes } from '@/lib/genome';
@@ -41,10 +42,14 @@ const STATE_MS = 6000;
 /** Ancho del contador de copias: el original más cuatro clones caben en tres bits. */
 const CLONE_BITS = 3;
 
+/** Adónde lleva «Expresar»: el cuerpo, la tercera parte de la Entidad. */
+const body = subById('cuerpo')?.sub;
+
 /**
- * Genoma digital de EVA: doble hélice procedural con siete acciones —clonar,
- * utilizar, mutar, escanear, desplegar, sonificar y descargar— más la purga de
- * copias.
+ * Genoma digital de EVA: doble hélice procedural con ocho acciones —clonar,
+ * utilizar, mutar, escanear, desplegar, sonificar, descargar y expresar— más la
+ * purga de copias, que vive junto a su contador. Expresar es el puente con el
+ * cuerpo (01.11): la hélice se enciende y la respuesta lleva hasta allí.
  *
  * Es ficción: no copia ni registra nada (la descarga es un archivo de texto
  * generado en el navegador). Sólo cambia lo que se ve y lo que EVA contesta.
@@ -70,6 +75,7 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
   const dragX = useRef(0);
   const sounded = useRef(0);
   const exported = useRef(0);
+  const expressedTurns = useRef(0);
 
   const [close, setClose] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -80,6 +86,7 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
   const [mutate, setMutate] = useState(0);
   const [scan, setScan] = useState(0);
   const [unwind, setUnwind] = useState(0);
+  const [express, setExpress] = useState(0);
   const [state, setState] = useState<GenomeState>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
   /* Con el neuroescáner abierto encima, la hélice no se ve: su bucle se congela y se retoma al cerrar. */
@@ -259,6 +266,14 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
     setClones(0);
   };
 
+  /** Expresar: la hélice se enciende y la recorre un barrido; la respuesta lleva hasta el cuerpo (01.11). */
+  const onExpress = () => {
+    play('open');
+    announce('expressing', genome.expressReplies[expressedTurns.current % genome.expressReplies.length]);
+    expressedTurns.current += 1;
+    setExpress((count) => count + 1);
+  };
+
   const drift = (clones * genome.driftPerClone).toFixed(1).replace('.', ',');
 
   return (
@@ -288,6 +303,7 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
             mutate={mutate}
             scan={scan}
             unwind={unwind}
+            express={express}
             nearRef={nearRef}
           />
         )}
@@ -302,8 +318,21 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
             {genome.core}: {genome.states[state]}
           </span>
           <span className="dna__hud-count">
-            {genome.clonesLabel}: <b data-bin="">{bin(clones + 1, CLONE_BITS)}</b> · {genome.driftLabel}:{' '}
-            {drift} %
+            <span>
+              {genome.clonesLabel}: <b data-bin="">{bin(clones + 1, CLONE_BITS)}</b> · {genome.driftLabel}:{' '}
+              {drift} %
+            </span>
+            {/* Junto al contador que vacía: así la botonera no gana una fila al aparecer. */}
+            {clones > 0 && (
+              <button
+                type="button"
+                className="dna__purge mono"
+                onClick={onPurge}
+                data-cursor-label="PURGAR"
+              >
+                {genome.actions.purge}
+              </button>
+            )}
           </span>
         </p>
 
@@ -329,22 +358,28 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
           <button type="button" className="dna__btn mono" onClick={onDownload} data-cursor-label="DESCARGAR">
             {genome.actions.download}
           </button>
-          {clones > 0 && (
-            <button
-              type="button"
-              className="dna__btn dna__btn--ghost mono"
-              onClick={onPurge}
-              data-cursor-label="PURGAR"
-            >
-              {genome.actions.purge}
-            </button>
-          )}
+          <button
+            type="button"
+            className="dna__btn dna__btn--express mono"
+            onClick={onExpress}
+            data-cursor-label="EXPRESAR"
+          >
+            {genome.actions.express}
+          </button>
         </div>
 
         <p className="dna__reply" role="status">
           {reply.map((line) => (
             <span key={line}>{line}</span>
           ))}
+          {state === 'expressing' && body && (
+            <a href={body.href} className="dna__reply-link mono" data-sound="open">
+              <b aria-hidden="true" data-bin="">
+                {body.code}
+              </b>{' '}
+              {genome.expressLink} <span aria-hidden="true">↓</span>
+            </a>
+          )}
         </p>
         {foot}
       </div>

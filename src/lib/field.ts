@@ -6,7 +6,7 @@
  * segundo, sin pasar por React.
  */
 export interface FieldSignal {
-  /** 0 deriva normal · 1 quietud: las partículas frenan hasta casi pararse (Vigilancia). */
+  /** 0 deriva normal · 1 quietud: las partículas frenan hasta casi pararse (un lugar clausurado). */
   calm: number;
   /** Color de los hilos del campo, como `r, g, b`. */
   rgb: string;

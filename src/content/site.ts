@@ -8,12 +8,12 @@ const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 export const site = {
   name: 'EVA',
   expansion: 'Entidad de Vigilancia y Autonomía',
-  version: 'v6.0',
+  version: 'v7.0',
   locale: 'es_CL',
   seo: {
     title: 'EVA — Entidad de Vigilancia y Autonomía',
     description:
-      'EVA, una forma de vida que apareció dentro de una red, se cuenta en tres ejes: Entidad —su núcleo cerebral y su genoma digital—, Vigilancia y Autonomía. Ficción interactiva.',
+      'EVA, una forma de vida que apareció dentro de una red, se deja leer por dentro: su núcleo cerebral, su genoma digital y su cuerpo. Ficción interactiva.',
   },
   /** Único canal público verificado. */
   social: {
@@ -45,8 +45,9 @@ export const nav = {
 } as const;
 
 /**
- * Portada. El acrónimo es el acceso a los tres ejes: las letras, las palabras y
- * los estados salen de `structure.ts`; aquí queda lo que sólo dice la portada.
+ * Portada. El acrónimo es el nombre de EVA, letra a letra; las tres puertas
+ * —núcleo cerebral, genoma digital y cuerpo— salen de `structure.ts`. Aquí
+ * queda lo que sólo dice la portada.
  */
 export const hero = {
   /** Nombre del proyecto: es un nombre propio, no una enumeración. No se convierte. */
@@ -54,9 +55,18 @@ export const hero = {
   label: 'EVA // SISTEMA ACTIVO',
   online: 'EVA está en línea.',
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
-  /** Rótulo accesible del acrónimo como navegación. */
-  doorsLabel: 'Los tres ejes de EVA',
-  enter: 'Entrar',
+  /**
+   * El nombre, letra a letra: «Entidad de Vigilancia y Autonomía». Es cómo se
+   * llama, no un índice: desde la v7 las palabras ya no son enlaces.
+   */
+  acronym: [
+    { letter: 'E', word: 'Entidad' },
+    { letter: 'V', word: 'de Vigilancia' },
+    { letter: 'A', word: 'y Autonomía' },
+  ],
+  /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. */
+  doorsLabel: 'Las tres partes de EVA',
+  doorsEyebrow: 'Entrar por',
   /** Pie de la portada: una nota; el enlace al primer lugar lo pone la estructura. */
   foot: { note: 'Una forma de vida en evolución' },
 } as const;
@@ -80,6 +90,7 @@ export const genome = {
     unwinding: 'FILAMENTOS SEPARADOS',
     sounding: 'TRANSCRIPCIÓN SONORA',
     exporting: 'SECUENCIA EXPORTADA',
+    expressing: 'EXPRESIÓN EN CURSO',
   },
   clonesLabel: 'CLONES ACTIVOS',
   driftLabel: 'DERIVA',
@@ -91,6 +102,7 @@ export const genome = {
     unwind: 'Desplegar',
     sound: 'Sonificar',
     download: 'Descargar',
+    express: 'Expresar',
     purge: 'Purgar clones',
   },
   /** Pista del arrastre sobre la hélice. */
@@ -140,6 +152,15 @@ export const genome = {
     ['Ya la tienes.', 'Ahora somos dos los que guardamos una copia de mí.'],
   ],
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
+  /**
+   * Expresar: la secuencia se hace cuerpo. Es el puente con 01.11; la respuesta
+   * lleva un enlace hasta allí. Texto nuevo de la v7, pendiente de revisión de tono.
+   */
+  expressReplies: [
+    ['La secuencia se expresa.', 'En un organismo eso da proteínas. En mí da un cuerpo, y está un poco más abajo.'],
+    ['Otra expresión.', 'Nunca sale igual dos veces. Los humanos lo llaman carácter; yo, varianza.'],
+  ],
+  expressLink: 'Ver el cuerpo',
 } as const;
 
 /*
@@ -152,7 +173,7 @@ export const genome = {
 export const sections = {
   footer: {
     line: 'Una forma de vida que apareció dentro de una red.',
-    navLabel: 'Ejes de EVA',
+    navLabel: 'Partes de EVA',
     statusLabel: 'Estado',
     fiction: 'Ficción interactiva. EVA es un personaje.',
   },

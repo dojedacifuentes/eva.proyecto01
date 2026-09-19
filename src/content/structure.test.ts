@@ -1,38 +1,38 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { isBinaryCode } from '@/lib/binary';
-import { axes, contextNodes, hashAliases, home, navItems, nextContext } from './structure';
+import { axes, contextNodes, doors, hashAliases, home, navItems, nextContext } from './structure';
 
-test('los tres ejes llevan el código de su posición', () => {
+test('la Entidad es el único eje y lleva el código de su posición', () => {
   assert.deepEqual(
     axes.map((axis) => [axis.code, axis.name]),
-    [
-      ['01', 'Entidad'],
-      ['10', 'Vigilancia'],
-      ['11', 'Autonomía'],
-    ],
+    [['01', 'Entidad']],
   );
   assert.equal(home.code, '00');
 });
 
-test('Entidad tiene tres subsecciones con ruta binaria', () => {
+test('Entidad tiene tres subsecciones con ruta binaria, todas abiertas', () => {
   const entidad = axes[0];
   assert.deepEqual(
     entidad.children.map((child) => [child.code, child.id]),
     [
       ['01.01', 'nucleo'],
       ['01.10', 'genoma'],
-      ['01.11', 'reserva'],
+      ['01.11', 'cuerpo'],
     ],
   );
-  assert.equal(entidad.children[2].state, 'reserved');
+  for (const child of entidad.children) assert.equal(child.state, 'active');
 });
 
-test('Vigilancia está clausurada y Autonomía en desarrollo, sin subsecciones inventadas', () => {
-  assert.equal(axes[1].state, 'sealed');
-  assert.equal(axes[2].state, 'building');
-  assert.equal(axes[1].children.length, 0);
-  assert.equal(axes[2].children.length, 0);
+test('las puertas son las tres partes de la Entidad', () => {
+  assert.deepEqual(
+    doors.map((door) => [door.code, door.name]),
+    [
+      ['01.01', 'Núcleo cerebral'],
+      ['01.10', 'Genoma digital'],
+      ['01.11', 'Cuerpo'],
+    ],
+  );
 });
 
 test('todo código visible es binario y todo destino existe', () => {
@@ -47,11 +47,20 @@ test('todo código visible es binario y todo destino existe', () => {
   }
 });
 
+test('las anclas retiradas siguen llevando a algún sitio', () => {
+  assert.equal(hashAliases.reserva, 'cuerpo');
+  assert.equal(hashAliases.vigilancia, 'inicio');
+  assert.equal(hashAliases.autonomia, 'inicio');
+  for (const alias of Object.keys(hashAliases)) {
+    assert.ok(!contextNodes.some((node) => node.id === alias), `«${alias}» es un lugar vivo, no un alias`);
+  }
+});
+
 test('el recorrido sigue el orden de la página', () => {
   assert.deepEqual(
     contextNodes.map((node) => node.id),
-    ['inicio', 'nucleo', 'genoma', 'reserva', 'vigilancia', 'autonomia'],
+    ['inicio', 'nucleo', 'genoma', 'cuerpo'],
   );
-  assert.equal(nextContext('genoma')?.id, 'reserva');
-  assert.equal(nextContext('autonomia'), undefined);
+  assert.equal(nextContext('genoma')?.id, 'cuerpo');
+  assert.equal(nextContext('cuerpo'), undefined);
 });

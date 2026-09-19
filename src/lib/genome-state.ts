@@ -16,7 +16,8 @@ export type GenomeState =
   | 'scanning'
   | 'unwinding'
   | 'sounding'
-  | 'exporting';
+  | 'exporting'
+  | 'expressing';
 
 /** Cuánto sacude el tejido cada estado: mutar y clonar, mucho; leer, poco. */
 const SURGE: Record<GenomeState, number> = {
@@ -28,6 +29,7 @@ const SURGE: Record<GenomeState, number> = {
   unwinding: 0.45,
   sounding: 0.3,
   exporting: 0.3,
+  expressing: 0.65,
 };
 
 export function publishGenome(state: GenomeState) {

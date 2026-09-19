@@ -22,6 +22,8 @@
   --eva-violet: #9a8dff;
   --eva-yellow: #d8f05b;
   --eva-magenta: #f07ab9;
+  /* Verde bioluminiscente: el del líquido de la cápsula. Sólo lo usa el Cuerpo (01.11). */
+  --eva-bio: #78f0b4;
 
   /* Acento activo: cada universo lo redefine con [data-accent]. */
   --accent: var(--eva-cyan);

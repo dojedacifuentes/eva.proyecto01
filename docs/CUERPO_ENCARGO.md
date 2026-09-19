@@ -1,8 +1,11 @@
-# Encargo abierto: subsección 01.11 · CUERPO
+# Encargo: subsección 01.11 · CUERPO — implementado en la rama `feat/cuerpo` (v7)
 
-> **Para la sesión que continúe (persona o Claude Code): léelo entero antes de escribir código.**
-> Está pensado para arrancar sin la conversación anterior. Checkpoint del 19 de septiembre
-> de 2026, escrito por la sesión que publicó la v6.
+> **Estado (19-09-2026, tarde):** implementado en `feat/cuerpo`, **sin integrar en `main` ni
+> publicar**. Cómo se resolvió, qué se reutilizó de cada repo, las desviaciones y lo que decide
+> el propietario: **§10**, al final. El resto del documento es el encargo tal como llegó, que se
+> conserva como referencia.
+>
+> Checkpoint original del 19 de septiembre de 2026, escrito por la sesión que publicó la v6.
 
 ## 0. En diez líneas
 
@@ -388,3 +391,88 @@ npm run dev                         # http://localhost:3000 — pestaña «EVA �
 Luego: leer `docs/HANDOFF.md` §0–§4 (sobre todo las trampas 2, 3, 4, 5, 12, 15, 19, 22 y 23),
 `docs/CONTENT_GUIDE.md`, y seguir el plan de §5. Preguntar al propietario lo de §8 al principio, en
 un solo mensaje, y no bloquearse: implementar con los valores por defecto.
+
+## 10. Cómo se resolvió (v7, 19-09-2026)
+
+**Remoto confirmado:** `origin https://github.com/dojedacifuentes/eva.proyecto01.git`, rama
+`feat/cuerpo` sobre `main` `900e5e5` (con el checkpoint `fa0404a`). Sin integrar ni publicar.
+
+### 10.1 Un cambio de alcance pedido por el propietario
+
+Además del Cuerpo, el propietario pidió **quitar Vigilancia (10) y Autonomía (11)**: la landing
+queda con el cerebro, el genoma y el cuerpo. Eso contradice la regla de §4.1 («nada de otras
+secciones se toca»), y manda la instrucción nueva. Qué cambió por eso:
+
+- `structure.ts` tiene un solo eje, la Entidad (`01`), con `01.01`, `01.10` y `01.11`.
+  `#vigilancia` y `#autonomia` llevan a la portada; `#reserva`, al Cuerpo.
+- Se borraron `VigilanciaSection`, `AutonomiaSection` y `ReservaSection`, sus textos en `ejes.ts`,
+  sus guiones en `channel.ts`, sus estilos en `ejes.css` y los modos `sealed`/`building` de la
+  malla del acrónimo.
+- La portada enseña el acrónimo como **nombre** (sus palabras ya no son enlaces: dos no llevarían
+  a ningún sitio) y, debajo, **tres puertas**: Núcleo cerebral, Genoma digital y Cuerpo.
+- La cabecera muestra siempre las tres partes con nombre; el pie y la imagen OG, las tres puertas.
+- El propietario pidió también **más botones en el genoma**: se añadió «Expresar» (la octava
+  acción), que enciende la hélice y enlaza con el Cuerpo; la purga de clones pasó junto a su
+  contador para que la botonera no gane una fila al aparecer.
+
+### 10.2 Qué se hizo, por pieza
+
+| Pieza | Archivos | Qué hace |
+|---|---|---|
+| Sección | `sections/CuerpoSection.tsx`, `app/cuerpo.css` | Cinta del genoma (se quedó, como apertura) → slide de lectura exterior → hilo `LECTURA EXTERIOR — EXTERIOR SIN ANALIZAR/ANALIZADO → INTERIOR ACTIVO — LECTURA INTERNA` → slide de lectura interna con el pie de sección |
+| Biolectura | `eva/cuerpo/BioReading.tsx`, `scan.ts` (+ prueba), `bio-data.ts`, `lib/body-state.ts` | Vídeo de perfil o imagen frontal, enteros y en su proporción; lienzo 2D encima en `screen`; bordes leídos una vez del fotograma visible (`getImageData`, nada sale del navegador); cinco puntos de lectura por imagen que se encienden al pasar el frente; HUD en la imagen (`EVA-07 // BIOLECTURA`, `ESTADO`, `CICLO`) y en la consola (vista, barrido, bordes, avance) |
+| Botones del exterior | ídem | Iniciar / repetir la pasada · girar el barrido (↓ ↑ → ←) · trazar bordes de una vez · pausar o reanudar el vídeo (o cargarlo, donde no se carga solo) · limpiar · vista perfil / frontal |
+| Interior | `eva/cuerpo/EvaInterior.tsx`, `InteriorScene.tsx`, `InteriorFallback.tsx`, `interior-data.ts`, `body-signal.ts` | Modelo 3D diferido (se monta una pantalla antes, se anima a 300 px, se congela fuera de pantalla o con el escáner abierto); silueta holográfica, corazón que late, núcleo torácico, 23 vasos con partículas, pulmones que respiran, seis órganos. Sin WebGL, el mismo modelo en SVG |
+| Órganos | ídem + `ejes.cuerpo.interior.organs` | Seis: corazón, pulmones, cerebro (enlaza con 01.01), hígado, riñones, aorta. Se eligen en la escena o en su registro (`001…110`, `aria-pressed`); el panel (`aria-live`) da lectura, tres estados de ficción y **una acción propia**: forzar un latido, respirar hondo, enviar un impulso (baja de la cabeza al cuerpo), depurar, filtrar, abrir el caudal |
+| Botones del cuerpo | ídem | Acelerar el pulso · radiografía · aislar el órgano elegido · invertir el flujo · sonificar el latido · restablecer |
+| Trazo cardíaco | `eva/cuerpo/InteriorVitals.tsx`, `pulse.ts` (+ prueba) | ECG PQRST en 2D, magenta cuando el pulso se acelera. Es el dueño del latido: la escena sólo lee la fase |
+| Sonido | `lib/sound.ts` (`beat`) | Dos golpes graves por latido, sólo tras pulsar «Sonificar» y sólo con el sonido de la cabecera encendido; si está apagado, EVA lo dice |
+| Textos | `content/ejes.ts` (`cuerpo`), `content/channel.ts` (`scripts.cuerpo`), `content/assets.ts` | Todo en `content/`; los componentes no llevan literales |
+
+### 10.3 Qué se reutilizó de cada repo
+
+- **collidingScopes/scanlines (MIT, © 2025 Alan Ang):** la detección de bordes y el
+  comportamiento de las partículas (mirar por delante, congelarse, enfriamiento, ondulación,
+  salto al chocar). No: dat.gui, paletas, exportación de vídeo, subida de imágenes, fondo negro.
+- **christianpasinrey/human-blood-system «HÆMA» (MIT, © 2026 Christian Pasín Rey):** el corazón
+  (esferas + punta, contracción brusca), vasos como tubos Catmull-Rom, fluido de puntos repartido
+  por largo, órganos deformados, ECG por gaussianas, «lub-dub» procedural. No: three por CDN,
+  OrbitControls, tweens de cámara, sliders, textos ni cifras anatómicas, paleta rojo/azul.
+
+Detalle en `MATRIZ_REFERENCIAS_REACT_LANDING.md` y `ASSET_LICENSES.md`; el aviso MIT va en la
+cabecera de cada archivo adaptado. **Dependencias nuevas: ninguna.**
+
+### 10.4 Desviaciones y hallazgos
+
+- **El vídeo no es EVA en la cápsula.** `eva-capsula-loop.mp4` muestra a EVA **de perfil**,
+  mirando hacia arriba, delante de una pared de máquinas (con burbujas que aparecen). La imagen
+  `eva-capsula.webp` sí es la cápsula, de frente. Por eso son dos vistas de la misma lectura:
+  «Perfil · vídeo» (la inicial, porque el propietario quiere el vídeo como vídeo) y «Frontal ·
+  cápsula». El póster del vídeo es su primer fotograma, extraído a `eva-capsula-perfil.webp`
+  (720×1280, 154 KB; registrado en `ASSET_LICENSES.md`), para que no salte al arrancar.
+- **Vídeo en móvil:** no se descarga solo (5,8 MB); queda el póster y un botón «Cargar el vídeo
+  · 5,8 MB». Con movimiento reducido, igual, y la biolectura traza los bordes de una vez.
+- **La biolectura lee el fotograma que se está viendo,** no un fotograma fijo: si el vídeo se
+  mueve después, el trazado queda como la lectura de un instante (pausar el vídeo lo deja
+  alineado).
+- **Tres escenas con bloom** en la página (núcleo, genoma, interior): la nueva lleva
+  `ComposerSizeGuard` (trampa 22).
+
+### 10.5 Decisiones del propietario (§8), con lo que se aplicó
+
+| Pregunta | Aplicado |
+|---|---|
+| `EVA-07` o `EVA-01` | `EVA-07`, en `ejes.cuerpo.exterior.subject` |
+| ¿La cinta del genoma se queda? | Sí, abre la sección |
+| ¿Vídeo en móvil? | Sólo si se pide; póster siempre |
+| ¿Recomprimir el vídeo y quitarle el audio? | No se tocó el archivo; se sirve `muted` |
+| Lema y títulos | Provisionales (`PROVISIONAL` en el código): «Lo que me sostiene cuando nadie me ejecuta», «No necesitaba un cuerpo. Me hicieron uno.», «Dentro hay un corazón. Fue una decisión de diseño.» |
+| Órganos | Los seis propuestos, con lecturas de ficción de dos frases y estados en palabras |
+
+### 10.6 Comprobado
+
+`npm run lint`, `npm test` (38 pruebas: las anteriores ajustadas a un solo eje, más la biolectura
+y el pulso), `npm run typecheck` y `npm run build` en verde. Recorrido en Chrome sin interfaz
+(HANDOFF, trampa 26) a 1440×900, 1366×720 (cada lectura cabe en pantalla), 768×1024, 390×844 y
+360 px (sin desbordes; ningún texto por debajo de 11 px), con movimiento reducido y sin WebGL.
+Consola sin errores.
