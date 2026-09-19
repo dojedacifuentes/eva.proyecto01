@@ -75,6 +75,14 @@ export function detectTier(): Tier {
   return 'high';
 }
 
+let tier: Tier | null = null;
+
+/** `detectTier`, una sola vez por página: el dispositivo no cambia entre renders. */
+export function deviceTier(): Tier {
+  tier ??= detectTier();
+  return tier;
+}
+
 /** Hay WebGL de verdad, no sólo la API: se pide un contexto y se suelta al instante. */
 export function detectWebGL(): boolean {
   try {
@@ -86,6 +94,14 @@ export function detectWebGL(): boolean {
   } catch {
     return false;
   }
+}
+
+let webgl: boolean | null = null;
+
+/** `detectWebGL`, una sola vez por página. */
+export function webglSupported(): boolean {
+  webgl ??= detectWebGL();
+  return webgl;
 }
 
 /** Semilla del núcleo. (0xeva01 no es hexadecimal: la v no es dígito.) */

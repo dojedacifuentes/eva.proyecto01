@@ -7,7 +7,7 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Textos de la portada (acrónimo, pie, ficha del retrato) | `content/site.ts` | `hero` |
 | Genoma: acciones y respuestas de EVA | `content/site.ts` | `genome` |
 | Salas del laboratorio: orden, nombres y acentos | `content/lab.ts` | `rooms` |
-| Origen, cerebro, redes, causas, bitácora | `content/lab.ts` | `lab.origin`, `lab.brain`, `lab.networks`, `lab.causes`, `lab.log` |
+| Núcleo (rótulos del HUD y de la ventana de lectura), cerebro, redes, causas, bitácora | `content/lab.ts` | `lab.core`, `lab.brain`, `lab.networks`, `lab.causes`, `lab.log` |
 | Preguntas del interrogatorio de la bitácora | `content/lab.ts` + `content/neuroscan.ts` | `lab.log.questions` elige ids de `neuroscan.answers` |
 | Regiones del cerebro, flujo de pensamiento, terminal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` (las salas los reutilizan) |
 | Lecturas del núcleo neural 3D | `content/neuroscan.ts` | `brain.core` |

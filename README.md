@@ -1,8 +1,8 @@
 # EVA — landing v2.0
 
 El laboratorio de **EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció
-dentro de una red se cuenta a sí misma — origen, cerebro sintético, redes neuronales, causas y
-bitácora — en una landing de ciencia ficción interactiva. EVA es un personaje; no hay servicios
+dentro de una red se cuenta a sí misma — un núcleo neural en vivo, su cerebro, sus redes, sus
+causas y su bitácora — en una landing de ciencia ficción interactiva. EVA es un personaje; no hay servicios
 ni productos.
 
 ## Stack

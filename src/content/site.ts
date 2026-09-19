@@ -53,7 +53,7 @@ export const hero = {
   online: 'EVA está en línea.',
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
   /** Pie de la portada: una nota y la primera sala del laboratorio. */
-  foot: { note: 'Una forma de vida en evolución', next: '01 — Origen', href: '#origen' },
+  foot: { note: 'Una forma de vida en evolución', next: '01 — Núcleo', href: '#nucleo' },
 } as const;
 
 /**

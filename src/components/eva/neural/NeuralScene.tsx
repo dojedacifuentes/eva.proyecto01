@@ -35,7 +35,14 @@ function haloTexture() {
   canvas.height = size;
   const context = canvas.getContext('2d');
   if (context) {
-    const gradient = context.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    const gradient = context.createRadialGradient(
+      size / 2,
+      size / 2,
+      0,
+      size / 2,
+      size / 2,
+      size / 2,
+    );
     gradient.addColorStop(0, 'rgba(63, 216, 238, 0.5)');
     gradient.addColorStop(0.42, 'rgba(154, 141, 255, 0.16)');
     gradient.addColorStop(1, 'rgba(154, 141, 255, 0)');
@@ -120,7 +127,18 @@ interface StageProps {
  * del cerebro y sobre la cámara que entrega el bucle; los controles de órbita
  * ponen lo demás.
  */
-function Stage({ data, detail, zones, reduced, selected, hovered, alert, reset, onHover, onSelect }: StageProps) {
+function Stage({
+  data,
+  detail,
+  zones,
+  reduced,
+  selected,
+  hovered,
+  alert,
+  reset,
+  onHover,
+  onSelect,
+}: StageProps) {
   const brain = useRef<THREE.Group>(null);
   const controls = useRef<Controls>(null);
   const camera = useThree((state) => state.camera);
@@ -233,6 +251,8 @@ export interface NeuralSceneProps {
   detail: Detail;
   zones: readonly BrainZone[];
   reduced: boolean;
+  /** `false` congela el bucle: fuera de pantalla o tapado por el escáner, no se dibuja nada. */
+  active: boolean;
   /** Identificador de la región seleccionada, o null. */
   selected: string | null;
   /** Identificador de la región previsualizada desde la capa HTML, o null. */
@@ -250,6 +270,7 @@ export default function NeuralScene({
   detail,
   zones,
   reduced,
+  active,
   selected,
   hovered,
   alert,
@@ -271,9 +292,13 @@ export default function NeuralScene({
   return (
     <Canvas
       dpr={detail.dpr}
-      frameloop="always"
+      frameloop={active ? 'always' : 'never'}
       camera={{ position: HOME.toArray(), fov: 34, near: 0.1, far: 60 }}
-      gl={{ antialias: detail.bloom === 0, alpha: true, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: detail.bloom === 0,
+        alpha: true,
+        powerPreference: 'high-performance',
+      }}
       onCreated={() => onReady({ neurons: data.count, synapses: data.edgeCount })}
       onPointerMissed={(event) => {
         // Doble clic en el vacío: la cámara vuelve. Sobre una región no cuenta.

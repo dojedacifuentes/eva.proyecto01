@@ -1,9 +1,17 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  Component,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { neuroscan } from '@/content/neuroscan';
-import { DETAIL, detectTier, detectWebGL } from './neural-data';
+import { DETAIL, deviceTier, webglSupported } from './neural-data';
 import { NeuralFallback } from './NeuralFallback';
 
 /** three.js no viaja con el escáner: llega cuando el núcleo se monta. */
@@ -20,6 +28,20 @@ type Phase = 'loading' | 'fading' | 'live' | 'flat';
 
 /** Cuánto tarda el mapa plano en desvanecerse cuando el núcleo aparece. */
 const FADE_MS = 900;
+
+/*
+ * Estamos en el navegador. La sala 01 se renderiza en el servidor, donde no hay
+ * WebGL que detectar ni dispositivo que medir: hasta hidratar se pinta el mapa
+ * plano, y la escena se monta después con la detección ya hecha. Sin estado ni
+ * efectos: la instantánea del servidor es `false` y la del cliente, `true`.
+ */
+const subscribeNever = () => () => {};
+const useIsClient = () =>
+  useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
 
 /** Si la escena revienta —contexto perdido, sombreador rechazado— queda el mapa plano. */
 class SceneBoundary extends Component<
@@ -42,11 +64,21 @@ class SceneBoundary extends Component<
 }
 
 interface EvaNeuralCoreProps {
-  /** Región seleccionada; la lógica de selección sigue en el escáner. */
+  /** Región seleccionada; la lógica de selección vive en quien lo monta. */
   selected: string | null;
   reduced: boolean;
   onSelect: (id: string) => void;
   onReset: () => void;
+  /**
+   * `scan`: dentro del neuroescáner, con las fichas de regiones y el botón de
+   * restablecer. `room`: en la sala 01 de la página, sólo el lienzo y el HUD;
+   * las regiones se leen en la ventana de al lado.
+   */
+  variant?: 'scan' | 'room';
+  /** `false` congela el bucle de render (fuera de pantalla o tapado). */
+  active?: boolean;
+  /** Recuento de neuronas y sinapsis en cuanto el núcleo pinta. */
+  onStats?: (stats: { neurons: number; synapses: number }) => void;
 }
 
 /**
@@ -55,12 +87,25 @@ interface EvaNeuralCoreProps {
  * ofrece las ocho regiones como botones de verdad, con teclado y foco.
  * El lienzo es un refuerzo visual: todo lo que se lee está fuera de él.
  */
-export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeuralCoreProps) {
+export function EvaNeuralCore({
+  selected,
+  reduced,
+  onSelect,
+  onReset,
+  variant = 'scan',
+  active = true,
+  onStats,
+}: EvaNeuralCoreProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<Phase>(() => (detectWebGL() ? 'loading' : 'flat'));
-  const [detail] = useState(() => DETAIL[detectTier()]);
+  const client = useIsClient();
+  const [phase, setPhase] = useState<Phase>('loading');
+  const supported = client ? webglSupported() : true;
+  const detail = client ? DETAIL[deviceTier()] : DETAIL.high;
   const [hovered, setHovered] = useState<string | null>(null);
-  const [stats, setStats] = useState<{ neurons: number; synapses: number } | null>(null);
+  const [stats, setStats] = useState<{
+    neurons: number;
+    synapses: number;
+  } | null>(null);
   const [resetTick, setResetTick] = useState(0);
 
   /* El núcleo ya pinta: el mapa plano se va y, pasado el fundido, se desmonta. */
@@ -70,10 +115,14 @@ export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeura
     return () => clearTimeout(timer);
   }, [phase]);
 
-  const ready = useCallback((next: { neurons: number; synapses: number }) => {
-    setStats(next);
-    setPhase('fading');
-  }, []);
+  const ready = useCallback(
+    (next: { neurons: number; synapses: number }) => {
+      setStats(next);
+      setPhase('fading');
+      onStats?.(next);
+    },
+    [onStats],
+  );
 
   const fail = useCallback(() => {
     setStats(null);
@@ -99,7 +148,7 @@ export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeura
     setResetTick((tick) => tick + 1);
   };
 
-  const flat = phase === 'flat';
+  const flat = !supported || phase === 'flat';
   const focus = zones.find((zone) => zone.id === (hovered ?? selected));
   const mode = hovered ? 'preview' : selected ? 'active' : 'idle';
   const status = stats
@@ -109,9 +158,9 @@ export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeura
       : core.loading;
 
   return (
-    <div className="core" data-phase={phase}>
+    <div className="core" data-phase={phase} data-variant={variant}>
       <div className="core__stage">
-        {!flat && (
+        {client && !flat && (
           <div
             ref={canvasRef}
             className="core__canvas"
@@ -124,6 +173,7 @@ export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeura
                 detail={detail}
                 zones={zones}
                 reduced={reduced}
+                active={active}
                 selected={selected}
                 hovered={hovered}
                 alert={core.alert}
@@ -173,36 +223,38 @@ export function EvaNeuralCore({ selected, reduced, onSelect, onReset }: EvaNeura
         )}
       </div>
 
-      <div className="core__regions" role="group" aria-label={core.regionsLabel}>
-        {zones.map((zone) => (
+      {variant === 'scan' && (
+        <div className="core__regions" role="group" aria-label={core.regionsLabel}>
+          {zones.map((zone) => (
+            <button
+              key={zone.id}
+              type="button"
+              className="core__chip mono"
+              aria-pressed={selected === zone.id}
+              data-hover={hovered === zone.id || undefined}
+              onClick={() => onSelect(zone.id)}
+              onPointerEnter={() => setHovered(zone.id)}
+              onPointerLeave={() => setHovered(null)}
+              onFocus={() => setHovered(zone.id)}
+              onBlur={() => setHovered(null)}
+              data-cursor-label={zone.code}
+            >
+              <i aria-hidden="true">{zone.code}</i>
+              <span>{zone.name}</span>
+            </button>
+          ))}
           <button
-            key={zone.id}
             type="button"
-            className="core__chip mono"
-            aria-pressed={selected === zone.id}
-            data-hover={hovered === zone.id || undefined}
-            onClick={() => onSelect(zone.id)}
-            onPointerEnter={() => setHovered(zone.id)}
-            onPointerLeave={() => setHovered(null)}
-            onFocus={() => setHovered(zone.id)}
-            onBlur={() => setHovered(null)}
-            data-cursor-label={zone.code}
+            className="core__chip core__chip--reset mono"
+            onClick={reset}
+            aria-label={core.resetLabel}
+            data-cursor-label="RESET"
           >
-            <i aria-hidden="true">{zone.code}</i>
-            <span>{zone.name}</span>
+            <i aria-hidden="true">⟲</i>
+            <span>{core.reset}</span>
           </button>
-        ))}
-        <button
-          type="button"
-          className="core__chip core__chip--reset mono"
-          onClick={reset}
-          aria-label={core.resetLabel}
-          data-cursor-label="RESET"
-        >
-          <i aria-hidden="true">⟲</i>
-          <span>{core.reset}</span>
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -28,9 +28,11 @@ Una landing de una sola ruta (`src/app/page.tsx`) partida en secciones que
 `min-height: 100svh` y `scroll-snap-align`. Si añades contenido a una sección,
 comprueba que sigue cupiendo a 1440×900 y a 1366×720 antes de darla por buena.
 
-Orden actual: portada → **Origen** → **Cerebro** →
-**Redes** → **Causas** → **Bitácora**. Son las cinco salas del laboratorio de EVA:
-ella contándose. Los cuatro universos (Academy, News, Arcade, Lab), el destacado
+Orden actual: portada → **Núcleo** (el cerebro 3D con la ventana que lo lee)
+→ **Cerebro** → **Redes** → **Causas** → **Bitácora**. Son las cinco salas del
+laboratorio de EVA: ella contándose. La sala Origen («No nací. Aparecí.») duró un
+commit: el propietario la cambió por el núcleo en vivo (su texto sigue en
+`e58b34a`). Los cuatro universos (Academy, News, Arcade, Lab), el destacado
 y la sección Cursos salieron de la página por decisión del propietario: esto es
 el laboratorio personal de un personaje, no un catálogo de servicios ni de
 productos. Su código y sus colecciones quedan en el historial (último commit con
@@ -84,7 +86,8 @@ con un evento (`lib/stage.ts`) y `EvaProfile` lo atiende.
 | Retrato | `eva/EvaProfile.tsx` → `EvaPortraitFrame.tsx` → `EvaPortraitLoop.tsx` | Marco técnico con la ficha del estudio. Encima, un bucle de vídeo mudo que sólo se carga en pantallas de 1024 px o más. Debajo siempre está la imagen, que hace de póster. |
 | Pensamiento | `eva/EvaThoughtStream.tsx` | Panel flotante abajo a la derecha, montado en el **layout** (acompaña toda la página, no sólo la portada). Se despliega solo a los 2,2 s y teclea sin parar. El texto sale de `content/neuroscan.ts` para que EVA no se contradiga entre lo que piensa fuera y lo que piensa dentro del escáner. |
 | Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa al pulsar el retrato. Inertiza `main`, `header`, `footer` y `.synapse`. Al abrirse enciende `lib/stage.ts` (`setCovered`) y el genoma congela su bucle hasta que se cierra. |
-| Núcleo neural | `eva/neural/EvaNeuralCore.tsx` + `NeuralScene.tsx`, `BrainShell.tsx`, `NeuralNetwork.tsx`, `neural-data.ts`, `neural-signal.ts`, `NeuralFallback.tsx` | El cerebro 3D del escáner. Ver §7. |
+| Núcleo neural | `eva/neural/EvaNeuralCore.tsx` + `NeuralScene.tsx`, `BrainShell.tsx`, `NeuralNetwork.tsx`, `neural-data.ts`, `neural-signal.ts`, `NeuralFallback.tsx` | El cerebro 3D, en el escáner (`variant="scan"`) y en la sala 01 (`variant="room"`). Ver §7. |
+| Sala 01 | `eva/neural/NeuralRoom.tsx` + `NeuralReadout.tsx` | El mismo cerebro, con todos sus efectos, junto a la ventana «NEURAL READOUT» que teclea a 800 caracteres/s: aritmética de red, contadores de relaciones, un pensamiento suelto, volcados binarios y la lectura de la región que se pulse. Se congela fuera de pantalla y cuando el escáner la tapa. |
 | Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts` | Partículas que se enganchan al puntero y se vuelven cuadradas sobre lo interactivo; el cursor es un círculo que se convierte en cuadrado con esquinas de puntería. Comparten estado por un módulo, no por eventos por fotograma. |
 
 El genoma publica su estado en `.hero__grid` con `data-genome`, y el retrato
@@ -144,6 +147,18 @@ apareció dos veces en sitios distintos.
 14. El módulo 3D del escáner llega por `next/dynamic` y R3F sólo arranca cuando
     el contenedor mide algo: si el panel del navegador no pinta (trampa 4), el
     escáner se queda en «Compilando núcleo neural» aunque el código esté bien.
+15. **`EvaNeuralCore` se renderiza en el servidor** desde que vive en la sala 01.
+    Nada de `document` ni `window` en inicializadores: la detección de WebGL y
+    de dispositivo va detrás de `useIsClient` (`useSyncExternalStore`) y está
+    cacheada por página (`webglSupported`, `deviceTier`). Hasta hidratar se
+    pinta el mapa plano.
+16. **Dos escenas del núcleo comparten `coreSignal`** (sala y escáner). No chocan
+    porque nunca están activas a la vez: el escáner enciende `setCovered` y la
+    sala congela su bucle. Si algún día conviven, el signal tiene que ser por escena.
+17. Las capturas del panel del navegador tras un scroll programático salen negras
+    con la cabecera abajo: el compositor se queda en y=0 mientras no hay
+    fotogramas. No es la página. Para ver una sala, cárgala con `main`
+    desplazado por `margin-top` negativo o lleva el panel a primer plano.
 
 ---
 

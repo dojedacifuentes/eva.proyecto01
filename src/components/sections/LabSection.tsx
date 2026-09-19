@@ -6,6 +6,8 @@ interface LabSectionProps {
   eyebrow: string;
   title: string;
   lede: string;
+  /** Sin título visible ni entrada: la sala habla por sí misma (el núcleo). */
+  compact?: boolean;
   children: ReactNode;
 }
 
@@ -14,7 +16,14 @@ interface LabSectionProps {
  * el contenido que le pase cada sección y, al pie, el paso a la sala
  * siguiente. El acento sale de `rooms`, así que la sala no lo repite.
  */
-export function LabSection({ id, eyebrow, title, lede, children }: LabSectionProps) {
+export function LabSection({
+  id,
+  eyebrow,
+  title,
+  lede,
+  compact = false,
+  children,
+}: LabSectionProps) {
   const index = rooms.findIndex((room) => room.id === id);
   const room = rooms[index];
   const next = rooms[index + 1];
@@ -22,7 +31,7 @@ export function LabSection({ id, eyebrow, title, lede, children }: LabSectionPro
   return (
     <section
       id={id}
-      className="slide section section--ruled lab"
+      className={`slide section section--ruled lab${compact ? ' lab--compact' : ''}`}
       aria-labelledby={`${id}-titulo`}
       data-accent={room.accent}
     >
@@ -33,10 +42,10 @@ export function LabSection({ id, eyebrow, title, lede, children }: LabSectionPro
           </span>
           <div>
             <p className="eyebrow mono">{eyebrow}</p>
-            <h2 id={`${id}-titulo`} className="h2">
+            <h2 id={`${id}-titulo`} className={compact ? 'sr-only' : 'h2'}>
               {title}
             </h2>
-            <p className="lede">{lede}</p>
+            <p className={compact ? 'lab__hint mono' : 'lede'}>{lede}</p>
           </div>
         </div>
 
