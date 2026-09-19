@@ -395,25 +395,35 @@ function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduce
   const side = index % 2 === 0 ? 1 : -1;
   const rank = Math.floor(index / 2) + 1;
 
+  /*
+   * Los tubos llevan morph targets para el desplegado, y R3F asigna la
+   * geometría después de construir la malla: sin esto, la copia se dibuja sin
+   * `morphTargetInfluences` y three.js aborta el fotograma al llegar a ella —
+   * el original se veía y las copias no.
+   */
+  const initMorph = useCallback((mesh: THREE.Mesh | null) => {
+    mesh?.updateMorphTargets();
+  }, []);
+
   useFrame((state, delta) => {
     const node = group.current;
     if (!node) return;
     if (!reduced) node.rotation.y += Math.min(delta, 0.05) * (0.24 + index * 0.05) * side;
     // Se separa del original y vuelve, como si no terminara de cuajar.
     const wander = Math.sin(state.clock.elapsedTime * 0.35 + index) * 0.22;
-    node.position.x = side * rank * (1.5 + wander * 0.4);
-    node.position.z = -rank * 0.9;
+    node.position.x = side * rank * (2.15 + wander * 0.4);
+    node.position.z = -rank * 0.8;
     node.position.y = wander;
   });
 
-  const opacity = Math.max(0.12, 0.34 - index * 0.05);
+  const opacity = Math.max(0.2, 0.46 - index * 0.05);
 
   return (
     <group ref={group} scale={0.82 - index * 0.05}>
-      <mesh geometry={geo.tubeA}>
+      <mesh ref={initMorph} geometry={geo.tubeA}>
         <meshBasicMaterial color={MAGENTA} transparent opacity={opacity} toneMapped={false} />
       </mesh>
-      <mesh geometry={geo.tubeB}>
+      <mesh ref={initMorph} geometry={geo.tubeB}>
         <meshBasicMaterial color={VIOLET} transparent opacity={opacity} toneMapped={false} />
       </mesh>
     </group>
@@ -470,7 +480,7 @@ function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind,
        mover la cámara (que es valor de hook y no se puede mutar). */
     const node = frame.current;
     if (node) {
-      const target = 1 / (1 + clones * 0.16);
+      const target = 1 / (1 + clones * 0.21);
       node.scale.setScalar(node.scale.x + (target - node.scale.x) * Math.min(1, step * 2.4));
     }
   });

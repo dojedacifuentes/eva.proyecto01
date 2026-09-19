@@ -12,16 +12,29 @@ interface Node {
   phase: number;
   /** 0 arriba, 1 abajo: decide el color dentro del degradado. */
   depth: number;
+  /** Los del borde definen la silueta; los de dentro sólo la cruzan. */
+  edge: boolean;
+  /** Un satélite flota fuera de la letra y se ata con hilos largos. */
+  satellite: boolean;
 }
 
-/** Rejilla de muestreo de la letra, en píxeles. Menos = más nodos. */
-const STEP = 5;
-/** Hasta dónde se unen dos nodos con una línea. */
-const LINK = 19;
-/** Aristas máximas por nodo: sin esto el trazo se emborrona. */
-const MAX_LINKS = 5;
-/** Amplitud de la deriva y radio de empuje del puntero. */
-const DRIFT = 3.4;
+/** Rejilla de muestreo de la letra, en píxeles. */
+const STEP = 6;
+/** Cuántos nodos interiores se conservan: pocos, o se emborrona la letra. */
+const INSIDE_KEEP = 0.42;
+/**
+ * Alcance de las aristas. Largo a propósito: así se forman los triángulos que
+ * cruzan la letra de lado a lado, en vez de una costura de puntos pegados.
+ */
+const LINK = 24;
+const MAX_LINKS = 6;
+/** Nodos sueltos alrededor de las letras, atados con hilos tenues. */
+const SATELLITES = 20;
+const SATELLITE_LINK = 96;
+
+/** Onda que recorre la malla, y cuánto se aparta cada nodo del puntero. */
+const WAVE = 5.2;
+const WAVE_SPEED = 0.0016;
 const PUSH = 90;
 
 const TOP = [95, 226, 244] as const;
@@ -30,8 +43,7 @@ const BOTTOM = [232, 92, 200] as const;
 
 /** Color del degradado vertical: cian arriba, violeta en medio, magenta abajo. */
 function tint(depth: number): [number, number, number] {
-  const [from, to, t] =
-    depth < 0.5 ? [TOP, MID, depth * 2] : [MID, BOTTOM, (depth - 0.5) * 2];
+  const [from, to, t] = depth < 0.5 ? [TOP, MID, depth * 2] : [MID, BOTTOM, (depth - 0.5) * 2];
   return [
     Math.round(from[0] + (to[0] - from[0]) * t),
     Math.round(from[1] + (to[1] - from[1]) * t),
@@ -59,8 +71,12 @@ interface MeshProps {
 
 /**
  * El acrónimo de EVA dibujado como una red: las letras se rasterizan en un
- * lienzo oculto, se muestrean en nodos y se unen entre vecinos. Los nodos
- * derivan despacio y se apartan del puntero, así que la estructura respira.
+ * lienzo oculto, se muestrean en nodos y se unen con aristas largas, que es lo
+ * que forma los triángulos que cruzan cada letra. Alrededor flotan satélites
+ * atados con hilos tenues.
+ *
+ * Toda la malla ondea con una misma onda viajera — se mueve como una tela, no
+ * como un enjambre de puntos sueltos — y se aparta del puntero.
  *
  * Rasterizar el texto en vez de escribir polígonos a mano deja que la forma la
  * ponga la tipografía: si cambia la fuente, cambian las letras.
@@ -115,15 +131,28 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
         paint.fillText(letter, width / 2, rowHeight * (row + 0.5));
       });
 
-      const pixels = paint.getImageData(0, 0, scratch.width, scratch.height).data;
+      const image = paint.getImageData(0, 0, scratch.width, scratch.height).data;
+      const opaque = (x: number, y: number) => {
+        if (x < 0 || y < 0 || x >= scratch.width || y >= scratch.height) return false;
+        return image[(Math.round(y) * scratch.width + Math.round(x)) * 4 + 3] > 128;
+      };
+
       const random = seeded(0xe7a01);
       nodes = [];
+
       for (let y = 0; y < scratch.height; y += STEP) {
         for (let x = 0; x < scratch.width; x += STEP) {
-          if (pixels[(y * scratch.width + x) * 4 + 3] < 128) continue;
-          // Un poco de desorden: una rejilla perfecta no parece una red.
-          const jx = x + (random() - 0.5) * STEP * 1.2;
-          const jy = y + (random() - 0.5) * STEP * 1.2;
+          if (!opaque(x, y)) continue;
+          // Borde = tiene al menos un vecino fuera de la letra.
+          const edge =
+            !opaque(x - STEP, y) ||
+            !opaque(x + STEP, y) ||
+            !opaque(x, y - STEP) ||
+            !opaque(x, y + STEP);
+          // La silueta se conserva entera; del relleno sólo unos pocos.
+          if (!edge && random() > INSIDE_KEEP) continue;
+          const jx = x + (random() - 0.5) * STEP * 0.9;
+          const jy = y + (random() - 0.5) * STEP * 0.9;
           nodes.push({
             homeX: jx,
             homeY: jy,
@@ -131,15 +160,36 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
             y: jy,
             phase: random() * Math.PI * 2,
             depth: Math.min(1, Math.max(0, jy / height)),
+            edge,
+            satellite: false,
           });
         }
+      }
+
+      const letterCount = nodes.length;
+
+      // Satélites: puntos sueltos alrededor, para que la red no acabe en el
+      // contorno de la letra.
+      for (let i = 0; i < SATELLITES; i++) {
+        const sx = random() * width;
+        const sy = random() * height;
+        nodes.push({
+          homeX: sx,
+          homeY: sy,
+          x: sx,
+          y: sy,
+          phase: random() * Math.PI * 2,
+          depth: Math.min(1, Math.max(0, sy / height)),
+          edge: false,
+          satellite: true,
+        });
       }
 
       // Vecinos calculados una vez: por fotograma sólo se mueven los nodos.
       links = [];
       const degree = new Array(nodes.length).fill(0);
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
+      for (let i = 0; i < letterCount; i++) {
+        for (let j = i + 1; j < letterCount; j++) {
           if (degree[i] >= MAX_LINKS) break;
           if (degree[j] >= MAX_LINKS) continue;
           const dx = nodes[i].homeX - nodes[j].homeX;
@@ -150,6 +200,28 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
           degree[j]++;
         }
       }
+
+      // Cada satélite se ata a las dos letras más cercanas que tenga a tiro.
+      for (let s = letterCount; s < nodes.length; s++) {
+        const near: { at: number; distance: number }[] = [];
+        for (let i = 0; i < letterCount; i++) {
+          const distance = Math.hypot(nodes[s].homeX - nodes[i].homeX, nodes[s].homeY - nodes[i].homeY);
+          if (distance < SATELLITE_LINK) near.push({ at: i, distance });
+        }
+        near.sort((a, b) => a.distance - b.distance);
+        for (const { at } of near.slice(0, 2)) links.push([s, at]);
+      }
+    };
+
+    /** Onda viajera: todos los nodos se mueven con la misma tela. */
+    const swell = (node: Node, time: number) => {
+      if (reduced.matches) return { x: node.homeX, y: node.homeY };
+      const travel = node.homeX * 0.026 + node.homeY * 0.05 - time * WAVE_SPEED;
+      const amplitude = node.satellite ? WAVE * 1.5 : WAVE;
+      return {
+        x: node.homeX + Math.sin(travel) * amplitude,
+        y: node.homeY + Math.cos(travel * 0.8 + node.phase * 0.35) * amplitude * 0.62,
+      };
     };
 
     const draw = (time: number) => {
@@ -159,9 +231,9 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
       const py = pointerSignal.active ? pointerSignal.y - box.top : -9999;
 
       for (const node of nodes) {
-        const wobble = reduced.matches ? 0 : DRIFT;
-        let x = node.homeX + Math.sin(time * 0.0007 + node.phase) * wobble;
-        let y = node.homeY + Math.cos(time * 0.0009 + node.phase * 1.7) * wobble;
+        const { x: wx, y: wy } = swell(node, time);
+        let x = wx;
+        let y = wy;
 
         // El puntero abre un hueco en la malla y la deja volver.
         const dx = x - px;
@@ -176,14 +248,17 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
         node.y = y;
       }
 
-      context.lineWidth = 0.7;
+      context.lineWidth = 0.65;
       for (const [a, b] of links) {
         const first = nodes[a];
         const second = nodes[b];
         const [r, g, bl] = tint((first.depth + second.depth) / 2);
-        const stretch = Math.hypot(first.x - second.x, first.y - second.y);
-        const fade = Math.max(0, 1 - stretch / (LINK * 2.2));
-        context.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${0.42 * fade})`;
+        const span = Math.hypot(first.x - second.x, first.y - second.y);
+        // Los hilos largos se apagan: dan profundidad sin ensuciar la letra.
+        const fade = Math.max(0, 1 - span / (LINK * 2.4));
+        const alpha = (first.satellite || second.satellite ? 0.13 : 0.4) * fade;
+        if (alpha < 0.012) continue;
+        context.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
         context.beginPath();
         context.moveTo(first.x, first.y);
         context.lineTo(second.x, second.y);
@@ -195,13 +270,14 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
       for (const node of nodes) {
         const [r, g, b] = tint(node.depth);
         const pulse = reduced.matches ? 1 : 0.75 + Math.sin(time * 0.002 + node.phase) * 0.25;
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.16 * pulse})`;
+        const weight = node.satellite ? 0.4 : node.edge ? 1 : 0.6;
+        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.16 * pulse * weight})`;
         context.beginPath();
-        context.arc(node.x, node.y, 4.2, 0, Math.PI * 2);
+        context.arc(node.x, node.y, 4.4 * weight, 0, Math.PI * 2);
         context.fill();
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.92 * pulse})`;
+        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.92 * pulse * weight})`;
         context.beginPath();
-        context.arc(node.x, node.y, 1.25, 0, Math.PI * 2);
+        context.arc(node.x, node.y, node.edge ? 1.35 : 1, 0, Math.PI * 2);
         context.fill();
       }
     };
