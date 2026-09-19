@@ -1013,12 +1013,24 @@ html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
   }
 }
 @media (max-width: 47.99rem) {
-  /* En móvil el retrato flota arriba a la derecha: las puertas dejan ese hueco libre. */
+  /* En móvil el retrato flota arriba a la derecha: las puertas dejan ese hueco libre.
+     La columna de las palabras mide unos 200 px y una fila en línea (palabra,
+     código y estado) necesita hasta 225: el estado va debajo de la palabra. */
   .acronym__row {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.35rem;
     padding-right: 0;
   }
   .acronym__row:first-child {
     padding-right: 5.6rem;
+  }
+  .acronym__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
   }
   .acronym__index {
     display: block;
