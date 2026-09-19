@@ -6,8 +6,8 @@
 
 ## Estado actual — 19 de septiembre de 2026
 
-La interfaz visual compacta está preparada en la rama local `codex/compact-eva-interface`.
-El siguiente commit debe integrarse en `main` y activar el despliegue de Vercel.
+La interfaz visual compacta está integrada en `main` en el commit `e852f4d` y visible en
+https://evaproyecto01.vercel.app/. GitHub Actions y Vercel terminaron correctamente.
 
 Incluye: portada más compacta con acrónimo unido (E-ntidad, V-irtual, A-prendizaje),
 retrato discreto, tarjetas de Misión / Visión / Objetivos, descripción explícita de las
@@ -15,8 +15,9 @@ secciones EVA Academy · EVA News · EVA Arcade · EVA Lab, paneles tecnológico
 EVA flotante con navegación local. Se desactivaron sonido, cursor personalizado y frases
 rotativas para una lectura más sobria; el campo de partículas queda como textura sutil.
 
-Pendientes inmediatos: ejecutar lint, build y typecheck; revisar la portada a 390 y 1440 px;
-commit y push a `main`; comprobar la URL pública `https://evaproyecto01.vercel.app/`.
+Verificaciones realizadas: lint, build, typecheck y `npm audit` correctos; portada revisada
+a 390 y 1440 px; HTML público confirma el título de las cuatro secciones, las tarjetas y
+el asistente flotante. El próximo trabajo puede continuar directamente desde `main`.
 
 **Fecha:** 2026-09-18 · **Rama:** `landing-eva-v2` · **Base:** `main` @ `de4c587` (v0.1 intacta)
 
