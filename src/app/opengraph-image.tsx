@@ -1,14 +1,9 @@
 import { ImageResponse } from 'next/og';
 import { hero, site } from '@/content/site';
-import { axes } from '@/content/structure';
+import { doors } from '@/content/structure';
 
-/** El acento de cada eje, en hexadecimal: `next/og` no resuelve variables CSS. */
-const ACCENT: Record<string, string> = {
-  cyan: '#3fd8ee',
-  magenta: '#f07ab9',
-  violet: '#9a8dff',
-  yellow: '#d8f05b',
-};
+/** Un color por letra, de arriba abajo: el degradado del acrónimo de la portada. */
+const LETTER = ['#3fd8ee', '#9a8dff', '#f07ab9'];
 
 export const alt = `${site.name} — ${site.expansion}`;
 export const size = { width: 1200, height: 630 };
@@ -16,7 +11,8 @@ export const contentType = 'image/png';
 
 /**
  * Vista previa provisional al compartir el enlace: el acrónimo vertical sobre
- * negro. Se reemplaza por la imagen oficial cuando exista (ver roadmap).
+ * negro y, debajo, las tres puertas. Se reemplaza por la imagen oficial cuando
+ * exista (ver roadmap). `next/og` no resuelve variables CSS: colores en hexadecimal.
  */
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -37,27 +33,31 @@ export default function OpengraphImage() {
           {hero.label}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '2px solid #3fd8ee', paddingLeft: 36 }}>
-          {axes.map((axis) => (
-            <div key={axis.letter} style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+          {hero.acronym.map((item, at) => (
+            <div key={item.letter} style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
               <span
                 style={{
-                  fontSize: 132,
+                  fontSize: 124,
                   fontWeight: 700,
                   lineHeight: 1,
                   width: 110,
-                  color: ACCENT[axis.accent],
+                  color: LETTER[at % LETTER.length],
                 }}
               >
-                {axis.letter}
+                {item.letter}
               </span>
-              <span style={{ fontSize: 52, color: '#c3ccd2' }}>{axis.word}</span>
-              <span style={{ fontSize: 30, letterSpacing: 4, color: ACCENT[axis.accent] }}>
-                {axis.code}
-              </span>
+              <span style={{ fontSize: 52, color: '#c3ccd2' }}>{item.word}</span>
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', fontSize: 26, color: '#8e9ba3' }}>{site.expansion}</div>
+        <div style={{ display: 'flex', gap: 40, fontSize: 26, color: '#8e9ba3' }}>
+          {doors.map((door) => (
+            <div key={door.id} style={{ display: 'flex', gap: 12 }}>
+              <span style={{ color: '#3fd8ee', letterSpacing: 3 }}>{door.code}</span>
+              <span>{door.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     ),
     size,

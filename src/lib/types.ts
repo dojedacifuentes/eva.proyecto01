@@ -23,10 +23,10 @@ export interface NavChild {
   href: `#${string}`;
 }
 
-/** Un eje de la navegación: Entidad, Vigilancia o Autonomía. */
+/** Un eje de la navegación. Hoy hay uno solo: Entidad. */
 export interface NavItem {
   id: string;
-  /** Código binario visible: «01», «10», «11». */
+  /** Código binario visible: «01». */
   code: string;
   name: string;
   accent: AccentToken;
@@ -40,7 +40,7 @@ export interface NavItem {
 
 /**
  * Un lugar del recorrido que el visitante puede estar mirando: la portada, una
- * subsección de Entidad o un eje entero. El canal de EVA, la navegación y el
+ * subsección de Entidad o un eje sin subsecciones. El canal de EVA, la navegación y el
  * fondo leen de aquí dónde está el visitante.
  */
 export interface ContextNode {

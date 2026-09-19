@@ -150,6 +150,13 @@
 .dna[data-state='exporting'] .dna__hud-count {
   color: var(--eva-violet);
 }
+.dna[data-state='expressing'] .dna__hud-core {
+  color: var(--eva-magenta);
+}
+.dna[data-state='expressing'] .dna__hud-core i {
+  background: var(--eva-magenta);
+  box-shadow: 0 0 6px rgba(240, 122, 185, 0.7);
+}
 .dna[data-state='using'] .dna__hud-core i,
 .dna[data-state='scanning'] .dna__hud-core i,
 .dna[data-state='unwinding'] .dna__hud-core i,
@@ -201,6 +208,66 @@
 .dna__btn--ghost:focus-visible {
   color: var(--eva-magenta);
   border-color: var(--eva-magenta);
+}
+/* Expresar es el puente con el cuerpo: lleva el acento de lo vivo. */
+.dna__btn--express {
+  border-color: color-mix(in srgb, var(--eva-magenta) 55%, transparent);
+  color: var(--eva-text);
+}
+.dna__btn--express:hover,
+.dna__btn--express:focus-visible {
+  border-color: var(--eva-magenta);
+  background: rgba(240, 122, 185, 0.14);
+}
+/* La purga vive junto al contador que vacía, no en la botonera. */
+.dna__hud-count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.6rem;
+}
+.dna__purge {
+  min-height: 28px;
+  padding: 0 0.5rem;
+  border: 1px dashed var(--eva-line-strong);
+  border-radius: 3px;
+  color: var(--eva-muted);
+  background: transparent;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear;
+}
+.dna__purge:hover,
+.dna__purge:focus-visible {
+  border-color: var(--eva-magenta);
+  color: var(--eva-magenta);
+}
+@media (pointer: coarse) {
+  .dna__purge {
+    min-height: 40px;
+  }
+}
+.dna__reply-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-self: start;
+  min-height: 32px;
+  color: var(--eva-magenta);
+  font-size: var(--eva-type-label);
+  letter-spacing: 0.06em;
+  animation: reply-in 400ms var(--eva-ease) 240ms both;
+}
+.dna__reply-link b {
+  font-weight: 600;
+}
+.dna__reply-link:hover,
+.dna__reply-link:focus-visible {
+  color: var(--eva-text);
 }
 @media (pointer: coarse) {
   .dna__btn {
@@ -302,6 +369,7 @@ html[data-genome='mutating'] .hero .loop__video {
 
 @media (prefers-reduced-motion: reduce) {
   .dna__reply span,
+  .dna__reply-link,
   .dna__hud-core i,
   html[data-genome='mutating'] .genome__birth,
   html[data-genome='mutating'] .hero .portrait__frame img,

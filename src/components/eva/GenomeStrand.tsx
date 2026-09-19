@@ -22,9 +22,8 @@ const REACH = 150;
 /**
  * El genoma de EVA a la vista: la misma secuencia de 600 bases del genoma
  * digital, tendida en horizontal como una doble hélice plana que se lee de
- * corrido. Es la presencia de la subsección reservada (01.11): no le asigna
- * tema ni interacción propia, sólo deja ver que la secuencia sigue pasando por
- * un sitio que todavía no tiene nombre.
+ * corrido. Abre el Cuerpo (01.11): la secuencia entra en lo que sostiene a
+ * EVA antes de que se vea. En la v6 era todo lo que había en ese hueco.
  *
  * Lienzo 2D, como el acrónimo y el fondo: nada de WebGL para una cinta. Se
  * detiene fuera de pantalla y con la pestaña oculta; con movimiento reducido

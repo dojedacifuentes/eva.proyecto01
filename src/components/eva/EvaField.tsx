@@ -28,10 +28,11 @@ const IDLE_RGB = '63, 216, 238';
  * Las partículas se enganchan al puntero, se vuelven cuadradas cuando el cursor
  * se posa sobre algo interactivo y se apartan con la onda de cada clic.
  *
- * El recorrido también le habla (`lib/field`): cada eje tiñe los hilos con su
- * acento, Vigilancia —clausurada— lo frena hasta casi detenerlo, y las acciones
- * del genoma lo sacuden un instante. La quietud de Vigilancia es una frenada
- * que se ve ocurrir, no un interruptor.
+ * El recorrido también le habla (`lib/field`): cada lugar tiñe los hilos con su
+ * acento, un lugar clausurado lo frena hasta casi detenerlo (la v6 lo usaba en
+ * Vigilancia; hoy no hay ninguno), y las acciones del genoma y del cuerpo lo
+ * sacuden un instante. La quietud es una frenada que se ve ocurrir, no un
+ * interruptor.
  *
  * - Un solo requestAnimationFrame, posiciones en refs, sin estado de React.
  * - Se pausa con la pestaña oculta; densidad reducida en pantallas chicas.

@@ -1,12 +1,11 @@
 /**
  * EVA // LABORATORIO — EN RESERVA
  *
- * Las salas de la versión anterior (cerebro, redes, causas y bitácora) salieron
- * del recorrido visible cuando la página se reorganizó en los tres ejes del
- * acrónimo (`structure.ts`). Sus textos se conservan aquí, íntegros, para
- * reutilizarlos cuando Vigilancia, Autonomía o la subsección pendiente reciban
- * contenido. Sus componentes están en `components/sections/reserva/`: siguen
- * compilando, pero ninguna página los monta. No se han asignado a ningún eje.
+ * Las salas de la v5 (cerebro, redes, causas y bitácora) salieron del recorrido
+ * visible cuando la página se reorganizó por el acrónimo (`structure.ts`). Sus
+ * textos se conservan aquí, íntegros, por si el propietario decide darles
+ * sitio. Sus componentes están en `components/sections/reserva/`: siguen
+ * compilando, pero ninguna página los monta. No se han asignado a ningún lugar.
  *
  * Lo único vivo de este archivo es `lab.core.readout`: el vocabulario de la
  * ventana de lectura del núcleo cerebral.

@@ -6,6 +6,7 @@ import './neuroscan.css';
 import './dna.css';
 import './lab.css';
 import './ejes.css';
+import './cuerpo.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { EvaSynapse } from '@/components/eva/EvaSynapse';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';

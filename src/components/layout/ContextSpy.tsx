@@ -16,10 +16,11 @@ import { FIELD_TINT, fieldSignal } from '@/lib/field';
  *    (`aria-current`), sobre enlaces que siguen siendo HTML de servidor;
  *  · deja en `<html>` el eje y el nodo (`data-axis`, `data-node`) para que el
  *    CSS pueda teñir la página según dónde se esté;
- *  · le pide al fondo quietud en Vigilancia y el tinte de cada eje;
+ *  · le pide al fondo el tinte de cada lugar, y quietud en los clausurados;
  *  · cierra el canal en cuanto se pulsa un enlace interno hacia otro lugar,
  *    sin esperar a que el desplazamiento llegue;
- *  · redirige las anclas de versiones anteriores (`#cerebro`, `#redes`…).
+ *  · redirige las anclas de versiones anteriores (`#cerebro`, `#reserva`,
+ *    `#vigilancia`…).
  */
 export function ContextSpy() {
   useEffect(() => {

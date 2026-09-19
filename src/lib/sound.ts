@@ -4,7 +4,7 @@
  * el control de sonido, que es la interacción que los navegadores exigen.
  */
 
-export type SoundName = 'boot' | 'confirm' | 'open';
+export type SoundName = 'boot' | 'confirm' | 'open' | 'beat';
 
 interface Tone {
   frequency: number;
@@ -12,6 +12,8 @@ interface Tone {
   at: number;
   duration: number;
   type: OscillatorType;
+  /** Multiplica el volumen general: los graves necesitan más para oírse igual. */
+  gain?: number;
 }
 
 const sounds: Record<SoundName, Tone[]> = {
@@ -23,6 +25,15 @@ const sounds: Record<SoundName, Tone[]> = {
   open: [
     { frequency: 392, at: 0, duration: 0.09, type: 'sine' },
     { frequency: 587, at: 0.07, duration: 0.12, type: 'sine' },
+  ],
+  /*
+   * El latido del modelo interior: dos golpes graves, el segundo más corto. La
+   * idea del «lub-dub» procedural viene de HÆMA (MIT, ver ASSET_LICENSES.md);
+   * aquí son dos tonos más de esta tabla y sólo suenan si el visitante lo pide.
+   */
+  beat: [
+    { frequency: 92, to: 54, at: 0, duration: 0.13, type: 'sine', gain: 3.2 },
+    { frequency: 118, to: 66, at: 0.17, duration: 0.09, type: 'sine', gain: 2.4 },
   ],
 };
 
@@ -61,7 +72,7 @@ export function play(name: SoundName) {
     if (tone.to) oscillator.frequency.exponentialRampToValueAtTime(tone.to, end);
 
     gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(MASTER_VOLUME, start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(MASTER_VOLUME * (tone.gain ?? 1), start + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
     oscillator.connect(gain).connect(context.destination);

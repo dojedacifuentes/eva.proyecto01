@@ -5,12 +5,13 @@ import { ContextSpy } from './ContextSpy';
 import { MobileNavigation } from './MobileNavigation';
 
 /**
- * Cabecera: los tres ejes del acrónimo, con su código binario y su estado. Las
- * subsecciones de un eje aparecen cuando el visitante está dentro de él (lo
- * decide el CSS con `html[data-axis]`, que escribe `ContextSpy`).
+ * Cabecera: el recorrido, con su código binario. Hoy hay un solo eje —la
+ * Entidad— y sus tres partes van siempre a la vista. Si vuelve a haber varios,
+ * las subsecciones de cada uno aparecen sólo cuando el visitante está dentro
+ * (lo decide el CSS con `html[data-axis]`, que escribe `ContextSpy`).
  *
  * Los bits son adorno (`aria-hidden`): el nombre accesible de cada enlace dice
- * «Vigilancia, eje 2 de 3, clausurada».
+ * «Cuerpo, subsección 3 de 3».
  */
 export function SiteHeader() {
   return (
