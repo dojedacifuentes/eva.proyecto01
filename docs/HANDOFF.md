@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** rama `feat/eva-ejes` = v6 (la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS) · base: `main` v5.1 (`6dc9c14`), publicada en https://evaproyecto01.vercel.app/ · revisada en navegador a 1440×900, 1366×720, 768×1024 y 390×844 con cuatro correcciones encima (trampas 22 y 23, portada en móvil y suelo tipográfico) · **pendiente: integrar en `main`**
+**Estado:** `main` = v6 (`900e5e5`, la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS), **publicada** en https://evaproyecto01.vercel.app/ el 19-09-2026, revisada en navegador a 1440×900, 1366×720, 768×1024 y 390×844 · **encargo abierto: la subsección 01.11 pasa a ser CUERPO** (vídeo de la cápsula + biolectura + interior bio-sintético). Todo lo necesario está en `docs/CUERPO_ENCARGO.md`; rama de trabajo `feat/cuerpo`.
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -57,7 +57,7 @@ con numeración binaria real (`lib/binary.ts`):
 01 · ENTIDAD
      01.01 · Núcleo cerebral — cerebro 3D en vivo + ventana de lectura + 8 regiones
      01.10 · Genoma digital  — hélice 3D, 7 acciones, párrafo del nacimiento (se teclea una vez)
-     01.11 · Por definir     — banda de reserva: el genoma a la vista, sin tema asignado
+     01.11 · Por definir     — banda de reserva: el genoma a la vista (→ será CUERPO, ver docs/CUERPO_ENCARGO.md)
 10 · VIGILANCIA — clausurada (la «V» quieta con faja de clausura; el fondo se frena)
 11 · AUTONOMÍA  — en desarrollo (la «A» a medio ensamblar; registro listo para subsecciones)
 ```
@@ -246,6 +246,12 @@ apareció dos veces en sitios distintos.
 
 ## 5. Pendiente, por impacto
 
+0. **Subsección 01.11 · CUERPO.** Encargo del propietario del 19-09-2026, íntegro y
+   estructurado en `docs/CUERPO_ENCARGO.md`: el vídeo de EVA en la cápsula
+   (`public/eva/eva-capsula-loop.mp4`, ya en el repo) con una biolectura de
+   partículas (técnica de collidingScopes/scanlines, MIT) y, debajo, el interior
+   bio-sintético (corazón, vasos, órganos seleccionables y ECG, adaptado de
+   christianpasinrey/human-blood-system, MIT). Rama `feat/cuerpo`. Sin publicar.
 1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
    con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
    encargo entera: cerebro, hélice, canal (cerrado al cargar, aviso, abrir,
@@ -254,7 +260,7 @@ apareció dos veces en sitios distintos.
    reducido. Falta mirarla en Safari iOS y con lector de pantalla (punto 7).
    Nota: las anclas dejan unos 90 px de la sección anterior a la vista en
    móvil (`scroll-padding-top` + `scroll-margin-top`, CSS heredado de v5).
-2. **Contenido de Vigilancia, Autonomía y 01.11**: decisión del propietario.
+2. **Contenido de Vigilancia y Autonomía**: decisión del propietario.
    Las salas en reserva están disponibles.
 3. **Revisión de tono** de los textos nuevos: párrafo del nacimiento
    (`ejes.genoma.birth`), explicaciones del canal (`channel.scripts`) y líneas
