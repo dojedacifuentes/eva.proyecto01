@@ -78,6 +78,19 @@ export const hero = {
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
 } as const;
 
+/**
+ * Estudio detrás de EVA, en la ficha de perfil del hero.
+ * Los servicios listados son los que el destino declara; no añadir ninguno
+ * que no exista allá.
+ */
+export const studio = {
+  label: 'Servicios',
+  name: 'Ojeda & Andrade Labs',
+  services: ['Automatización documental', 'IA aplicada', 'Capacitación'],
+  cta: 'Saber más',
+  href: 'https://iusmachina.vercel.app/',
+} as const;
+
 export const sections = {
   universes: {
     eyebrow: '01 / El sistema',

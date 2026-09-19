@@ -357,6 +357,50 @@ html {
   font-size: 0.55rem;
 }
 
+/* Ficha del estudio, bajo el perfil de EVA. */
+.studio {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--eva-line);
+  transition: border-color var(--eva-normal) linear;
+}
+.studio__label {
+  color: var(--eva-muted);
+}
+.studio__name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.25;
+  transition: color var(--eva-fast) linear;
+}
+.studio__arrow {
+  color: var(--eva-cyan);
+  transition: translate var(--eva-normal) var(--eva-ease);
+}
+.studio__services {
+  color: var(--eva-muted);
+  font-size: 0.52rem;
+  line-height: 1.55;
+  letter-spacing: 0.06em;
+}
+.studio:hover,
+.studio:focus-visible {
+  border-color: var(--eva-line-strong);
+}
+.studio:hover .studio__name,
+.studio:focus-visible .studio__name {
+  color: var(--eva-cyan);
+}
+.studio:hover .studio__arrow,
+.studio:focus-visible .studio__arrow {
+  translate: 2px -2px;
+}
+
 .principles {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -945,11 +989,21 @@ html {
     font-size: 0.88rem;
     max-width: 34ch;
   }
+  /* El retrato flota arriba a la derecha; la ficha del estudio sigue el flujo. */
   .hero__portrait {
+    position: static;
+    width: auto;
+    max-width: none;
+  }
+  .hero .portrait {
     position: absolute;
     top: 1.15rem;
     right: 1.15rem;
+    z-index: 2;
     width: 5.5rem;
+  }
+  .studio {
+    margin-top: 0;
   }
   /* Los índices 01–03 chocarían con el retrato: en móvil sobran. */
   .acronym__index {

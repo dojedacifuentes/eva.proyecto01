@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { EvaPortraitFrame } from '@/components/eva/EvaPortraitFrame';
 import { Rotator } from '@/components/eva/Rotator';
 import { images } from '@/content/assets';
-import { flags, hero, site } from '@/content/site';
+import { flags, hero, site, studio, ui } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
@@ -61,13 +61,38 @@ export function HeroEva() {
               {flags.heroRotator && <Rotator lines={hero.rotator} />}
             </div>
 
-            <div className="hero__portrait" data-rise style={rise(2)}>
+            {/* Sin data-rise: su transform haría de este div el bloque contenedor
+                del retrato, que en móvil se posiciona contra la rejilla. */}
+            <div className="hero__portrait">
               <EvaPortraitFrame
                 image={images.heroPortrait}
                 caption={hero.portraitCaption}
                 sizes="(min-width: 64rem) 22rem, (min-width: 48rem) 30vw, 42vw"
                 priority
               />
+
+              {/* Ficha del estudio: el único enlace saliente de la portada. */}
+              <a
+                className="studio"
+                data-rise
+                style={rise(3)}
+                href={studio.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cursor="external"
+                data-cursor-label={studio.cta.toUpperCase()}
+                data-sound="open"
+              >
+                <span className="studio__label mono">{studio.label}</span>
+                <span className="studio__name">
+                  {studio.name}
+                  <span aria-hidden="true" className="studio__arrow">
+                    ↗
+                  </span>
+                </span>
+                <span className="studio__services mono">{studio.services.join(' · ')}</span>
+                <span className="sr-only"> ({ui.external})</span>
+              </a>
             </div>
           </div>
 
