@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** rama `feat/eva-ejes` = v6 (la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS) · base: `main` v5.1 (`6dc9c14`), publicada en https://evaproyecto01.vercel.app/ · **pendiente: revisión visual en navegador y publicación**
+**Estado:** rama `feat/eva-ejes` = v6 (la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS) · base: `main` v5.1 (`6dc9c14`), publicada en https://evaproyecto01.vercel.app/ · revisada en navegador a 1440×900, 1366×720, 768×1024 y 390×844 con cuatro correcciones encima (trampas 22 y 23, portada en móvil y suelo tipográfico) · **pendiente: integrar en `main`**
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -224,18 +224,36 @@ apareció dos veces en sitios distintos.
 21. **Un nodo sólo cuenta como «lugar» si se sostiene 400 ms** en la franja
     central (`CONTEXT_DWELL_MS`). Sin esa espera, el desplazamiento suave de un
     enlace pasaba por las secciones intermedias y el canal avisaba de todas.
+22. **Dos `EffectComposer` en la misma página se pisan el tamaño.**
+    `@react-three/postprocessing` (3.1.1) mide el lienzo en un `Vector2`
+    compartido por todos sus composers y lo lee más tarde, en un `useEffect`;
+    entre medias, el `useFrame` de cualquier otra escena activa vuelve a
+    escribirlo. Cuando el genoma monta (una pantalla antes de verse, con la
+    sala del cerebro animando) su renderer arranca con el tamaño del cerebro y
+    la hélice sale recortada hasta el siguiente `resize`. `ComposerSizeGuard`
+    va detrás del composer en cada `<Canvas>` y devuelve el renderer a
+    `state.size`. Si añades una escena con bloom, ponlo también.
+23. **Lo que un bucle escribe en el DOM no puede ser hijo de React.** La
+    ventana de lectura teclea creando `<p>` a mano dentro de un contenedor
+    que React también rellena (las líneas de arranque). Si el bucle borra un
+    nodo de React, la siguiente reconciliación —al cambiar `reduced`, por
+    ejemplo— lanza `removeChild` sobre un nodo que ya no es hijo, el commit
+    falla y **la página entera se desmonta** (de rebote, un `<Canvas>` a
+    medio configurar conecta eventos sobre `null`). El bucle sólo desahucia
+    líneas suyas (`typed`) y las retira al pasar a movimiento reducido.
 
 ---
 
 ## 5. Pendiente, por impacto
 
-1. **Revisión visual en navegador de la v6.** Lint, tipos, build, 23 pruebas
-   unitarias y 19 comprobaciones sobre el HTML generado pasan, pero la vista
-   previa no se pudo revisar en esta sesión. Recorrer a 1440×900, 1366×720,
-   768×1024 y 390×844: tamaño del cerebro, borde del lienzo invisible, hélice
-   sin rectángulo, canal (cerrado al cargar, aviso, abrir, cerrar al cambiar de
-   sección, retomar hilo), faja de Vigilancia, «A» de Autonomía, cinta de 01.11.
-   Recordar las trampas 4 y 17.
+1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
+   con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
+   encargo entera: cerebro, hélice, canal (cerrado al cargar, aviso, abrir,
+   cerrar al cambiar de sección, retomar hilo), regiones por teclado, escáner
+   (Escape y foco de vuelta), anclas antiguas, menú móvil y movimiento
+   reducido. Falta mirarla en Safari iOS y con lector de pantalla (punto 7).
+   Nota: las anclas dejan unos 90 px de la sección anterior a la vista en
+   móvil (`scroll-padding-top` + `scroll-margin-top`, CSS heredado de v5).
 2. **Contenido de Vigilancia, Autonomía y 01.11**: decisión del propietario.
    Las salas en reserva están disponibles.
 3. **Revisión de tono** de los textos nuevos: párrafo del nacimiento
