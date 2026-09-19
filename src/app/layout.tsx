@@ -1,105 +1,69 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
-import { Footer } from '@/components/layout/Footer';
-import { MobileNav } from '@/components/layout/MobileNav';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { TopBar } from '@/components/layout/TopBar';
-import {
-  DEFAULT_THEME,
-  THEME_COLOR,
-  THEME_SCRIPT,
-} from '@/components/theme/theme';
-import { identity, seo } from '@/data/eva';
+import { EvaField } from '@/components/eva/EvaField';
+import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+import { flags, nav, site } from '@/content/site';
 import { siteUrl } from '@/lib/site';
 
-const geistSans = Geist({
+const grotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-geist-sans',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-grotesk',
   display: 'swap',
 });
 
-const geistMono = Geist_Mono({
+const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-geist-mono',
+  weight: ['400', '600'],
+  variable: '--font-jetbrains',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  // Con esto, cada ruta relativa de la metadata —la imagen de vista previa
-  // incluida— se resuelve a una URL absoluta. Sin ello, los previsualizadores
-  // de WhatsApp, Instagram o Slack no encuentran la imagen.
   metadataBase: new URL(siteUrl),
-  title: { default: seo.title, template: `%s — ${identity.name}` },
-  description: seo.description,
-  applicationName: identity.name,
+  title: site.seo.title,
+  description: site.seo.description,
+  applicationName: site.name,
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    locale: 'es_CL',
+    locale: site.locale,
     url: '/',
-    siteName: identity.name,
-    title: seo.title,
-    description: seo.description,
+    siteName: site.name,
+    title: site.seo.title,
+    description: site.seo.description,
   },
   twitter: {
     card: 'summary_large_image',
-    title: seo.title,
-    description: seo.description,
+    title: site.seo.title,
+    description: site.seo.description,
   },
   robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
-  themeColor: THEME_COLOR[DEFAULT_THEME],
+  themeColor: '#020407',
+  colorScheme: 'dark',
 };
 
-/**
- * Armazón de la aplicación: lateral fijo, barra que nombra la página y barra
- * inferior en móvil.
- *
- * La navegación es permanente y siempre muestra el mapa completo, en lugar de
- * aparecer al pasar el hero. Cada capítulo es una ruta, así que se puede
- * enlazar, compartir y volver atrás — cosa que un ancla no permite.
- */
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="es-CL"
-      // El modo oscuro llega ya resuelto desde el servidor: sin JavaScript el
-      // sitio es oscuro, y el script en línea sólo corrige a claro si el
-      // visitante lo eligió antes. En ningún caso hay flash.
-      data-theme={DEFAULT_THEME}
-      className={`${geistSans.variable} ${geistMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-dvh">
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <a
-          href="#contenido"
-          className="eva-mono sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:rounded-eva focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
-        >
-          Saltar al contenido
+    <html lang="es-CL" className={`${grotesk.variable} ${jetbrains.variable}`}>
+      <body>
+        <a href="#contenido" className="skip-link sr-only-focusable mono">
+          {nav.skip}
         </a>
 
-        <div aria-hidden="true" className="eva-atmosphere" />
+        {/* Capas decorativas: detrás del contenido y sin capturar eventos. */}
+        <EvaField particles={flags.reactiveField} />
+        {flags.signalCursor && <EvaSignalCursor />}
 
-        <div className="relative z-10 flex min-h-dvh">
-          <Sidebar />
-          <div className="eva-shell flex min-w-0 flex-1 flex-col">
-            <TopBar />
-            <main id="contenido" className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </div>
-
-        <MobileNav />
+        <SiteHeader />
+        <main id="contenido">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );

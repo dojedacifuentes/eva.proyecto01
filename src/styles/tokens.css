@@ -1,0 +1,63 @@
+/*
+ * Tokens de EVA. Cambiar un color, un radio o un tiempo aquí lo cambia en todo
+ * el sitio. Base heredada de evaprompts (negro profundo, cian estructural,
+ * bordes finos) y ampliada con un acento por universo.
+ */
+:root {
+  /* Superficie */
+  --eva-bg: #020407;
+  --eva-surface: #070a0e;
+  --eva-surface-raised: #0c1117;
+  --eva-line: rgba(226, 233, 238, 0.1);
+  --eva-line-strong: rgba(226, 233, 238, 0.22);
+
+  /* Texto */
+  --eva-text: #eef3f6;
+  --eva-soft: #c3ccd2;
+  --eva-muted: #8e9ba3;
+
+  /* Acentos */
+  --eva-cyan: #3fd8ee;
+  --eva-blue: #5998ff;
+  --eva-violet: #9a8dff;
+  --eva-yellow: #d8f05b;
+  --eva-magenta: #f07ab9;
+
+  /* Acento activo: cada universo lo redefine con [data-accent]. */
+  --accent: var(--eva-cyan);
+  --accent-2: var(--eva-blue);
+
+  /* Forma */
+  --eva-radius: 6px;
+  --eva-radius-lg: 10px;
+  --eva-max: 82rem;
+  --eva-gutter: clamp(1.25rem, 4vw, 3rem);
+  --eva-header: 3.75rem;
+
+  /* Movimiento */
+  --eva-fast: 160ms;
+  --eva-normal: 420ms;
+  --eva-slow: 800ms;
+  --eva-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+
+  /* Puntero (los actualiza EvaField) */
+  --px: 50%;
+  --py: 30%;
+}
+
+[data-accent='cyan'] {
+  --accent: var(--eva-cyan);
+  --accent-2: var(--eva-blue);
+}
+[data-accent='yellow'] {
+  --accent: var(--eva-yellow);
+  --accent-2: #9fd36a;
+}
+[data-accent='magenta'] {
+  --accent: var(--eva-magenta);
+  --accent-2: #ff8f70;
+}
+[data-accent='violet'] {
+  --accent: var(--eva-violet);
+  --accent-2: var(--eva-blue);
+}
