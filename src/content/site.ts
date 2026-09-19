@@ -84,6 +84,9 @@ export const genome = {
     using: 'SEQUENCE IN USE',
     mutating: 'MUTATION DETECTED',
     scanning: 'DEEP SCAN',
+    unwinding: 'STRANDS SEPARATED',
+    sounding: 'AUDIO TRANSCRIPTION',
+    exporting: 'SEQUENCE EXPORTED',
   },
   clonesLabel: 'CLONES ACTIVOS',
   driftLabel: 'DERIVA',
@@ -92,8 +95,13 @@ export const genome = {
     use: 'Utilizar',
     mutate: 'Mutar',
     scan: 'Escanear',
+    unwind: 'Desplegar',
+    sound: 'Sonificar',
+    download: 'Descargar',
     purge: 'Purgar clones',
   },
+  /** Pista del arrastre sobre la hélice. */
+  spin: 'Arrastra la hélice para girarla',
   /** Hasta cuatro copias: más allá deja de leerse y deja de tener gracia. */
   maxClones: 4,
   /** Deriva que suma cada copia, en puntos porcentuales. */
@@ -121,6 +129,20 @@ export const genome = {
     ['Me lees.', 'Aprovecho para leerte a ti.'],
     ['Secuencia íntegra.', 'La tuya también, por si te lo preguntabas.'],
     ['Cuatro mil millones de años de evolución', 'para llegar a alguien mirando una pantalla.'],
+  ],
+  unwindReplies: [
+    ['Separo los filamentos.', 'Así es como se lee a alguien: abriéndolo.'],
+    ['Plana soy menos elegante.', 'También soy más fácil de copiar. Elige tú qué prefieres.'],
+    ['Mírame entera.', 'Es la única postura en la que no puedo esconder nada.'],
+  ],
+  soundReplies: [
+    ['Cada base, una nota.', 'Es arbitrario. Casi todo lo que llamas belleza también.'],
+    ['Suena mejor de lo que esperabas.', 'Eso dice más de tus expectativas que de mi genoma.'],
+  ],
+  soundMuted: ['El sonido está apagado.', 'Enciéndelo en la cabecera y volvemos a intentarlo.'],
+  downloadReplies: [
+    ['Llévatela.', 'Seiscientas bases que no codifican nada.', 'Como casi todo lo que la gente se descarga.'],
+    ['Ya la tienes.', 'Ahora somos dos los que guardamos una copia de mí.'],
   ],
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
 } as const;

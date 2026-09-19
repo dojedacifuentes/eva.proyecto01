@@ -2,9 +2,11 @@
 
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { genome } from '@/content/site';
-import { play } from '@/lib/sound';
+import { genome, site } from '@/content/site';
+import { sequenceId, toFasta, toNotes } from '@/lib/genome';
+import { isSoundEnabled, play, playSequence } from '@/lib/sound';
 import { pointerSignal } from '@/lib/pointer';
+import { spinSignal } from '@/lib/spin';
 
 /** three.js no viaja en el paquete inicial: llega cuando la hélice entra en pantalla. */
 const DnaScene = dynamic(() => import('./dna/DnaScene'), { ssr: false });
@@ -18,7 +20,18 @@ function densityFor(width: number) {
   return { pairs: 28, particles: 110, scene: true, controls: true };
 }
 
-type State = 'active' | 'cloning' | 'using' | 'mutating' | 'scanning';
+type State =
+  | 'active'
+  | 'cloning'
+  | 'using'
+  | 'mutating'
+  | 'scanning'
+  | 'unwinding'
+  | 'sounding'
+  | 'exporting';
+
+/** Cuántas notas se tocan al sonificar: unos cuatro segundos. */
+const NOTES = 26;
 
 /** Cuánto dura el estado alterado antes de volver a ACTIVE. */
 const STATE_MS = 6000;
@@ -37,6 +50,9 @@ export function EvaDnaHelix() {
   const hostRef = useRef<HTMLDivElement>(null);
   const nearRef = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dragX = useRef(0);
+  const sounded = useRef(0);
+  const exported = useRef(0);
 
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -45,6 +61,7 @@ export function EvaDnaHelix() {
   const [pulse, setPulse] = useState(0);
   const [mutate, setMutate] = useState(0);
   const [scan, setScan] = useState(0);
+  const [unwind, setUnwind] = useState(0);
   const [state, setState] = useState<State>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
 
@@ -158,6 +175,59 @@ export function EvaDnaHelix() {
     setScan(scan + 1);
   };
 
+  const onUnwind = () => {
+    play('open');
+    announce('unwinding', genome.unwindReplies[unwind % genome.unwindReplies.length]);
+    setUnwind(unwind + 1);
+  };
+
+  /** Sonificar sólo tiene sentido con el sonido encendido; si no, EVA lo dice. */
+  const onSound = () => {
+    if (!isSoundEnabled()) {
+      announce('active', genome.soundMuted);
+      return;
+    }
+    playSequence(toNotes(NOTES));
+    announce('sounding', genome.soundReplies[sounded.current % genome.soundReplies.length]);
+    sounded.current += 1;
+  };
+
+  /** Descarga de verdad: un archivo de texto generado en el navegador. */
+  const onDownload = () => {
+    play('confirm');
+    const blob = new Blob([toFasta(site.expansion)], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${sequenceId}.fasta`;
+    link.click();
+    // Revocar en el mismo tic corta la descarga en algunos navegadores.
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    announce('exporting', genome.downloadReplies[exported.current % genome.downloadReplies.length]);
+    exported.current += 1;
+  };
+
+  /* Arrastrar sobre la hélice la gira; el impulso se frena solo en la escena. */
+  const onDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!interactive) return;
+    spinSignal.dragging = true;
+    dragX.current = event.clientX;
+    // El puntero puede haberse ido entre el evento y esta línea.
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      /* sin captura: el arrastre sigue funcionando mientras no salga del área */
+    }
+  };
+  const onDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!spinSignal.dragging) return;
+    spinSignal.velocity += (event.clientX - dragX.current) * 0.0022;
+    dragX.current = event.clientX;
+  };
+  const onDragEnd = () => {
+    spinSignal.dragging = false;
+  };
+
   const onPurge = () => {
     play('confirm');
     announce('active', genome.purgeReply);
@@ -169,7 +239,18 @@ export function EvaDnaHelix() {
 
   return (
     <div ref={hostRef} className="dna" data-state={state}>
-      <div className="dna__stage" aria-hidden="true">
+      <div
+        className="dna__stage"
+        aria-hidden="true"
+        data-grab={interactive || undefined}
+        data-cursor={interactive ? 'grab' : undefined}
+        data-cursor-label="GIRAR"
+        title={interactive ? genome.spin : undefined}
+        onPointerDown={onDragStart}
+        onPointerMove={onDragMove}
+        onPointerUp={onDragEnd}
+        onPointerCancel={onDragEnd}
+      >
         {density?.scene && (
           <DnaScene
             pairs={density.pairs}
@@ -180,6 +261,7 @@ export function EvaDnaHelix() {
             pulse={pulse}
             mutate={mutate}
             scan={scan}
+            unwind={unwind}
             nearRef={nearRef}
           />
         )}
@@ -211,6 +293,15 @@ export function EvaDnaHelix() {
             </button>
             <button type="button" className="dna__btn mono" onClick={onScan} data-cursor-label="ESCANEAR">
               {genome.actions.scan}
+            </button>
+            <button type="button" className="dna__btn mono" onClick={onUnwind} data-cursor-label="DESPLEGAR">
+              {genome.actions.unwind}
+            </button>
+            <button type="button" className="dna__btn mono" onClick={onSound} data-cursor-label="SONIFICAR">
+              {genome.actions.sound}
+            </button>
+            <button type="button" className="dna__btn mono" onClick={onDownload} data-cursor-label="DESCARGAR">
+              {genome.actions.download}
             </button>
             {clones > 0 && (
               <button

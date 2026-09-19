@@ -2,9 +2,10 @@
 
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { pointerSignal } from '@/lib/pointer';
+import { spinSignal } from '@/lib/spin';
 
 /** Geometría de la hélice. Constantes, no props: la forma no cambia en runtime. */
 const TURNS = 2.7;
@@ -20,6 +21,9 @@ const MAGENTA = '#f07ab9';
 
 /** Cuánto dura un barrido de escaneo, en segundos. */
 const SCAN_SECONDS = 1.9;
+/** Desplegado: subida, tiempo abierta y bajada, en segundos. */
+const UNWIND_RAMP = 0.9;
+const UNWIND_HOLD = 3.2;
 
 /**
  * Generador pseudoaleatorio con semilla. El polvo debe salir idéntico en cada
@@ -46,6 +50,31 @@ function helixCurve(phase: number) {
   return new THREE.CatmullRomCurve3(points);
 }
 
+/** La misma hélice desenrollada: una vertical a cada lado, sin vueltas. */
+function ladderCurve(side: number) {
+  const points: THREE.Vector3[] = [];
+  for (let i = 0; i <= SAMPLES; i++) {
+    const t = i / SAMPLES;
+    points.push(new THREE.Vector3(side * RADIUS, (t - 0.5) * HEIGHT, 0));
+  }
+  return new THREE.CatmullRomCurve3(points);
+}
+
+/**
+ * Cuelga del tubo helicoidal un objetivo de morph con la forma desplegada.
+ * Mismos parámetros de TubeGeometry ⇒ mismo número de vértices, que es lo que
+ * exige un morph target absoluto.
+ */
+function withLadderMorph(tube: THREE.TubeGeometry, side: number) {
+  const ladder = new THREE.TubeGeometry(ladderCurve(side), SAMPLES, TUBE_RADIUS, 10, false);
+  tube.morphAttributes.position = [
+    new THREE.Float32BufferAttribute(Float32Array.from(ladder.attributes.position.array), 3),
+  ];
+  tube.morphTargetsRelative = false;
+  ladder.dispose();
+  return tube;
+}
+
 interface Geometries {
   curveA: THREE.CatmullRomCurve3;
   curveB: THREE.CatmullRomCurve3;
@@ -67,8 +96,8 @@ function useGeometries(): Geometries {
     return {
       curveA,
       curveB,
-      tubeA: new THREE.TubeGeometry(curveA, SAMPLES, TUBE_RADIUS, 10, false),
-      tubeB: new THREE.TubeGeometry(curveB, SAMPLES, TUBE_RADIUS, 10, false),
+      tubeA: withLadderMorph(new THREE.TubeGeometry(curveA, SAMPLES, TUBE_RADIUS, 10, false), 1),
+      tubeB: withLadderMorph(new THREE.TubeGeometry(curveB, SAMPLES, TUBE_RADIUS, 10, false), -1),
       rod,
       node: new THREE.SphereGeometry(0.075, 10, 8),
       spark: new THREE.SphereGeometry(0.11, 12, 10),
@@ -77,40 +106,54 @@ function useGeometries(): Geometries {
   }, []);
 }
 
-/** Barras y nodos de un cuerpo: se calculan una vez, nunca por fotograma. */
+/**
+ * Barras y nodos de un cuerpo. Se escriben una vez en reposo y sólo se vuelven
+ * a escribir mientras la hélice se despliega: `unwind` va de 0 (enrollada) a 1
+ * (escalera plana) reduciendo el ángulo de cada par.
+ */
 function useBasePairs(pairs: number) {
   const rods = useRef<THREE.InstancedMesh>(null);
   const nodes = useRef<THREE.InstancedMesh>(null);
+  const scratch = useMemo(
+    () => ({
+      matrix: new THREE.Matrix4(),
+      quaternion: new THREE.Quaternion(),
+      position: new THREE.Vector3(),
+      scale: new THREE.Vector3(1, 1, 1),
+      axis: new THREE.Vector3(0, 1, 0),
+    }),
+    [],
+  );
 
-  useLayoutEffect(() => {
-    const matrix = new THREE.Matrix4();
-    const quaternion = new THREE.Quaternion();
-    const position = new THREE.Vector3();
-    const scale = new THREE.Vector3(1, 1, 1);
-    const axis = new THREE.Vector3(0, 1, 0);
+  const write = useCallback(
+    (unwind: number) => {
+      const { matrix, quaternion, position, scale, axis } = scratch;
+      for (let i = 0; i < pairs; i++) {
+        const t = pairs === 1 ? 0.5 : i / (pairs - 1);
+        const angle = t * Math.PI * 2 * TURNS * (1 - unwind);
+        const y = (t - 0.5) * HEIGHT;
 
-    for (let i = 0; i < pairs; i++) {
-      const t = pairs === 1 ? 0.5 : i / (pairs - 1);
-      const angle = t * Math.PI * 2 * TURNS;
-      const y = (t - 0.5) * HEIGHT;
+        position.set(0, y, 0);
+        quaternion.setFromAxisAngle(axis, -angle);
+        rods.current?.setMatrixAt(i, matrix.compose(position, quaternion, scale));
 
-      position.set(0, y, 0);
-      quaternion.setFromAxisAngle(axis, -angle);
-      rods.current?.setMatrixAt(i, matrix.compose(position, quaternion, scale));
-
-      for (const sign of [1, -1] as const) {
-        position.set(Math.cos(angle) * RADIUS * sign, y, Math.sin(angle) * RADIUS * sign);
-        nodes.current?.setMatrixAt(
-          i * 2 + (sign === 1 ? 0 : 1),
-          matrix.compose(position, quaternion, scale),
-        );
+        for (const sign of [1, -1] as const) {
+          position.set(Math.cos(angle) * RADIUS * sign, y, Math.sin(angle) * RADIUS * sign);
+          nodes.current?.setMatrixAt(
+            i * 2 + (sign === 1 ? 0 : 1),
+            matrix.compose(position, quaternion, scale),
+          );
+        }
       }
-    }
-    if (rods.current) rods.current.instanceMatrix.needsUpdate = true;
-    if (nodes.current) nodes.current.instanceMatrix.needsUpdate = true;
-  }, [pairs]);
+      if (rods.current) rods.current.instanceMatrix.needsUpdate = true;
+      if (nodes.current) nodes.current.instanceMatrix.needsUpdate = true;
+    },
+    [pairs, scratch],
+  );
 
-  return { rods, nodes };
+  useLayoutEffect(() => write(0), [write]);
+
+  return { rods, nodes, write };
 }
 
 /** Señales que los botones encienden y el bucle de render va apagando. */
@@ -119,6 +162,8 @@ interface Signals {
   mutation: RefObject<number>;
   /** Progreso del barrido, 0–1; por encima de 1 está en reposo. */
   scan: RefObject<number>;
+  /** 0 enrollada, 1 escalera plana. */
+  unwind: RefObject<number>;
   near: RefObject<number>;
 }
 
@@ -139,10 +184,24 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
   const nodeMaterial = useRef<THREE.MeshStandardMaterial>(null);
   const sparkA = useRef<THREE.Mesh>(null);
   const sparkB = useRef<THREE.Mesh>(null);
+  const strandA = useRef<THREE.Mesh>(null);
+  const strandB = useRef<THREE.Mesh>(null);
   const travel = useRef(0);
   const glow = useRef(0);
+  const lastUnwind = useRef(0);
 
-  const { rods, nodes } = useBasePairs(pairs);
+  const { rods, nodes, write } = useBasePairs(pairs);
+
+  /*
+   * R3F asigna la geometría después de construir la malla, así que el
+   * constructor de Mesh no llega a ver los morph targets y deja
+   * `morphTargetInfluences` sin crear. three.js lo lee en cada fotograma y
+   * revienta el bucle entero: hay que pedirlo a mano, antes del primer pintado.
+   */
+  useLayoutEffect(() => {
+    strandA.current?.updateMorphTargets();
+    strandB.current?.updateMorphTargets();
+  }, []);
   const tints = useMemo(
     () => ({ base: new THREE.Color(CYAN), mutated: new THREE.Color(MAGENTA) }),
     [],
@@ -169,10 +228,23 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
     const energy = signals.energy.current ?? 0;
     const mutation = signals.mutation.current ?? 0;
 
+    // Giro: el automático se aparta mientras se arrastra, y el impulso frena solo.
+    const auto = spinSignal.dragging ? 0 : step * (0.24 + energy * 0.5 + mutation * 0.7);
     if (!reduced) {
-      node.rotation.y += step * (0.24 + energy * 0.5 + mutation * 0.7);
+      node.rotation.y += auto + spinSignal.velocity;
       node.position.y = Math.sin(time * 0.55) * 0.14;
     }
+    spinSignal.velocity *= 0.93;
+    if (Math.abs(spinSignal.velocity) < 0.0002) spinSignal.velocity = 0;
+
+    // Desplegado: los tubos hacen morph y las barras se reescriben con él.
+    const unwind = signals.unwind.current ?? 0;
+    if (Math.abs(unwind - lastUnwind.current) > 0.002) {
+      write(unwind);
+      lastUnwind.current = unwind;
+    }
+    if (strandA.current?.morphTargetInfluences) strandA.current.morphTargetInfluences[0] = unwind;
+    if (strandB.current?.morphTargetInfluences) strandB.current.morphTargetInfluences[0] = unwind;
 
     // Inclinación leve hacia el puntero, con inercia.
     const nx = (pointerSignal.x / window.innerWidth) * 2 - 1;
@@ -209,7 +281,7 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
   return (
     <group ref={group}>
       <group ref={shake}>
-        <mesh geometry={geo.tubeA}>
+        <mesh ref={strandA} geometry={geo.tubeA}>
           <meshStandardMaterial
             ref={strandMaterial}
             color={CYAN}
@@ -219,7 +291,7 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
             roughness={0.22}
           />
         </mesh>
-        <mesh geometry={geo.tubeB}>
+        <mesh ref={strandB} geometry={geo.tubeB}>
           <meshStandardMaterial
             color={VIOLET}
             emissive={VIOLET}
@@ -350,12 +422,15 @@ function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduce
 
 /* ───────────── Escena ───────────── */
 
-function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, nearRef }: SceneProps) {
+function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind, nearRef }: SceneProps) {
   const geo = useGeometries();
   const frame = useRef<THREE.Group>(null);
   const energy = useRef(0);
   const mutation = useRef(0);
   const scanProgress = useRef(2);
+  const unwindValue = useRef(0);
+  /** Segundos desde que empezó el desplegado; negativo en reposo. */
+  const unwindPhase = useRef(-1);
 
   /* Cada pulsación recarga su señal; el fotograma la va apagando. */
   useEffect(() => {
@@ -367,12 +442,29 @@ function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, nearRef
   useEffect(() => {
     if (scan > 0) scanProgress.current = 0;
   }, [scan]);
+  useEffect(() => {
+    if (unwind > 0) unwindPhase.current = 0;
+  }, [unwind]);
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 0.05);
     energy.current = Math.max(0, energy.current - step * 0.42);
     mutation.current = Math.max(0, mutation.current - step * 0.5);
     if (scanProgress.current <= 1) scanProgress.current += step / SCAN_SECONDS;
+
+    // Desplegado: abre, se queda abierta y vuelve a enrollarse.
+    if (unwindPhase.current >= 0) {
+      unwindPhase.current += step;
+      const at = unwindPhase.current;
+      const closing = UNWIND_RAMP + UNWIND_HOLD;
+      if (at < UNWIND_RAMP) unwindValue.current = at / UNWIND_RAMP;
+      else if (at < closing) unwindValue.current = 1;
+      else if (at < closing + UNWIND_RAMP) unwindValue.current = 1 - (at - closing) / UNWIND_RAMP;
+      else {
+        unwindValue.current = 0;
+        unwindPhase.current = -1;
+      }
+    }
 
     /* Encuadre: la escena se encoge a medida que aparecen copias, en vez de
        mover la cámara (que es valor de hook y no se puede mutar). */
@@ -383,7 +475,13 @@ function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, nearRef
     }
   });
 
-  const signals: Signals = { energy, mutation, scan: scanProgress, near: nearRef };
+  const signals: Signals = {
+    energy,
+    mutation,
+    scan: scanProgress,
+    unwind: unwindValue,
+    near: nearRef,
+  };
 
   return (
     <group ref={frame}>
@@ -406,6 +504,7 @@ export interface SceneProps {
   pulse: number;
   mutate: number;
   scan: number;
+  unwind: number;
   nearRef: RefObject<number>;
 }
 

@@ -20,7 +20,17 @@
 
 .dna__stage {
   position: relative;
-  height: clamp(15rem, 38vh, 25rem);
+  height: clamp(13rem, 33vh, 21rem);
+}
+/* Sólo el escenario recoge el puntero, y sólo donde hay hélice que girar.
+   pan-y deja pasar el desplazamiento vertical de la página. */
+.dna__stage[data-grab] {
+  pointer-events: auto;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.dna__stage[data-grab]:active {
+  cursor: grabbing;
 }
 /* Halo que asienta la hélice en el panel en vez de recortarla contra el fondo. */
 .dna__stage::before {
@@ -82,11 +92,20 @@
 .dna[data-state='using'] .dna__hud-core,
 .dna[data-state='using'] .dna__hud-count,
 .dna[data-state='scanning'] .dna__hud-core,
-.dna[data-state='scanning'] .dna__hud-count {
+.dna[data-state='scanning'] .dna__hud-count,
+.dna[data-state='unwinding'] .dna__hud-core,
+.dna[data-state='unwinding'] .dna__hud-count,
+.dna[data-state='sounding'] .dna__hud-core,
+.dna[data-state='sounding'] .dna__hud-count,
+.dna[data-state='exporting'] .dna__hud-core,
+.dna[data-state='exporting'] .dna__hud-count {
   color: var(--eva-violet);
 }
 .dna[data-state='using'] .dna__hud-core i,
-.dna[data-state='scanning'] .dna__hud-core i {
+.dna[data-state='scanning'] .dna__hud-core i,
+.dna[data-state='unwinding'] .dna__hud-core i,
+.dna[data-state='sounding'] .dna__hud-core i,
+.dna[data-state='exporting'] .dna__hud-core i {
   background: var(--eva-violet);
   box-shadow: 0 0 6px rgba(154, 141, 255, 0.7);
 }
@@ -95,18 +114,18 @@
 
 .dna__actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.3rem;
 }
 .dna__btn {
-  min-height: 32px;
-  padding: 0.35rem 0.5rem;
+  min-height: 30px;
+  padding: 0.3rem 0.35rem;
   border: 1px solid var(--eva-line-strong);
   border-radius: 3px;
   color: var(--eva-cyan);
   background: rgba(7, 19, 31, 0.78);
-  font-size: 0.48rem;
-  letter-spacing: 0.16em;
+  font-size: 0.46rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   transition:

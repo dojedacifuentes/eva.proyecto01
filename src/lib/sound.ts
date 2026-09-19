@@ -69,3 +69,30 @@ export function play(name: SoundName) {
     oscillator.stop(end + 0.02);
   }
 }
+
+/**
+ * Reproduce una secuencia de notas, una tras otra. La usa el genoma para
+ * sonificarse: sólo suena si alguien ya encendió el sonido en la cabecera.
+ */
+export function playSequence(frequencies: number[], step = 0.14) {
+  if (!enabled || !context) return;
+  const now = context.currentTime;
+
+  frequencies.forEach((frequency, index) => {
+    const oscillator = context!.createOscillator();
+    const gain = context!.createGain();
+    const start = now + index * step;
+    const end = start + step * 0.9;
+
+    oscillator.type = index % 2 === 0 ? 'sine' : 'triangle';
+    oscillator.frequency.setValueAtTime(frequency, start);
+
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(MASTER_VOLUME * 0.8, start + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+    oscillator.connect(gain).connect(context!.destination);
+    oscillator.start(start);
+    oscillator.stop(end + 0.02);
+  });
+}
