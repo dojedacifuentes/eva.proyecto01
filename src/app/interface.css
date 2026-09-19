@@ -299,14 +299,7 @@ html {
 }
 .hero__head {
   min-width: 0;
-}
-@media (min-width: 64rem) {
-  /* Acotada al ancho de su contenido: estirada hasta el borde de la columna,
-     su caja tapaba los botones del genoma aunque estuviera vacía ahí. 28rem es
-     lo mínimo para que los dos botones del hero quepan en una línea. */
-  .hero__head {
-    max-width: 28rem;
-  }
+  align-self: center;
 }
 .hero__label {
   color: var(--eva-cyan);
@@ -315,9 +308,6 @@ html {
 /* El acrónimo vuelve a mandar en la portada, un punto más chico que en v2. */
 .acronym {
   margin-top: 0.9rem;
-  /* Acotado para que los índices 01–03 no se vayan al otro extremo de la
-     columna: dejan libre la banda donde vive el genoma. */
-  max-width: 26rem;
   border-left: 1px solid var(--eva-line-strong);
 }
 .acronym__row {
@@ -326,40 +316,20 @@ html {
   padding-left: clamp(0.6rem, 1.4vw, 1.1rem);
 }
 .acronym__letter {
-  font-size: clamp(2.9rem, min(7.4vw, 11vh), 5.6rem);
+  font-size: clamp(3rem, min(7.6vw, 13vh), 6.6rem);
   line-height: 0.9;
 }
 .acronym__word {
   gap: clamp(0.45rem, 1.1vw, 0.85rem);
   font-size: clamp(0.95rem, 1.9vw, 1.45rem);
+  text-wrap: nowrap;
 }
 .acronym__word::before {
-  flex-basis: clamp(0.75rem, 2vw, 1.9rem);
+  flex-basis: clamp(0.5rem, 1.4vw, 1.25rem);
 }
 .acronym__index {
   font-size: 0.58rem;
 }
-.hero__lede {
-  margin-top: 1rem;
-  /* Se detiene antes del genoma: nada de texto por encima de la hélice. */
-  max-width: 26rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-.hero__actions {
-  margin-top: 1.1rem;
-}
-.hero .btn {
-  min-height: 42px;
-  padding-inline: 1.1rem;
-  font-size: 0.85rem;
-}
-.hero .rotator {
-  margin-top: 0.9rem;
-  min-height: 2.2em;
-  font-size: 0.72rem;
-}
-
 /* EVA, a la derecha y al lado del acrónimo. Marco estrecho: ocupa menos y lee
    como una ficha técnica, no como una fotografía grande. */
 .hero__portrait {
@@ -418,12 +388,13 @@ html {
   }
 }
 
-/* Ficha del estudio, bajo el perfil de EVA. */
+/* Ficha del estudio. Salió de la portada; ahora abre el pie. */
 .studio {
   display: grid;
   gap: 0.15rem;
-  margin-top: 0.7rem;
-  padding-top: 0.7rem;
+  max-width: 24rem;
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
   border-top: 1px solid var(--eva-line);
   transition: border-color var(--eva-normal) linear;
 }
@@ -460,66 +431,6 @@ html {
 .studio:hover .studio__arrow,
 .studio:focus-visible .studio__arrow {
   translate: 2px -2px;
-}
-
-.principles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--eva-line-strong);
-}
-.principle {
-  position: relative;
-  padding: 0.9rem 1.4rem 1rem;
-  min-width: 0;
-  background: linear-gradient(150deg, rgba(21, 41, 64, 0.33), transparent);
-  transition: background var(--eva-normal) var(--eva-ease);
-}
-.principle + .principle {
-  border-left: 1px solid var(--eva-line);
-}
-.principle:hover {
-  background: linear-gradient(150deg, rgba(30, 60, 90, 0.5), transparent);
-}
-.principle__label {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: var(--eva-cyan);
-}
-.principle__label h2 {
-  color: var(--eva-soft);
-  font-weight: 400;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: var(--font-jetbrains), monospace;
-}
-/* Cuadrado que gira a rombo al pasar por encima. */
-.principle__mark {
-  margin-left: auto;
-  width: 7px;
-  height: 7px;
-  border: 1px solid var(--eva-muted);
-  transition:
-    rotate var(--eva-normal) var(--eva-ease),
-    border-color var(--eva-normal) linear;
-}
-.principle:hover .principle__mark {
-  rotate: 45deg;
-  border-color: var(--eva-cyan);
-}
-.principle > p {
-  margin-top: 0.5rem;
-  font-size: 0.97rem;
-  font-weight: 500;
-  line-height: 1.32;
-}
-.principle__aside {
-  display: block;
-  margin-top: 0.3rem;
-  color: var(--eva-muted);
-  font-size: 0.74rem;
-  line-height: 1.45;
 }
 
 /* ───────────── Selector de universos ───────────── */
@@ -988,15 +899,37 @@ html {
 
 /* ───────────── Adaptación ───────────── */
 
-@media (min-width: 48rem) {
-  /* Dos columnas reales: el acrónimo manda, EVA va al lado y a la derecha. */
+/* Tablet: acrónimo y genoma apilados, EVA al lado ocupando las dos filas. */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
   .hero__grid {
-    grid-template-columns: minmax(0, 1fr) clamp(8.5rem, 19vw, 13.5rem);
+    grid-template-columns: minmax(0, 1fr) clamp(8rem, 18vw, 11rem);
   }
+  .hero__head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .dna {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .hero__portrait {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+}
+
+/* Escritorio: acrónimo, genoma y EVA, uno al lado del otro. */
+@media (min-width: 64rem) {
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.05fr) clamp(9rem, 15vw, 14rem);
+  }
+}
+
+@media (min-width: 48rem) {
   .hero__head,
   .hero__portrait {
     grid-column: auto;
-    grid-row: auto;
   }
   .hero .portrait {
     grid-column: auto;
@@ -1046,11 +979,7 @@ html {
   .acronym__word {
     font-size: 1rem;
   }
-  .hero__lede {
-    font-size: 0.88rem;
-    max-width: 34ch;
-  }
-  /* El retrato flota arriba a la derecha; la ficha del estudio sigue el flujo. */
+  /* El retrato flota arriba a la derecha. */
   .hero__portrait {
     position: static;
     width: auto;
@@ -1082,31 +1011,12 @@ html {
     padding: 0.2rem 0.3rem;
     opacity: 1;
   }
-  .studio {
-    margin-top: 0;
-  }
   /* Los índices 01–03 chocarían con el retrato: en móvil sobran. */
   .acronym__index {
     display: none;
   }
   .hero .portrait__caption {
     display: none;
-  }
-  .principles {
-    grid-template-columns: 1fr;
-  }
-  .principle {
-    padding: 0.7rem 1.15rem;
-  }
-  .principle + .principle {
-    border-left: 0;
-    border-top: 1px solid var(--eva-line);
-  }
-  .principle > p {
-    font-size: 0.88rem;
-  }
-  .principle__aside {
-    font-size: 0.7rem;
   }
   .slide__foot {
     font-size: 0.48rem;
@@ -1171,12 +1081,6 @@ html {
   }
   .acronym__letter {
     font-size: clamp(2.6rem, 8vh, 4.3rem);
-  }
-  .hero__lede {
-    margin-top: 0.7rem;
-  }
-  .principle {
-    padding-block: 0.7rem;
   }
   .universe,
   .universe:nth-child(n) {

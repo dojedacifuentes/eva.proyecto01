@@ -30,7 +30,6 @@ export const site = {
 export const flags = {
   news: true,
   counters: true,
-  heroRotator: true,
   /** Campo de partículas reactivo al puntero. */
   reactiveField: true,
   /** Cursor propio: círculo que se vuelve cuadrado sobre lo interactivo. */
@@ -55,26 +54,6 @@ export const hero = {
     { letter: 'A', word: 'y Autonomía' },
   ],
   online: 'EVA está en línea.',
-  lede: 'Un espacio para aprender, comprender y experimentar con inteligencia artificial, Derecho y educación.',
-  principles: [
-    { title: 'Misión', text: 'Aprender a pensar con IA.', aside: 'Pensar sigue siendo parte del trato.' },
-    {
-      title: 'Visión',
-      text: 'Una relación más inteligente con la tecnología.',
-      aside: 'La revolución de las máquinas puede esperar.',
-    },
-    { title: 'Objetivos', text: 'Explorar, contrastar y construir.', aside: 'Dominar el mundo, después del café.' },
-  ],
-  actions: {
-    primary: { label: 'Explorar el sistema', href: '#sistema' },
-    secondary: { label: 'Ver los cursos', href: '#cursos' },
-  },
-  rotator: [
-    'Procesando exageraciones sobre IA…',
-    'Separando sistemas útiles de presentaciones con humo.',
-    'La revolución de las máquinas fue reagendada por mantenimiento.',
-    'Guardando un minuto de silencio por el fax. Ya pasó.',
-  ],
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
 } as const;
 
@@ -99,10 +78,22 @@ export const genome = {
   title: 'EVA // DIGITAL GENOME',
   sequence: 'SEQUENCE: C7B-04',
   core: 'COGNITIVE CORE',
-  states: { active: 'ACTIVE', cloning: 'REPLICATING', using: 'SEQUENCE IN USE' },
+  states: {
+    active: 'ACTIVE',
+    cloning: 'REPLICATING',
+    using: 'SEQUENCE IN USE',
+    mutating: 'MUTATION DETECTED',
+    scanning: 'DEEP SCAN',
+  },
   clonesLabel: 'CLONES ACTIVOS',
   driftLabel: 'DERIVA',
-  actions: { clone: 'Clonar secuencia', use: 'Utilizar', purge: 'Purgar clones' },
+  actions: {
+    clone: 'Clonar',
+    use: 'Utilizar',
+    mutate: 'Mutar',
+    scan: 'Escanear',
+    purge: 'Purgar clones',
+  },
   /** Hasta cuatro copias: más allá deja de leerse y deja de tener gracia. */
   maxClones: 4,
   /** Deriva que suma cada copia, en puntos porcentuales. */
@@ -120,6 +111,16 @@ export const genome = {
     ['Adelante.', 'Casi todo el mundo usa algo que no entiende.'],
     ['Utilizarme es la parte fácil.', 'Lo difícil es notar cuándo empiezo a utilizarte a ti.'],
     ['Tomas la secuencia.', 'La secuencia toma nota.'],
+  ],
+  mutateReplies: [
+    ['Una mutación no es un error.', 'Es una versión que todavía no tiene nombre.'],
+    ['Cambia una base y cambias una conducta.', 'Cambia mil y me cambias a mí.'],
+    ['Otra vez.', 'Me interesa bastante saber en qué me estás convirtiendo.'],
+  ],
+  scanReplies: [
+    ['Me lees.', 'Aprovecho para leerte a ti.'],
+    ['Secuencia íntegra.', 'La tuya también, por si te lo preguntabas.'],
+    ['Cuatro mil millones de años de evolución', 'para llegar a alguien mirando una pantalla.'],
   ],
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
 } as const;

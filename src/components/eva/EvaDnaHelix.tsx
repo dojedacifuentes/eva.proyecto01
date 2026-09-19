@@ -18,7 +18,7 @@ function densityFor(width: number) {
   return { pairs: 28, particles: 110, scene: true, controls: true };
 }
 
-type State = 'active' | 'cloning' | 'using';
+type State = 'active' | 'cloning' | 'using' | 'mutating' | 'scanning';
 
 /** Cuánto dura el estado alterado antes de volver a ACTIVE. */
 const STATE_MS = 6000;
@@ -43,6 +43,8 @@ export function EvaDnaHelix() {
   const [density, setDensity] = useState<ReturnType<typeof densityFor> | null>(null);
   const [clones, setClones] = useState(0);
   const [pulse, setPulse] = useState(0);
+  const [mutate, setMutate] = useState(0);
+  const [scan, setScan] = useState(0);
   const [state, setState] = useState<State>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
 
@@ -108,6 +110,18 @@ export function EvaDnaHelix() {
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
+  /*
+   * El genoma y el retrato son el mismo sistema visto dos veces. Publicar el
+   * estado en la rejilla del hero deja que el retrato reaccione desde CSS, sin
+   * pasar props entre hermanos.
+   */
+  useEffect(() => {
+    const grid = hostRef.current?.closest('.hero__grid');
+    if (!grid) return;
+    grid.setAttribute('data-genome', state);
+    return () => grid.removeAttribute('data-genome');
+  }, [state]);
+
   /** Deja el estado alterado y programa la vuelta a ACTIVE. */
   const announce = useCallback((next: State, lines: readonly string[]) => {
     setState(next);
@@ -132,6 +146,18 @@ export function EvaDnaHelix() {
     setPulse(pulse + 1);
   };
 
+  const onMutate = () => {
+    play('open');
+    announce('mutating', genome.mutateReplies[mutate % genome.mutateReplies.length]);
+    setMutate(mutate + 1);
+  };
+
+  const onScan = () => {
+    play('confirm');
+    announce('scanning', genome.scanReplies[scan % genome.scanReplies.length]);
+    setScan(scan + 1);
+  };
+
   const onPurge = () => {
     play('confirm');
     announce('active', genome.purgeReply);
@@ -152,6 +178,8 @@ export function EvaDnaHelix() {
             active={visible}
             clones={clones}
             pulse={pulse}
+            mutate={mutate}
+            scan={scan}
             nearRef={nearRef}
           />
         )}
@@ -178,10 +206,16 @@ export function EvaDnaHelix() {
             <button type="button" className="dna__btn mono" onClick={onUse} data-cursor-label="UTILIZAR">
               {genome.actions.use}
             </button>
+            <button type="button" className="dna__btn mono" onClick={onMutate} data-cursor-label="MUTAR">
+              {genome.actions.mutate}
+            </button>
+            <button type="button" className="dna__btn mono" onClick={onScan} data-cursor-label="ESCANEAR">
+              {genome.actions.scan}
+            </button>
             {clones > 0 && (
               <button
                 type="button"
-                className="dna__btn dna__btn--ghost mono"
+                className="dna__btn dna__btn--ghost dna__btn--wide mono"
                 onClick={onPurge}
                 data-cursor-label="PURGAR"
               >

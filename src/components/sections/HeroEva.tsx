@@ -1,14 +1,14 @@
 import type { CSSProperties } from 'react';
 import { EvaDnaHelix } from '@/components/eva/EvaDnaHelix';
 import { EvaProfile } from '@/components/eva/EvaProfile';
-import { Rotator } from '@/components/eva/Rotator';
-import { flags, hero, site, studio, ui } from '@/content/site';
+import { hero, site } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
- * Portada: acrónimo vertical a la izquierda, EVA a la derecha y la franja de
- * principios abajo. Todo dentro de un marco técnico que cabe en una pantalla.
+ * Portada: tres piezas y nada más — el acrónimo, el genoma y EVA mirándose a sí
+ * misma. Sin texto corrido, sin botones y sin franja de principios: lo que hay
+ * que explicar se explica más abajo.
  */
 export function HeroEva() {
   return (
@@ -21,9 +21,6 @@ export function HeroEva() {
           </div>
 
           <div className="hero__grid">
-            {/* Genoma digital: capa decorativa, fuera del flujo y bajo el texto. */}
-            <EvaDnaHelix />
-
             <div className="hero__head">
               <p className="hero__label mono" data-rise style={rise(0)}>
                 {hero.label}
@@ -44,68 +41,15 @@ export function HeroEva() {
                   </div>
                 ))}
               </div>
-
-              <p className="hero__lede" data-rise style={rise(4)}>
-                {hero.lede}
-              </p>
-
-              <div className="hero__actions" data-rise style={rise(5)}>
-                <a href={hero.actions.primary.href} className="btn btn--solid" data-sound="open">
-                  {hero.actions.primary.label}
-                  <span aria-hidden="true" className="btn__arrow">
-                    ↓
-                  </span>
-                </a>
-                <a href={hero.actions.secondary.href} className="btn btn--ghost" data-sound="open">
-                  {hero.actions.secondary.label}
-                </a>
-              </div>
-
-              {flags.heroRotator && <Rotator lines={hero.rotator} />}
             </div>
 
-            {/* Sin data-rise: su transform haría de este div el bloque contenedor
-                del retrato, que en móvil se posiciona contra la rejilla. */}
+            {/* El genoma y el retrato son el mismo sistema visto dos veces: lo que
+                se hace en uno se nota en el otro. */}
+            <EvaDnaHelix />
+
             <div className="hero__portrait">
               <EvaProfile />
-
-              {/* Ficha del estudio: el único enlace saliente de la portada. */}
-              <a
-                className="studio"
-                data-rise
-                style={rise(3)}
-                href={studio.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-cursor="external"
-                data-cursor-label={studio.cta.toUpperCase()}
-                data-sound="open"
-              >
-                <span className="studio__label mono">{studio.label}</span>
-                <span className="studio__name">
-                  {studio.name}
-                  <span aria-hidden="true" className="studio__arrow">
-                    ↗
-                  </span>
-                </span>
-                <span className="studio__services mono">{studio.services.join(' · ')}</span>
-                <span className="sr-only"> ({ui.external})</span>
-              </a>
             </div>
-          </div>
-
-          <div className="principles" aria-label="Misión, visión y objetivos">
-            {hero.principles.map((item, index) => (
-              <article className="principle" key={item.title} data-rise style={rise(6 + index)}>
-                <div className="principle__label mono">
-                  <span>0{index + 1}</span>
-                  <h2>{item.title}</h2>
-                  <span aria-hidden="true" className="principle__mark" />
-                </div>
-                <p>{item.text}</p>
-                <span className="principle__aside">{item.aside}</span>
-              </article>
-            ))}
           </div>
         </div>
 

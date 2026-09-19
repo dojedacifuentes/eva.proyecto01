@@ -37,7 +37,7 @@ export default function OpengraphImage() {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', fontSize: 26, color: '#8e9ba3' }}>{hero.principles[0].text}</div>
+        <div style={{ display: 'flex', fontSize: 26, color: '#8e9ba3' }}>{site.expansion}</div>
       </div>
     ),
     size,

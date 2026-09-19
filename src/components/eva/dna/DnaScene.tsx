@@ -18,6 +18,9 @@ const VIOLET = '#9a8dff';
 const WHITE = '#dff4ff';
 const MAGENTA = '#f07ab9';
 
+/** Cuánto dura un barrido de escaneo, en segundos. */
+const SCAN_SECONDS = 1.9;
+
 /**
  * Generador pseudoaleatorio con semilla. El polvo debe salir idéntico en cada
  * render: Math.random() en fase de render es impuro y da resultados inestables.
@@ -51,6 +54,7 @@ interface Geometries {
   rod: THREE.CylinderGeometry;
   node: THREE.SphereGeometry;
   spark: THREE.SphereGeometry;
+  ring: THREE.RingGeometry;
 }
 
 function useGeometries(): Geometries {
@@ -68,6 +72,7 @@ function useGeometries(): Geometries {
       rod,
       node: new THREE.SphereGeometry(0.075, 10, 8),
       spark: new THREE.SphereGeometry(0.11, 12, 10),
+      ring: new THREE.RingGeometry(RADIUS * 0.25, RADIUS * 2.1, 56),
     };
   }, []);
 }
@@ -108,6 +113,15 @@ function useBasePairs(pairs: number) {
   return { rods, nodes };
 }
 
+/** Señales que los botones encienden y el bucle de render va apagando. */
+interface Signals {
+  energy: RefObject<number>;
+  mutation: RefObject<number>;
+  /** Progreso del barrido, 0–1; por encima de 1 está en reposo. */
+  scan: RefObject<number>;
+  near: RefObject<number>;
+}
+
 /* ───────────── Cuerpo principal ───────────── */
 
 interface BodyProps {
@@ -115,13 +129,12 @@ interface BodyProps {
   pairs: number;
   particles: number;
   reduced: boolean;
-  nearRef: RefObject<number>;
-  /** 0–1: la carga que deja «Utilizar», decae sola. */
-  energyRef: RefObject<number>;
+  signals: Signals;
 }
 
-function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps) {
+function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
   const group = useRef<THREE.Group>(null);
+  const shake = useRef<THREE.Group>(null);
   const strandMaterial = useRef<THREE.MeshStandardMaterial>(null);
   const nodeMaterial = useRef<THREE.MeshStandardMaterial>(null);
   const sparkA = useRef<THREE.Mesh>(null);
@@ -130,6 +143,10 @@ function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps)
   const glow = useRef(0);
 
   const { rods, nodes } = useBasePairs(pairs);
+  const tints = useMemo(
+    () => ({ base: new THREE.Color(CYAN), mutated: new THREE.Color(MAGENTA) }),
+    [],
+  );
 
   const dust = useMemo(() => {
     const random = seeded(0x5eed);
@@ -148,11 +165,13 @@ function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps)
     const node = group.current;
     if (!node) return;
     const step = Math.min(delta, 0.05);
-    const energy = energyRef.current ?? 0;
+    const time = state.clock.elapsedTime;
+    const energy = signals.energy.current ?? 0;
+    const mutation = signals.mutation.current ?? 0;
 
     if (!reduced) {
-      node.rotation.y += step * (0.24 + energy * 0.5);
-      node.position.y = Math.sin(state.clock.elapsedTime * 0.55) * 0.14;
+      node.rotation.y += step * (0.24 + energy * 0.5 + mutation * 0.7);
+      node.position.y = Math.sin(time * 0.55) * 0.14;
     }
 
     // Inclinación leve hacia el puntero, con inercia.
@@ -162,72 +181,84 @@ function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps)
     node.rotation.x += ((tilting ? ny * 0.22 : 0) - node.rotation.x) * 0.06;
     node.rotation.z += ((tilting ? nx * -0.12 : 0) - node.rotation.z) * 0.06;
 
+    // La mutación sacude un grupo interior, para no pelearse con la inclinación.
+    const inner = shake.current;
+    if (inner) {
+      inner.rotation.z = Math.sin(time * 37) * 0.055 * mutation;
+      inner.scale.setScalar(1 + Math.sin(time * 29) * 0.06 * mutation);
+    }
+
     // Chispa recorriendo cada filamento: la vida de fondo de la hélice.
     travel.current = (travel.current + step * (0.11 + energy * 0.5)) % 1;
-    const point = geo.curveA.getPointAt(travel.current);
-    sparkA.current?.position.copy(point);
+    sparkA.current?.position.copy(geo.curveA.getPointAt(travel.current));
     sparkB.current?.position.copy(geo.curveB.getPointAt(travel.current));
-    const sparkScale = 0.8 + energy * 1.4;
+    const sparkScale = 0.8 + energy * 1.4 + mutation * 0.8;
     sparkA.current?.scale.setScalar(sparkScale);
     sparkB.current?.scale.setScalar(sparkScale);
 
-    glow.current += ((nearRef.current ?? 0) - glow.current) * 0.08;
-    const lift = glow.current * 1.1 + energy * 1.8;
-    if (strandMaterial.current) strandMaterial.current.emissiveIntensity = 1.15 + lift;
+    glow.current += ((signals.near.current ?? 0) - glow.current) * 0.08;
+    const lift = glow.current * 1.1 + energy * 1.8 + mutation * 1.2;
+    if (strandMaterial.current) {
+      strandMaterial.current.emissiveIntensity = 1.15 + lift;
+      strandMaterial.current.color.lerpColors(tints.base, tints.mutated, mutation);
+      strandMaterial.current.emissive.lerpColors(tints.base, tints.mutated, mutation);
+    }
     if (nodeMaterial.current) nodeMaterial.current.emissiveIntensity = 1.5 + lift * 1.3;
   });
 
   return (
     <group ref={group}>
-      <mesh geometry={geo.tubeA}>
-        <meshStandardMaterial
-          ref={strandMaterial}
-          color={CYAN}
-          emissive={CYAN}
-          emissiveIntensity={1.15}
-          metalness={0.75}
-          roughness={0.22}
-        />
-      </mesh>
-      <mesh geometry={geo.tubeB}>
-        <meshStandardMaterial
-          color={VIOLET}
-          emissive={VIOLET}
-          emissiveIntensity={1.05}
-          metalness={0.75}
-          roughness={0.22}
-        />
-      </mesh>
+      <group ref={shake}>
+        <mesh geometry={geo.tubeA}>
+          <meshStandardMaterial
+            ref={strandMaterial}
+            color={CYAN}
+            emissive={CYAN}
+            emissiveIntensity={1.15}
+            metalness={0.75}
+            roughness={0.22}
+          />
+        </mesh>
+        <mesh geometry={geo.tubeB}>
+          <meshStandardMaterial
+            color={VIOLET}
+            emissive={VIOLET}
+            emissiveIntensity={1.05}
+            metalness={0.75}
+            roughness={0.22}
+          />
+        </mesh>
 
-      <instancedMesh ref={rods} args={[geo.rod, undefined, pairs]}>
-        <meshStandardMaterial
-          color={WHITE}
-          emissive={CYAN}
-          emissiveIntensity={0.55}
-          metalness={0.9}
-          roughness={0.35}
-          transparent
-          opacity={0.72}
-        />
-      </instancedMesh>
+        <instancedMesh ref={rods} args={[geo.rod, undefined, pairs]}>
+          <meshStandardMaterial
+            color={WHITE}
+            emissive={CYAN}
+            emissiveIntensity={0.55}
+            metalness={0.9}
+            roughness={0.35}
+            transparent
+            opacity={0.72}
+          />
+        </instancedMesh>
 
-      <instancedMesh ref={nodes} args={[geo.node, undefined, pairs * 2]}>
-        <meshStandardMaterial
-          ref={nodeMaterial}
-          color={WHITE}
-          emissive={WHITE}
-          emissiveIntensity={1.5}
-          metalness={0.4}
-          roughness={0.15}
-        />
-      </instancedMesh>
+        <instancedMesh ref={nodes} args={[geo.node, undefined, pairs * 2]}>
+          <meshStandardMaterial
+            ref={nodeMaterial}
+            color={WHITE}
+            emissive={WHITE}
+            emissiveIntensity={1.5}
+            metalness={0.4}
+            roughness={0.15}
+          />
+        </instancedMesh>
 
-      <mesh ref={sparkA} geometry={geo.spark}>
-        <meshBasicMaterial color={WHITE} toneMapped={false} />
-      </mesh>
-      <mesh ref={sparkB} geometry={geo.spark}>
-        <meshBasicMaterial color={CYAN} toneMapped={false} />
-      </mesh>
+        <mesh ref={sparkA} geometry={geo.spark}>
+          <meshBasicMaterial color={WHITE} toneMapped={false} />
+        </mesh>
+        <mesh ref={sparkB} geometry={geo.spark}>
+          <meshBasicMaterial color={CYAN} toneMapped={false} />
+        </mesh>
+      </group>
 
       <points>
         <bufferGeometry>
@@ -244,6 +275,40 @@ function Body({ geo, pairs, particles, reduced, nearRef, energyRef }: BodyProps)
         />
       </points>
     </group>
+  );
+}
+
+/* ───────────── Barrido de escaneo ───────────── */
+
+/** Un anillo luminoso que recorre la hélice de abajo arriba. */
+function ScanRing({ geo, scan }: { geo: Geometries; scan: RefObject<number> }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const material = useRef<THREE.MeshBasicMaterial>(null);
+
+  useFrame(() => {
+    const node = mesh.current;
+    if (!node) return;
+    const progress = scan.current ?? 2;
+    const running = progress >= 0 && progress <= 1;
+    node.visible = running;
+    if (!running) return;
+    node.position.y = (progress - 0.5) * HEIGHT * 1.12;
+    // Entra y sale con un seno: sin cortes al principio ni al final.
+    if (material.current) material.current.opacity = Math.sin(progress * Math.PI) * 0.55;
+  });
+
+  return (
+    <mesh ref={mesh} geometry={geo.ring} rotation={[Math.PI / 2, 0, 0]} visible={false}>
+      <meshBasicMaterial
+        ref={material}
+        color={WHITE}
+        transparent
+        opacity={0}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
   );
 }
 
@@ -285,21 +350,32 @@ function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduce
 
 /* ───────────── Escena ───────────── */
 
-function Stage({ pairs, particles, reduced, clones, pulse, nearRef }: SceneProps) {
+function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, nearRef }: SceneProps) {
   const geo = useGeometries();
-  const energyRef = useRef(0);
-  /* Encuadre: la escena se encoge a medida que aparecen copias, en vez de mover
-     la cámara (que es valor de hook y no se puede mutar). */
   const frame = useRef<THREE.Group>(null);
+  const energy = useRef(0);
+  const mutation = useRef(0);
+  const scanProgress = useRef(2);
 
-  /* Cada «Utilizar» recarga la energía; el fotograma la va apagando. */
+  /* Cada pulsación recarga su señal; el fotograma la va apagando. */
   useEffect(() => {
-    if (pulse > 0) energyRef.current = 1;
+    if (pulse > 0) energy.current = 1;
   }, [pulse]);
+  useEffect(() => {
+    if (mutate > 0) mutation.current = 1;
+  }, [mutate]);
+  useEffect(() => {
+    if (scan > 0) scanProgress.current = 0;
+  }, [scan]);
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 0.05);
-    energyRef.current = Math.max(0, energyRef.current - step * 0.42);
+    energy.current = Math.max(0, energy.current - step * 0.42);
+    mutation.current = Math.max(0, mutation.current - step * 0.5);
+    if (scanProgress.current <= 1) scanProgress.current += step / SCAN_SECONDS;
+
+    /* Encuadre: la escena se encoge a medida que aparecen copias, en vez de
+       mover la cámara (que es valor de hook y no se puede mutar). */
     const node = frame.current;
     if (node) {
       const target = 1 / (1 + clones * 0.16);
@@ -307,16 +383,12 @@ function Stage({ pairs, particles, reduced, clones, pulse, nearRef }: SceneProps
     }
   });
 
+  const signals: Signals = { energy, mutation, scan: scanProgress, near: nearRef };
+
   return (
     <group ref={frame}>
-      <Body
-        geo={geo}
-        pairs={pairs}
-        particles={particles}
-        reduced={reduced}
-        nearRef={nearRef}
-        energyRef={energyRef}
-      />
+      <Body geo={geo} pairs={pairs} particles={particles} reduced={reduced} signals={signals} />
+      <ScanRing geo={geo} scan={scanProgress} />
       {Array.from({ length: clones }, (_, index) => (
         <Clone key={index} geo={geo} index={index} reduced={reduced} />
       ))}
@@ -330,8 +402,10 @@ export interface SceneProps {
   reduced: boolean;
   /** Copias activas además del original. */
   clones: number;
-  /** Contador de pulsaciones de «Utilizar»: al subir, enciende la hélice. */
+  /** Contadores de pulsación: al subir, encienden su señal. */
   pulse: number;
+  mutate: number;
+  scan: number;
   nearRef: RefObject<number>;
 }
 
@@ -340,7 +414,7 @@ export interface DnaSceneProps extends SceneProps {
   active: boolean;
 }
 
-export default function DnaScene({ active, clones, ...scene }: DnaSceneProps) {
+export default function DnaScene({ active, ...scene }: DnaSceneProps) {
   return (
     <Canvas
       dpr={[1, 1.6]}
@@ -354,7 +428,7 @@ export default function DnaScene({ active, clones, ...scene }: DnaSceneProps) {
       <pointLight position={[-3.5, -2, 2]} intensity={18} color={VIOLET} />
       <pointLight position={[0, 0, -5]} intensity={12} color={WHITE} />
 
-      <Stage clones={clones} {...scene} />
+      <Stage {...scene} />
 
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={0.9} luminanceThreshold={0.18} luminanceSmoothing={0.35} mipmapBlur />
