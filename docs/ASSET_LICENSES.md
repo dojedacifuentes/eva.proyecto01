@@ -2,7 +2,8 @@
 
 | Activo | Ubicación | Origen | Licencia / permiso | Atribución visible |
 |---|---|---|---|---|
-| Retrato de EVA (hero) | `public/eva/eva-retrato.webp` | Entregado por el propietario del proyecto, 2026-09-18 | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
+| Retrato de EVA (hero, cíborg) | `public/eva/eva-cyborg.webp` | Entregado por el propietario del proyecto, 2026-09-19; convertido de JPEG a WebP | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
+| Retrato de EVA (humano, en reserva) | `public/eva/eva-retrato.webp` | Entregado por el propietario del proyecto, 2026-09-18 | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
 | Retrato de EVA (consola) | `public/eva/eva-consola.webp` | Ídem | **Por confirmar por el propietario** | No |
 | Space Grotesk | vía `next/font/google` (autoalojada en build) | Google Fonts | SIL Open Font License 1.1 | No |
 | JetBrains Mono | vía `next/font/google` | Google Fonts | SIL Open Font License 1.1 | No |

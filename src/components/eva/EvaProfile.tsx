@@ -33,7 +33,7 @@ export function EvaProfile() {
         data-sound="open"
       >
         <span aria-hidden="true" className="profile__hint mono">
-          {neuroscan.trigger.hint}
+          <span className="profile__hint-label">{neuroscan.trigger.hint}</span>
           <i>↗</i>
         </span>
       </button>

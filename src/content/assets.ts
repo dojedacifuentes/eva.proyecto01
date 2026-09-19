@@ -12,8 +12,17 @@ export interface EvaImage {
   focus: string;
 }
 
-export const images: Record<'heroPortrait' | 'aboutPortrait', EvaImage> = {
+export const images: Record<'heroPortrait' | 'humanPortrait' | 'aboutPortrait', EvaImage> = {
+  /** Retrato principal: media cara humana, media estructura expuesta. */
   heroPortrait: {
+    src: '/eva/eva-cyborg.webp',
+    alt: 'Retrato de EVA: la mitad izquierda es un rostro humano de flequillo recto y ojos claros; la derecha deja ver la estructura mecánica bajo la piel, con circuitos, cables y mensajes de error superpuestos.',
+    width: 499,
+    height: 1024,
+    focus: '50% 6%',
+  },
+  /** Versión íntegramente humana, conservada por si vuelve a hacer falta. */
+  humanPortrait: {
     src: '/eva/eva-retrato.webp',
     alt: 'Retrato de EVA: melena negra ondulada con flequillo recto, ojos azules y traje técnico negro, frente a paneles de datos azulados.',
     width: 1122,

@@ -242,6 +242,10 @@ html {
 .hero {
   padding-block: clamp(0.75rem, 2vh, 1.75rem);
 }
+/* El panel no se estira hasta el borde: la composición se lee más compacta. */
+.hero .wrap {
+  max-width: 68rem;
+}
 
 .panel {
   position: relative;
@@ -344,17 +348,62 @@ html {
   font-size: 0.72rem;
 }
 
-/* EVA, a la derecha y al lado del acrónimo. */
+/* EVA, a la derecha y al lado del acrónimo. Marco estrecho: ocupa menos y lee
+   como una ficha técnica, no como una fotografía grande. */
 .hero__portrait {
   justify-self: end;
   width: 100%;
-  max-width: 17rem;
+  max-width: 13.5rem;
 }
 .hero .portrait__frame {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
+  border-color: rgba(122, 193, 236, 0.45);
+}
+.hero .portrait__frame img {
+  filter: saturate(0.94) contrast(1.09);
+}
+/* Barrido de líneas más marcado y caída inferior para que el pie se lea. */
+.hero .portrait__frame::after {
+  background:
+    linear-gradient(180deg, rgba(5, 12, 20, 0.3) 0%, transparent 18%, transparent 72%, rgba(4, 11, 18, 0.92)),
+    repeating-linear-gradient(180deg, rgba(128, 217, 239, 0.05) 0 1px, transparent 1px 3px);
+}
+/* Franja de exploración que recorre el retrato, muy tenue. */
+.hero .portrait::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  height: 22%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(128, 217, 239, 0.14), transparent);
+  animation: portrait-scan 6.5s linear infinite;
+}
+/* Al apuntarla, separación cromática mínima: glitch, no fuegos artificiales. */
+.profile:hover .portrait__frame img,
+.profile:focus-within .portrait__frame img {
+  filter: saturate(1) contrast(1.12) drop-shadow(1.5px 0 0 rgba(240, 122, 185, 0.38))
+    drop-shadow(-1.5px 0 0 rgba(63, 216, 238, 0.38));
 }
 .hero .portrait__caption {
-  font-size: 0.55rem;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.55rem;
+  font-size: 0.5rem;
+}
+@keyframes portrait-scan {
+  0% {
+    transform: translateY(-40%);
+    opacity: 0;
+  }
+  12%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(420%);
+    opacity: 0;
+  }
 }
 
 /* Ficha del estudio, bajo el perfil de EVA. */
@@ -930,7 +979,7 @@ html {
 @media (min-width: 48rem) {
   /* Dos columnas reales: el acrónimo manda, EVA va al lado y a la derecha. */
   .hero__grid {
-    grid-template-columns: minmax(0, 1fr) clamp(10rem, 24vw, 17rem);
+    grid-template-columns: minmax(0, 1fr) clamp(8.5rem, 19vw, 13.5rem);
   }
   .hero__head,
   .hero__portrait {
@@ -995,12 +1044,31 @@ html {
     width: auto;
     max-width: none;
   }
-  .hero .portrait {
+  /* El bloque contenedor del retrato es .profile (relative), así que es .profile
+     quien flota arriba a la derecha; el figure vuelve al flujo. */
+  .hero .profile {
     position: absolute;
     top: 1.15rem;
     right: 1.15rem;
     z-index: 2;
-    width: 5.5rem;
+    width: 5.25rem;
+  }
+  .hero .portrait {
+    position: static;
+    width: auto;
+  }
+  /* globals recorta el retrato en apaisado para móvil; esta imagen es vertical. */
+  .hero .portrait__frame {
+    aspect-ratio: 3 / 4;
+  }
+  /* La pista no cabe junto a un retrato de 84 px: queda la flecha. */
+  .profile__hint-label {
+    display: none;
+  }
+  /* Sin hover que la revele, la pista se muestra entera. */
+  .profile__hint {
+    padding: 0.2rem 0.3rem;
+    opacity: 1;
   }
   .studio {
     margin-top: 0;
