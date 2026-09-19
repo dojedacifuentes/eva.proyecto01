@@ -19,7 +19,7 @@ export function MobileNavigation({ modules }: { modules: NavModule[] }) {
     const desktop = window.matchMedia('(min-width: 64rem)');
     const previousOverflow = document.body.style.overflow;
     const covered = Array.from(document.querySelectorAll<HTMLElement>(
-      'main, footer, .eva-assistant, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
+      'main, footer, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
     )).map((element) => ({ element, inert: element.inert }));
     for (const { element } of covered) element.inert = true;
 
@@ -95,8 +95,14 @@ export function MobileNavigation({ modules }: { modules: NavModule[] }) {
             {module.name}
           </a>
         ))}
-        <a href={nav.contact.href} onClick={() => selectDestination(nav.contact.href)}>
-          <span className="mono">→</span>
+        <a
+          href={nav.contact.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cursor="external"
+          onClick={() => setOpen(false)}
+        >
+          <span className="mono">↗</span>
           {nav.contact.label}
         </a>
       </nav>

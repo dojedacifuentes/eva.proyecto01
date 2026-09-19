@@ -2,12 +2,16 @@
 
 import { useEffect, useRef } from 'react';
 import { ui } from '@/content/site';
+import { emitPulse, pointerSignal } from '@/lib/pointer';
 
 const INTERACTIVE = 'a, button, [data-cursor]';
+/** Cuánto se estira el anillo con la velocidad del puntero. */
+const STRETCH = 0.32;
 
 /**
  * Cursor de señal de EVA: punto exacto + anillo con retícula que lo sigue con
- * inercia y cambia de forma sobre elementos interactivos.
+ * inercia, se estira en la dirección del movimiento y se convierte en cuadrado
+ * sobre lo interactivo, enganchando el campo de partículas.
  *
  * Es un refuerzo, no una condición: sólo se activa con puntero fino y sin
  * movimiento reducido. En táctil no se monta nada y queda el cursor nativo.
@@ -33,13 +37,23 @@ export function EvaSignalCursor() {
     let running = false;
 
     const render = () => {
-      current.x += (target.x - current.x) * 0.2;
-      current.y += (target.y - current.y) * 0.2;
-      ring.style.transform = `translate3d(${current.x}px, ${current.y}px, 0)`;
+      const dx = target.x - current.x;
+      const dy = target.y - current.y;
+      current.x += dx * 0.2;
+      current.y += dy * 0.2;
 
-      if (Math.abs(target.x - current.x) + Math.abs(target.y - current.y) > 0.1) {
+      // Estiramiento direccional: rotar, escalar y desrotar deja la forma recta.
+      const speed = Math.min(Math.hypot(dx, dy) / 42, 1);
+      const angle = speed > 0.02 ? (Math.atan2(dy, dx) * 180) / Math.PI : 0;
+      ring.style.transform =
+        `translate3d(${current.x}px, ${current.y}px, 0) rotate(${angle}deg)` +
+        ` scale(${1 + speed * STRETCH}, ${1 - speed * STRETCH * 0.7}) rotate(${-angle}deg)`;
+      label.style.transform = `translate3d(${current.x}px, ${current.y}px, 0)`;
+
+      if (Math.abs(dx) + Math.abs(dy) > 0.1) {
         frame = requestAnimationFrame(render);
       } else {
+        ring.style.transform = `translate3d(${current.x}px, ${current.y}px, 0)`;
         running = false;
       }
     };
@@ -67,18 +81,30 @@ export function EvaSignalCursor() {
         root.dataset.state = 'idle';
         label.textContent = ui.cursor.idle;
         root.style.removeProperty('--cursor-accent');
+        pointerSignal.locked = false;
+        pointerSignal.accent = '';
         return;
       }
       const external = element.dataset.cursor === 'external';
       root.dataset.state = external ? 'external' : 'link';
       label.textContent =
         element.dataset.cursorLabel ?? (external ? ui.cursor.external : ui.cursor.link);
-      root.style.setProperty('--cursor-accent', getComputedStyle(element).getPropertyValue('--accent'));
+
+      const accent = getComputedStyle(element).getPropertyValue('--accent');
+      root.style.setProperty('--cursor-accent', accent);
+      pointerSignal.locked = true;
+      pointerSignal.accent = accent;
     };
 
-    const onDown = () => root.classList.add('is-pressed');
+    const onDown = (event: PointerEvent) => {
+      root.classList.add('is-pressed');
+      emitPulse(event.clientX, event.clientY);
+    };
     const onUp = () => root.classList.remove('is-pressed');
-    const onLeave = () => root.classList.remove('is-visible');
+    const onLeave = () => {
+      root.classList.remove('is-visible');
+      pointerSignal.locked = false;
+    };
 
     const enable = () => {
       document.documentElement.classList.add('eva-cursor');
@@ -94,6 +120,7 @@ export function EvaSignalCursor() {
       running = false;
       document.documentElement.classList.remove('eva-cursor');
       root.classList.remove('is-visible');
+      pointerSignal.locked = false;
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerover', onOver);
       window.removeEventListener('pointerdown', onDown);
@@ -120,10 +147,15 @@ export function EvaSignalCursor() {
   return (
     <div ref={rootRef} aria-hidden="true" className="cursor" data-state="idle">
       <span ref={ringRef} className="cursor__ring">
-        <span className="cursor__ring-shape" />
-        <span ref={labelRef} className="cursor__label">
-          {ui.cursor.idle}
+        <span className="cursor__core">
+          <span className="cursor__shape" />
+          {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
+            <span key={corner} className={`cursor__bracket cursor__bracket--${corner}`} />
+          ))}
         </span>
+      </span>
+      <span ref={labelRef} className="cursor__label mono">
+        {ui.cursor.idle}
       </span>
       <span ref={dotRef} className="cursor__dot" />
     </div>

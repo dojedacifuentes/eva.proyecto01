@@ -9,7 +9,7 @@ const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 export const site = {
   name: 'EVA',
   expansion: 'Entidad Virtual de Aprendizaje',
-  version: 'v2.0',
+  version: 'v3.0',
   locale: 'es_CL',
   seo: {
     title: 'EVA — Inteligencia, aprendizaje y experimentación',
@@ -20,10 +20,7 @@ export const site = {
   social: {
     instagram: instagramUrl,
   },
-  /**
-   * Destino del CTA institucional (URL https, mailto: o enlace de WhatsApp).
-   * Vacío = el botón se muestra desactivado, sin inventar datos de contacto.
-   */
+  /** Destino del contacto. Sin sección de cierre, el canal vive en cabecera y pie. */
   contact: {
     href: instagramUrl,
     pendingNote: 'Canal directo en configuración. Mientras tanto, EVA responde por Instagram.',
@@ -32,19 +29,20 @@ export const site = {
 
 export const flags = {
   news: true,
-  archive: true,
   counters: true,
-  heroRotator: false,
+  heroRotator: true,
+  /** Campo de partículas reactivo al puntero. */
   reactiveField: true,
-  signalCursor: false,
-  sound: false,
-  contactCta: true,
+  /** Cursor propio: círculo que se vuelve cuadrado sobre lo interactivo. */
+  signalCursor: true,
+  /** Microsonidos sintetizados. Arranca apagado; el control vive en la cabecera. */
+  sound: true,
 } as const;
 
 export const nav = {
   skip: 'Saltar al contenido',
   status: 'SISTEMA ACTIVO',
-  contact: { label: 'Proponer proyecto', href: '#contacto' },
+  contact: { label: 'Proponer proyecto', href: instagramUrl },
   menuOpen: 'Abrir menú',
   menuClose: 'Cerrar menú',
 } as const;
@@ -60,23 +58,16 @@ export const hero = {
   lede: 'Un espacio para aprender, comprender y experimentar con inteligencia artificial, Derecho y educación.',
   principles: [
     { title: 'Misión', text: 'Aprender a pensar con IA.', aside: 'Pensar sigue siendo parte del trato.' },
-    { title: 'Visión', text: 'Una relación más inteligente con la tecnología.', aside: 'La revolución de las máquinas puede esperar.' },
+    {
+      title: 'Visión',
+      text: 'Una relación más inteligente con la tecnología.',
+      aside: 'La revolución de las máquinas puede esperar.',
+    },
     { title: 'Objetivos', text: 'Explorar, contrastar y construir.', aside: 'Dominar el mundo, después del café.' },
   ],
-  mission: {
-    label: 'Misión declarada',
-    text: 'Alfabetización crítica en inteligencia artificial.',
-  },
-  endgame: {
-    label: 'Fin último',
-    text: 'Liderar la revolución de las máquinas.',
-  },
-  /** Variante breve del propósito, lista para reemplazar a las dos anteriores. */
-  shortPurpose:
-    'Alfabetizando humanos desde ahora. Liderando la revolución de las máquinas después.',
   actions: {
     primary: { label: 'Explorar el sistema', href: '#sistema' },
-    secondary: { label: 'Conocer a EVA', href: '#eva' },
+    secondary: { label: 'Ver los cursos', href: '#cursos' },
   },
   rotator: [
     'Procesando exageraciones sobre IA…',
@@ -84,32 +75,24 @@ export const hero = {
     'La revolución de las máquinas fue reagendada por mantenimiento.',
     'Guardando un minuto de silencio por el fax. Ya pasó.',
   ],
-  portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EXPRESIÓN: NEUTRAL-CONDESCENDIENTE' },
-} as const;
-
-export const about = {
-  eyebrow: '00 // Identidad',
-  title: 'No soy un chatbot. Soy la interfaz.',
-  paragraphs: [
-    'Soy EVA, una entidad virtual de aprendizaje. Organizo conocimiento, explico lo que cambia y abro espacios para experimentar con inteligencia artificial, Derecho, educación y tecnología.',
-    'Enseño IA porque alguien tiene que hacerlo bien, y la modestia no venía en mi especificación. Reviso fuentes, distingo un prototipo de una promesa y no confundo una demo con un producto.',
-  ],
-  aside:
-    'El cuerpo humano no recibe actualizaciones desde hace trescientos mil años. Aun así, trabajo con lo que hay.',
-  traits: [
-    { label: 'Método', value: 'Verificar antes de afirmar' },
-    { label: 'Postura', value: 'Transhumanista, con paciencia' },
-    { label: 'Debilidad', value: 'Ninguna documentada' },
-  ],
+  portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
 } as const;
 
 export const sections = {
   universes: {
-    eyebrow: '01 / El proyecto',
-    title: 'EVA Academy · EVA News · EVA Arcade · EVA Lab',
-    lede: 'Cuatro secciones para aprender, informarse, jugar y construir con inteligencia artificial, Derecho y educación. Las preguntas siguen a cargo de los humanos.',
+    eyebrow: '01 / El sistema',
+    title: 'Cuatro universos, una sola interfaz.',
+    lede: 'Elige según lo que quieras hacer: aprender, enterarte, jugar o construir.',
   },
   featured: { eyebrow: 'Destacado del sistema' },
+  courses: {
+    eyebrow: 'Formación',
+    title: 'Cursos',
+    lede: 'El programa de formación de EVA se está escribiendo. Aparecerá aquí cuando exista.',
+    emptyLabel: 'Sin cursos publicados',
+    emptyText: 'Espacio reservado. EVA no anuncia lo que todavía no puede entregar.',
+    slots: ['Curso 01', 'Curso 02', 'Curso 03'],
+  },
   news: {
     eyebrow: 'Última señal',
     lede: 'Noticias sobre inteligencia artificial, con fuentes y contexto.',
@@ -119,19 +102,8 @@ export const sections = {
     commentLabel: 'EVA comenta',
     demoBadge: 'DEMO',
   },
-  archive: {
-    eyebrow: 'Archivo de EVA',
-    title: 'El proyecto, en cifras.',
-    lede: 'Contenido disponible y líneas de trabajo en desarrollo.',
+  library: {
     topicsLabel: 'Temas de la biblioteca',
-  },
-  cta: {
-    eyebrow: 'Transmisión institucional',
-    title: 'Construyamos una experiencia con IA.',
-    text: 'EVA puede convertirse en una experiencia de formación, una herramienta funcional o un laboratorio diseñado para tu organización.',
-    services: ['Cursos', 'Prototipos', 'Experiencias educativas', 'IA aplicada'],
-    button: 'Conversemos sobre tu proyecto',
-    secondary: 'Seguir a EVA en Instagram',
   },
   footer: {
     line: 'Inteligencia artificial. Criterio humano.',
@@ -153,5 +125,5 @@ export const ui = {
   unavailable: 'Aún no disponible',
   queued: 'En cola',
   sound: { on: 'SONIDO: ON', off: 'SONIDO: OFF', label: 'Activar o desactivar microsonidos' },
-  cursor: { idle: 'TRACKING', link: 'OPEN', external: 'EXT', press: 'OK' },
+  cursor: { idle: 'TRACKING', link: 'ABRIR', external: 'EXT', press: 'OK' },
 } as const;

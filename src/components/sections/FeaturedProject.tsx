@@ -16,7 +16,7 @@ export function FeaturedProject() {
   const context = project.contexts?.[moduleId];
 
   return (
-    <section className="section" aria-labelledby="destacado-titulo" data-accent={home.accent}>
+    <section id="foro" className="slide section" aria-labelledby="destacado-titulo" data-accent={home.accent}>
       <div className="wrap">
         <div className="featured reveal">
           <div>

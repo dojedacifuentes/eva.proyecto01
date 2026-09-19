@@ -33,7 +33,13 @@ export function SiteHeader() {
 
         <div className="header__tools">
           {flags.sound && <SoundControl />}
-          <a href={nav.contact.href} className="chip-btn mono header__contact">
+          <a
+            href={nav.contact.href}
+            className="chip-btn mono header__contact"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor="external"
+          >
             {nav.contact.label}
           </a>
           <MobileNavigation modules={items} />

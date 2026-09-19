@@ -12,7 +12,7 @@ export function NewsPreview() {
   return (
     <section
       id="news"
-      className="section section--ruled"
+      className="slide section section--ruled"
       aria-labelledby="news-titulo"
       data-accent={current.accent}
     >

@@ -1,46 +1,97 @@
-﻿import Image from 'next/image';
+import type { CSSProperties } from 'react';
+import { EvaPortraitFrame } from '@/components/eva/EvaPortraitFrame';
+import { Rotator } from '@/components/eva/Rotator';
 import { images } from '@/content/assets';
-import { hero, site } from '@/content/site';
+import { flags, hero, site } from '@/content/site';
 
+const rise = (i: number) => ({ '--i': i }) as CSSProperties;
+
+/**
+ * Portada: acrónimo vertical a la izquierda, EVA a la derecha y la franja de
+ * principios abajo. Todo dentro de un marco técnico que cabe en una pantalla.
+ */
 export function HeroEva() {
-  const portrait = images.heroPortrait;
   return (
-    <section id="inicio" className="intro" aria-labelledby="hero-titulo">
+    <section id="inicio" className="slide hero" aria-labelledby="hero-titulo">
       <div className="wrap">
-        <div className="intro__frame">
-          <div className="intro__bar mono">
+        <div className="panel hero__frame">
+          <div className="panel__bar mono">
             <span>EVA / Proyecto 01</span>
-            <span className="intro__status">En línea</span>
+            <span className="panel__status">{hero.online}</span>
           </div>
-          <div className="intro__main">
-            <div className="intro__identity">
-              <p className="eyebrow mono">Conoce a EVA</p>
-              <h1 id="hero-titulo" className="intro__name" aria-label={site.expansion}>
-                <span><b>E</b>ntidad</span>
-                <span><b>V</b>irtual</span>
-                <span><small>de </small><b>A</b>prendizaje</span>
+
+          <div className="hero__grid">
+            <div className="hero__head">
+              <p className="hero__label mono" data-rise style={rise(0)}>
+                {hero.label}
+              </p>
+
+              {/* El h1 lleva la lectura lineal; el acrónimo vertical es su versión visual. */}
+              <h1 id="hero-titulo" className="sr-only">
+                {site.name} — {site.expansion}
               </h1>
-              <p className="intro__description">{hero.lede}</p>
-              <a href="#sistema" className="intro__link">Explorar el proyecto <span aria-hidden="true">↗</span></a>
-            </div>
-            <figure className="intro__portrait">
-              <div className="intro__portrait-image">
-                <Image src={portrait.src} alt="EVA, la identidad virtual del proyecto" width={portrait.width} height={portrait.height} sizes="(max-width: 600px) 90px, 190px" priority />
+              <div className="acronym" aria-hidden="true">
+                {hero.acronym.map((row, index) => (
+                  <div key={row.letter} className="acronym__row" data-rise style={rise(index + 1)}>
+                    <span className="acronym__letter">{row.letter}</span>
+                    <span className="acronym__word">
+                      {row.word}
+                      <span className="acronym__index mono">0{index + 1}</span>
+                    </span>
+                  </div>
+                ))}
               </div>
-              <figcaption><span className="mono">EVA / 01</span><span>Inteligencia con criterio.</span></figcaption>
-            </figure>
+
+              <p className="hero__lede" data-rise style={rise(4)}>
+                {hero.lede}
+              </p>
+
+              <div className="hero__actions" data-rise style={rise(5)}>
+                <a href={hero.actions.primary.href} className="btn btn--solid" data-sound="open">
+                  {hero.actions.primary.label}
+                  <span aria-hidden="true" className="btn__arrow">
+                    ↓
+                  </span>
+                </a>
+                <a href={hero.actions.secondary.href} className="btn btn--ghost" data-sound="open">
+                  {hero.actions.secondary.label}
+                </a>
+              </div>
+
+              {flags.heroRotator && <Rotator lines={hero.rotator} />}
+            </div>
+
+            <div className="hero__portrait" data-rise style={rise(2)}>
+              <EvaPortraitFrame
+                image={images.heroPortrait}
+                caption={hero.portraitCaption}
+                sizes="(min-width: 64rem) 22rem, (min-width: 48rem) 30vw, 42vw"
+                priority
+              />
+            </div>
           </div>
+
           <div className="principles" aria-label="Misión, visión y objetivos">
             {hero.principles.map((item, index) => (
-              <article className="principle" key={item.title}>
-                <div className="principle__label mono"><span>0{index + 1}</span><h2>{item.title}</h2><span aria-hidden="true">+</span></div>
+              <article className="principle" key={item.title} data-rise style={rise(6 + index)}>
+                <div className="principle__label mono">
+                  <span>0{index + 1}</span>
+                  <h2>{item.title}</h2>
+                  <span aria-hidden="true" className="principle__mark" />
+                </div>
                 <p>{item.text}</p>
                 <span className="principle__aside">{item.aside}</span>
               </article>
             ))}
           </div>
         </div>
-        <div className="intro__foot mono"><span>Un proyecto en evolución</span><a href="#sistema">01 — El proyecto <span aria-hidden="true">↓</span></a></div>
+
+        <p className="slide__foot mono">
+          <span>Un proyecto en evolución</span>
+          <a href="#sistema" data-sound="open">
+            01 — El sistema <span aria-hidden="true">↓</span>
+          </a>
+        </p>
       </div>
     </section>
   );

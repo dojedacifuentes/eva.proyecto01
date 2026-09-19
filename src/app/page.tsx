@@ -1,7 +1,6 @@
-import { ArchiveStats } from '@/components/sections/ArchiveStats';
+import { CoursesSection } from '@/components/sections/CoursesSection';
 import { FeaturedProject } from '@/components/sections/FeaturedProject';
 import { HeroEva } from '@/components/sections/HeroEva';
-import { InstitutionalCTA } from '@/components/sections/InstitutionalCTA';
 import { ModuleGrid } from '@/components/sections/ModuleGrid';
 import { ModuleSection } from '@/components/sections/ModuleSection';
 import { NewsPreview } from '@/components/sections/NewsPreview';
@@ -17,7 +16,7 @@ export default function HomePage() {
 
       <ModuleSection id="academy" layout="lead">
         <div className="topics reveal">
-          <p className="topics__label mono">{sections.archive.topicsLabel}</p>
+          <p className="topics__label mono">{sections.library.topicsLabel}</p>
           <ul className="tags">
             {topics.map((topic) => (
               <li key={topic} className="tag">
@@ -28,12 +27,11 @@ export default function HomePage() {
         </div>
       </ModuleSection>
 
+      <CoursesSection />
+
       {flags.news && <NewsPreview />}
       <ModuleSection id="arcade" layout="split" />
       <ModuleSection id="lab" layout="split" />
-
-      {flags.archive && <ArchiveStats />}
-      {flags.contactCta && <InstitutionalCTA />}
     </>
   );
 }

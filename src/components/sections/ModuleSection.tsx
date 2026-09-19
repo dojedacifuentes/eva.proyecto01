@@ -18,7 +18,7 @@ export function ModuleSection({ id, layout, children }: ModuleSectionProps) {
   return (
     <section
       id={id}
-      className="section section--ruled"
+      className="slide section section--ruled"
       aria-labelledby={`${id}-titulo`}
       data-accent={current.accent}
     >

@@ -21,7 +21,14 @@ export function SiteFooter() {
                   {module.name}
                 </a>
               ))}
-            <a href={nav.contact.href}>{nav.contact.label}</a>
+            <a
+              href={nav.contact.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor="external"
+            >
+              {nav.contact.label}
+            </a>
           </nav>
           <p className="mono">
             {sections.footer.statusLabel}: {nav.status.toLowerCase()} · {site.version}

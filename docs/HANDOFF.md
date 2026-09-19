@@ -4,6 +4,36 @@
 > El estado de abajo corresponde a la entrega original del ZIP. Para el estado posterior,
 > consultar [RELEASE_2026-09-19.md](RELEASE_2026-09-19.md).
 
+## v3 — 19 de septiembre de 2026 (rama `landing-eva-v3`)
+
+Vuelve la capa interactiva que la v2 compacta había apagado y la portada recupera el
+acrónimo vertical, ahora en escala menor y con EVA a la derecha.
+
+**Qué pasó con el cursor y el fondo.** El commit `e852f4d` («Refine EVA interface with compact
+technical landing») puso `signalCursor: false` y `sound: false` en `src/content/site.ts`, y
+`interface.css` bajó el canvas del campo a `opacity: .25`. Nada se borró: sólo se apagó.
+
+**Cambios de la v3**
+
+- Conmutadores otra vez en `true`: `signalCursor`, `sound`, `heroRotator`. Canvas a `.72`.
+- `EvaSignalCursor`: círculo con retícula que gira en reposo y se vuelve **cuadrado** con
+  esquinas de puntería sobre lo interactivo; se estira en la dirección del movimiento.
+- `EvaField`: las partículas se enganchan al puntero, se vuelven cuadradas cuando el cursor
+  fija un objetivo, toman su acento y se apartan con la onda de cada clic.
+- `src/lib/pointer.ts`: estado compartido del puntero entre cursor y campo, sin eventos por
+  fotograma.
+- Portada: acrónimo E/V/A vertical (`~90px` de letra, frente a `~200px` en v2 y `~53px` en la
+  compacta), retrato de EVA a la derecha con su marco técnico, franja de principios abajo.
+- Sistema de slides: cada sección es `.slide` con `min-height: 100svh` y `scroll-snap-align`.
+  Verificado que las ocho caben sin scroll interno a 1440×860 y 1366×720.
+- Sección **Cursos** (`#cursos`), vacía a propósito: tres espacios reservados, sin contenido
+  inventado.
+- Fuera: «El proyecto, en cifras» (`ArchiveStats`), el cierre institucional (`InstitutionalCTA`),
+  el asistente flotante (`EvaAssistant`) y `AboutEva`. El contacto vive en cabecera y pie.
+- `ScrollReveal`: revelado por IntersectionObserver donde no hay `animation-timeline: view()`.
+- Animación continua en tarjetas de universo (glifo círculo↔cuadrado, barrido, esquinas),
+  skyline del destacado, insignias disponibles y espacios de Cursos.
+
 ## Estado actual — 19 de septiembre de 2026
 
 La interfaz visual compacta está integrada en `main` en el commit `e852f4d` y visible en
