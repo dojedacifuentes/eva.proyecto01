@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { JetBrains_Mono, Orbitron, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import './interface.css';
 import './neuroscan.css';
@@ -23,6 +23,14 @@ const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '600'],
   variable: '--font-jetbrains',
+  display: 'swap',
+});
+
+/** Sólo para el acrónimo del hero: tres letras, tipografía de display. */
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['600', '800'],
+  variable: '--font-orbitron',
   display: 'swap',
 });
 
@@ -55,7 +63,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-CL" className={`${grotesk.variable} ${jetbrains.variable}`}>
+    <html
+      lang="es-CL"
+      className={`${grotesk.variable} ${jetbrains.variable} ${orbitron.variable}`}
+    >
       <body>
         <a href="#contenido" className="skip-link sr-only-focusable mono">
           {nav.skip}

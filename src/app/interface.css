@@ -242,9 +242,10 @@ html {
 .hero {
   padding-block: clamp(0.75rem, 2vh, 1.75rem);
 }
-/* El panel no se estira hasta el borde: la composición se lee más compacta. */
+/* La tarjeta de portada respira: es lo primero que se ve y ahora lleva tres
+   piezas más la franja de pensamiento. */
 .hero .wrap {
-  max-width: 68rem;
+  max-width: 76rem;
 }
 
 .panel {
@@ -293,9 +294,9 @@ html {
 
 .hero__grid {
   display: grid;
-  gap: 1.75rem;
+  gap: 2rem;
   align-items: center;
-  padding: clamp(1.1rem, 2.4vh, 1.9rem) clamp(1.25rem, 3vw, 2.6rem);
+  padding: clamp(1.4rem, 3.2vh, 2.6rem) clamp(1.5rem, 3.4vw, 3rem);
 }
 .hero__head {
   min-width: 0;
@@ -311,13 +312,17 @@ html {
   border-left: 1px solid var(--eva-line-strong);
 }
 .acronym__row {
-  grid-template-columns: clamp(2.6rem, 6.5vw, 5.1rem) 1fr;
+  grid-template-columns: clamp(3rem, 7.5vw, 6.2rem) 1fr;
   column-gap: clamp(0.5rem, 1.4vw, 1.1rem);
   padding-left: clamp(0.6rem, 1.4vw, 1.1rem);
 }
+/* Orbitron sólo aquí: tres letras de display, el resto sigue en Grotesk. */
 .acronym__letter {
-  font-size: clamp(3rem, min(7.6vw, 13vh), 6.6rem);
-  line-height: 0.9;
+  font-family: var(--font-orbitron), var(--font-grotesk), sans-serif;
+  font-size: clamp(2.6rem, min(6.6vw, 13vh), 5.6rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 .acronym__word {
   gap: clamp(0.45rem, 1.1vw, 0.85rem);
@@ -335,7 +340,7 @@ html {
 .hero__portrait {
   justify-self: end;
   width: 100%;
-  max-width: 13.5rem;
+  max-width: 16rem;
 }
 .hero .portrait__frame {
   aspect-ratio: 3 / 4;
@@ -922,7 +927,7 @@ html {
 /* Escritorio: acrónimo, genoma y EVA, uno al lado del otro. */
 @media (min-width: 64rem) {
   .hero__grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.05fr) clamp(9rem, 15vw, 14rem);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr) clamp(10rem, 16vw, 16rem);
   }
 }
 

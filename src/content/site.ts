@@ -125,6 +125,18 @@ export const genome = {
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
 } as const;
 
+/**
+ * Franja de pensamiento de la portada. El texto no vive aquí: sale del flujo
+ * del neuroescáner (content/neuroscan.ts), para que EVA no se contradiga entre
+ * lo que piensa arriba y lo que piensa dentro del escáner.
+ */
+export const synapse = {
+  title: 'Actividad cerebral artificial',
+  channel: 'SINAPSIS',
+  state: 'FLUJO: ACTIVO',
+  prompt: '>',
+} as const;
+
 export const sections = {
   universes: {
     eyebrow: '01 / El sistema',
