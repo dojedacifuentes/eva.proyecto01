@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
-import { EvaPortraitFrame } from '@/components/eva/EvaPortraitFrame';
+import { EvaProfile } from '@/components/eva/EvaProfile';
 import { Rotator } from '@/components/eva/Rotator';
-import { images } from '@/content/assets';
 import { flags, hero, site, studio, ui } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
@@ -64,12 +63,7 @@ export function HeroEva() {
             {/* Sin data-rise: su transform haría de este div el bloque contenedor
                 del retrato, que en móvil se posiciona contra la rejilla. */}
             <div className="hero__portrait">
-              <EvaPortraitFrame
-                image={images.heroPortrait}
-                caption={hero.portraitCaption}
-                sizes="(min-width: 64rem) 22rem, (min-width: 48rem) 30vw, 42vw"
-                priority
-              />
+              <EvaProfile />
 
               {/* Ficha del estudio: el único enlace saliente de la portada. */}
               <a
