@@ -2,6 +2,7 @@ import { SoundControl } from '@/components/eva/SoundControl';
 import { modules } from '@/content/modules';
 import { flags, nav, site } from '@/content/site';
 import { MobileNavigation } from './MobileNavigation';
+import { NavSpy } from './NavSpy';
 
 export function SiteHeader() {
   const items = modules
@@ -10,6 +11,7 @@ export function SiteHeader() {
 
   return (
     <header className="header">
+      <NavSpy ids={items.map((module) => module.id)} />
       <div className="wrap header__bar">
         <a href="#inicio" className="wordmark" aria-label={`${site.name}, inicio`}>
           <span aria-hidden="true" className="wordmark__glyph" />

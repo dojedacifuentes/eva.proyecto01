@@ -25,6 +25,13 @@
 | F5 | P3 | Las fichas en concepto repetían «Aún no disponible» | Captura de Arcade | Etiqueta superior «En cola» |
 | F6 | P3 | `tsc` fallaba por tipos antiguos en `.next/` de las rutas eliminadas | Salida de `tsc` | Se regeneran con `next build`; no es un fallo del código |
 
+## Tercera pasada (refinamiento)
+
+- Navegación con sección activa (`NavSpy`, `aria-current`), verificada al desplazarse a Arcade.
+- Parallax leve del retrato (±7 px, desactivado con movimiento reducido).
+- Página 404 con la voz de EVA (`src/app/not-found.tsx`, textos en `content/site.ts`).
+- Foco por teclado comprobado visualmente: anillo con el acento del universo.
+
 **P0 restantes: 0. P1 restantes: 0.**
 
 ## Hallazgos abiertos

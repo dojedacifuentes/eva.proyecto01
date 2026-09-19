@@ -133,6 +133,14 @@ export const sections = {
   },
 } as const;
 
+export const notFound = {
+  eyebrow: 'Error 404',
+  title: 'Esta ruta no existe.',
+  text: 'Revisé dos veces. No está en el sistema, y yo no pierdo cosas.',
+  aside: 'Probablemente la escribió un humano.',
+  action: 'Volver al inicio',
+} as const;
+
 export const ui = {
   external: 'se abre en una pestaña nueva',
   externalExperience: 'Experiencia externa',

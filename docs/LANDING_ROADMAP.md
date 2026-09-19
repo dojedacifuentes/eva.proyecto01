@@ -42,7 +42,6 @@ señales») · `/academy` con biblioteca filtrable · `/arcade` · `/lab`.
 ## Mejoras de movimiento e interacción
 
 - Línea de señal que conecte hero y selector de universos.
-- Parallax leve del retrato.
 - Campo con ruido procedural (WebGL) con fallback al canvas actual.
 - Más microsonidos por universo; evaluar Howler si se pasa a archivos de audio.
 

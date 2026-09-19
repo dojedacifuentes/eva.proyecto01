@@ -286,8 +286,13 @@ html.eva-cursor * {
     transform var(--eva-fast) var(--eva-ease);
 }
 .nav a:hover,
-.nav a:focus-visible {
+.nav a:focus-visible,
+.nav a[aria-current] {
   color: var(--eva-text);
+}
+.nav a[aria-current]::before {
+  opacity: 1;
+  transform: scale(1.5) rotate(45deg);
 }
 .nav a:hover::before,
 .nav a:focus-visible::before {
@@ -663,6 +668,10 @@ main {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Parallax leve: --nx/--ny (-1 a 1) los publica EvaField. */
+  scale: 1.05;
+  translate: calc(var(--nx, 0) * -7px) calc(var(--ny, 0) * -7px);
+  transition: translate var(--eva-slow) var(--eva-ease);
 }
 .portrait__frame::after {
   content: '';

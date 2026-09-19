@@ -123,6 +123,10 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
       pointer.active = true;
       root.style.setProperty('--px', `${event.clientX}px`);
       root.style.setProperty('--py', `${event.clientY}px`);
+      if (!reduced.matches) {
+        root.style.setProperty('--nx', ((event.clientX / width) * 2 - 1).toFixed(3));
+        root.style.setProperty('--ny', ((event.clientY / height) * 2 - 1).toFixed(3));
+      }
     };
     const onLeave = () => {
       pointer.active = false;
