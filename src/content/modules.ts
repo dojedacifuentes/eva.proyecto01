@@ -13,7 +13,6 @@ export const modules: Module[] = [
     accent: 'cyan',
     href: '#academy',
     intent: 'Quiero aprender',
-    aside: 'Enseño despacio. Ustedes procesan en serie.',
   },
   {
     id: 'news',
@@ -21,7 +20,7 @@ export const modules: Module[] = [
     name: NEWS_NAME,
     tagline: 'Noticias de IA, con contexto.',
     description:
-      'EVA cuenta, contextualiza y explica lo que cambia en inteligencia artificial. Con fuente, fecha y una opinión que nadie pidió.',
+      'Actualidad de inteligencia artificial explicada con fuentes, contexto y perspectiva crítica.',
     accent: 'yellow',
     href: '#news',
     intent: 'Quiero enterarme',
@@ -32,7 +31,7 @@ export const modules: Module[] = [
     name: 'EVA Arcade',
     tagline: 'Juegos, simuladores y experiencias.',
     description:
-      'Aprender Derecho tomando decisiones y asumiendo consecuencias. Aquí, al menos, son simuladas.',
+      'Juegos y simuladores para aprender Derecho a través de decisiones y experiencias.',
     accent: 'magenta',
     href: '#arcade',
     intent: 'Quiero jugar',
@@ -43,10 +42,9 @@ export const modules: Module[] = [
     name: 'EVA Lab',
     tagline: 'Herramientas, prototipos y experimentos.',
     description:
-      'Prototipos funcionales para usar hoy y experimentos con su estado a la vista. Lo que no funciona todavía, lo dice.',
+      'Herramientas de IA aplicada y prototipos, con su estado de desarrollo a la vista.',
     accent: 'violet',
     href: '#lab',
     intent: 'Quiero construir',
-    aside: 'Todo prototipo aspira a dejar obsoleto a alguien.',
   },
 ];

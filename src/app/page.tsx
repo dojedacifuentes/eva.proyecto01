@@ -1,4 +1,3 @@
-import { AboutEva } from '@/components/sections/AboutEva';
 import { ArchiveStats } from '@/components/sections/ArchiveStats';
 import { FeaturedProject } from '@/components/sections/FeaturedProject';
 import { HeroEva } from '@/components/sections/HeroEva';
@@ -15,7 +14,6 @@ export default function HomePage() {
       <HeroEva />
       <ModuleGrid />
       <FeaturedProject />
-      <AboutEva />
 
       <ModuleSection id="academy" layout="lead">
         <div className="topics reveal">

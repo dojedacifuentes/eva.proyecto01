@@ -9,12 +9,15 @@ export function ModuleGrid() {
 
   return (
     <section id="sistema" className="section section--ruled" aria-labelledby="sistema-titulo">
-      <div className="wrap">
+      <div className="wrap project-overview">
+        <div id="eva" className="project-overview__intro">
         <p className="eyebrow mono">{copy.eyebrow}</p>
         <h2 id="sistema-titulo" className="h2">
           {copy.title}
         </h2>
         <p className="lede">{copy.lede}</p>
+        <div className="project-overview__tags mono"><span>Aprendizaje</span><span>Criterio</span><span>Experimentación</span></div>
+        </div>
 
         <div className="universes">
           {visible.map((module) => (

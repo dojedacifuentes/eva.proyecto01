@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
+import './interface.css';
 import { EvaField } from '@/components/eva/EvaField';
+import { EvaAssistant } from '@/components/eva/EvaAssistant';
 import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
@@ -64,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main id="contenido">{children}</main>
         <SiteFooter />
+        <EvaAssistant />
       </body>
     </html>
   );

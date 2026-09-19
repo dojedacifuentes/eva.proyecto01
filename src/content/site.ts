@@ -34,10 +34,10 @@ export const flags = {
   news: true,
   archive: true,
   counters: true,
-  heroRotator: true,
+  heroRotator: false,
   reactiveField: true,
-  signalCursor: true,
-  sound: true,
+  signalCursor: false,
+  sound: false,
   contactCta: true,
 } as const;
 
@@ -57,7 +57,12 @@ export const hero = {
     { letter: 'A', word: 'de Aprendizaje' },
   ],
   online: 'EVA está en línea.',
-  lede: 'Aprende, explora y construye con inteligencia artificial. Cursos, conocimiento, noticias, juegos y prototipos para quienes quieren entender algo más que la interfaz.',
+  lede: 'Un espacio para aprender, comprender y experimentar con inteligencia artificial, Derecho y educación.',
+  principles: [
+    { title: 'Misión', text: 'Aprender a pensar con IA.', aside: 'Pensar sigue siendo parte del trato.' },
+    { title: 'Visión', text: 'Una relación más inteligente con la tecnología.', aside: 'La revolución de las máquinas puede esperar.' },
+    { title: 'Objetivos', text: 'Explorar, contrastar y construir.', aside: 'Dominar el mundo, después del café.' },
+  ],
   mission: {
     label: 'Misión declarada',
     text: 'Alfabetización crítica en inteligencia artificial.',
@@ -100,14 +105,14 @@ export const about = {
 
 export const sections = {
   universes: {
-    eyebrow: 'Mapa del sistema',
-    title: 'Cuatro universos, una sola interfaz.',
-    lede: 'Elige según lo que quieras hacer: aprender, enterarte, jugar o construir.',
+    eyebrow: '01 / El proyecto',
+    title: 'EVA Academy · EVA News · EVA Arcade · EVA Lab',
+    lede: 'Cuatro secciones para aprender, informarse, jugar y construir con inteligencia artificial, Derecho y educación. Las preguntas siguen a cargo de los humanos.',
   },
   featured: { eyebrow: 'Destacado del sistema' },
   news: {
     eyebrow: 'Última señal',
-    lede: 'Noticias de IA con contexto: qué pasó, por qué importa y qué opino. Lo último es inevitable.',
+    lede: 'Noticias sobre inteligencia artificial, con fuentes y contexto.',
     demoNotice:
       'Entradas de demostración: muestran el formato del módulo. No son noticias reales ni se actualizan solas.',
     whyLabel: 'Por qué importa',
@@ -116,20 +121,20 @@ export const sections = {
   },
   archive: {
     eyebrow: 'Archivo de EVA',
-    title: 'Inventario honesto.',
-    lede: 'Cifras calculadas desde los datos publicados. Son pocas todavía; al menos son ciertas.',
+    title: 'El proyecto, en cifras.',
+    lede: 'Contenido disponible y líneas de trabajo en desarrollo.',
     topicsLabel: 'Temas de la biblioteca',
   },
   cta: {
     eyebrow: 'Transmisión institucional',
-    title: '¿Tu empresa o institución necesita algo más que otra charla sobre ChatGPT?',
+    title: 'Construyamos una experiencia con IA.',
     text: 'EVA puede convertirse en una experiencia de formación, una herramienta funcional o un laboratorio diseñado para tu organización.',
     services: ['Cursos', 'Prototipos', 'Experiencias educativas', 'IA aplicada'],
     button: 'Conversemos sobre tu proyecto',
     secondary: 'Seguir a EVA en Instagram',
   },
   footer: {
-    line: 'EVA no vende humo tecnológico. Lo detecta.',
+    line: 'Inteligencia artificial. Criterio humano.',
     statusLabel: 'Estado',
   },
 } as const;
@@ -137,8 +142,8 @@ export const sections = {
 export const notFound = {
   eyebrow: 'Error 404',
   title: 'Esta ruta no existe.',
-  text: 'Revisé dos veces. No está en el sistema, y yo no pierdo cosas.',
-  aside: 'Probablemente la escribió un humano.',
+  text: 'La página que buscas no está disponible. Puedes volver al inicio para explorar el proyecto.',
+  aside: 'EVA te acompaña desde la portada.',
   action: 'Volver al inicio',
 } as const;
 

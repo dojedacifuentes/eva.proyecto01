@@ -19,7 +19,7 @@ export function MobileNavigation({ modules }: { modules: NavModule[] }) {
     const desktop = window.matchMedia('(min-width: 64rem)');
     const previousOverflow = document.body.style.overflow;
     const covered = Array.from(document.querySelectorAll<HTMLElement>(
-      'main, footer, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
+      'main, footer, .eva-assistant, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
     )).map((element) => ({ element, inert: element.inert }));
     for (const { element } of covered) element.inert = true;
 

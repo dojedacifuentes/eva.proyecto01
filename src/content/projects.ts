@@ -51,7 +51,7 @@ export const projects: Project[] = [
     updatedAt: '2026-09-18',
     featured: true,
     featuredPitch:
-      'El procedimiento se aprende litigando. Aquí perder un plazo no le cuesta nada a nadie, salvo a tu orgullo.',
+      'Practica decisiones procesales en un entorno narrativo, a tu propio ritmo.',
     contexts: {
       arcade: {
         label: 'FORO [in]VISIBLE',
@@ -68,7 +68,7 @@ export const projects: Project[] = [
     id: 'arcade-next',
     title: 'Próxima experiencia',
     description:
-      'Espacio reservado para simuladores de audiencias, trivias jurídicas y desafíos interactivos. Todavía no existe, y no fingiremos lo contrario.',
+      'Simuladores de audiencias, trivias jurídicas y nuevos desafíos interactivos. En fase de diseño.',
     status: 'concept',
     kinds: ['game'],
     modules: ['arcade'],
@@ -78,7 +78,7 @@ export const projects: Project[] = [
     id: 'lab-next',
     title: 'Próximo experimento',
     description:
-      'Un prototipo en fase de idea. Cuando funcione aparecerá aquí con enlace; antes, no.',
+      'Una nueva herramienta de IA aplicada, actualmente en fase de exploración.',
     status: 'concept',
     kinds: ['prototype'],
     modules: ['lab'],

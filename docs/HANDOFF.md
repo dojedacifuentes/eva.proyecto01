@@ -4,6 +4,20 @@
 > El estado de abajo corresponde a la entrega original del ZIP. Para el estado posterior,
 > consultar [RELEASE_2026-09-19.md](RELEASE_2026-09-19.md).
 
+## Estado actual — 19 de septiembre de 2026
+
+La interfaz visual compacta está preparada en la rama local `codex/compact-eva-interface`.
+El siguiente commit debe integrarse en `main` y activar el despliegue de Vercel.
+
+Incluye: portada más compacta con acrónimo unido (E-ntidad, V-irtual, A-prendizaje),
+retrato discreto, tarjetas de Misión / Visión / Objetivos, descripción explícita de las
+secciones EVA Academy · EVA News · EVA Arcade · EVA Lab, paneles tecnológicos y asistente
+EVA flotante con navegación local. Se desactivaron sonido, cursor personalizado y frases
+rotativas para una lectura más sobria; el campo de partículas queda como textura sutil.
+
+Pendientes inmediatos: ejecutar lint, build y typecheck; revisar la portada a 390 y 1440 px;
+commit y push a `main`; comprobar la URL pública `https://evaproyecto01.vercel.app/`.
+
 **Fecha:** 2026-09-18 · **Rama:** `landing-eva-v2` · **Base:** `main` @ `de4c587` (v0.1 intacta)
 
 ## Estado
