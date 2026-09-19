@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` @ `0af47e0` · publicado en https://evaproyecto01.vercel.app/
+**Estado:** `main` = v5 (núcleo neural 3D + laboratorio; rama `feat/eva-neural-core` fusionada) · publicado en https://evaproyecto01.vercel.app/
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -28,7 +28,7 @@ Una landing de una sola ruta (`src/app/page.tsx`) partida en secciones que
 `min-height: 100svh` y `scroll-snap-align`. Si añades contenido a una sección,
 comprueba que sigue cupiendo a 1440×900 y a 1366×720 antes de darla por buena.
 
-Orden actual (rama `feat/eva-neural-core`): portada → **Origen** → **Cerebro** →
+Orden actual: portada → **Origen** → **Cerebro** →
 **Redes** → **Causas** → **Bitácora**. Son las cinco salas del laboratorio de EVA:
 ella contándose. Los cuatro universos (Academy, News, Arcade, Lab), el destacado
 y la sección Cursos salieron de la página por decisión del propietario: esto es
@@ -193,7 +193,7 @@ Detalle histórico: `LANDING_ROADMAP.md`, `AUDITORIA_FINAL_LANDING_EVA.md`,
 
 ## 7. Núcleo neural 3D
 
-Rama `feat/eva-neural-core`. Sustituye el dibujo SVG del escáner por un cerebro
+Llegó en la rama `feat/eva-neural-core` (v5). Sustituye el dibujo SVG del escáner por un cerebro
 sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selección.
 
 - **Qué se ve.** Dos hemisferios (esfera deformada en `neural-data.ts`, surcos
@@ -231,6 +231,6 @@ sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selecci
   con siete funciones, retrato en vídeo, escáner neurodigital y el pensamiento de
   EVA como panel flotante. Fuera el texto introductorio, los botones, el rotador
   y la franja de Misión / Visión / Objetivos.
-- **v5** (esta rama) — el escáner cambia el dibujo por un cerebro sintético en
+- **v5** (esta) — el escáner cambia el dibujo por un cerebro sintético en
   WebGL (§7) y la página deja de ser un catálogo: fuera los cuatro universos, el
   destacado y Cursos; entran las cinco salas del laboratorio de EVA.
