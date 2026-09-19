@@ -377,7 +377,8 @@
 .footer__fiction {
   margin-top: 0.6rem;
   color: var(--eva-muted);
-  font-size: 0.55rem;
+  /* El suelo tipográfico (tokens.css): antes iba a 8,8 px. */
+  font-size: var(--eva-type-micro);
 }
 
 /* ───────────── Movimiento reducido ───────────── */

@@ -1102,7 +1102,8 @@
   border-radius: 3px;
   color: var(--eva-cyan);
   background: rgba(4, 14, 24, 0.86);
-  font-size: 0.5rem;
+  /* El suelo tipográfico (tokens.css): antes iba a 8 px. */
+  font-size: var(--eva-type-micro);
   opacity: 0.75;
   transition: opacity var(--eva-normal) linear;
 }

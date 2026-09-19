@@ -416,7 +416,8 @@ html {
   left: 0.6rem;
   right: 0.6rem;
   bottom: 0.55rem;
-  font-size: 0.5rem;
+  /* El suelo tipográfico (tokens.css): antes iba a 8 px. */
+  font-size: var(--eva-type-micro);
 }
 @keyframes portrait-scan {
   0% {
@@ -524,7 +525,8 @@ html {
   }
   .panel__bar {
     padding: 0.65rem 1rem;
-    font-size: 0.5rem;
+    /* El suelo tipográfico (tokens.css): antes iba a 8 px. */
+    font-size: var(--eva-type-micro);
     letter-spacing: 0.06em;
   }
   .hero__grid {
