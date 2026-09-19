@@ -490,10 +490,12 @@
   border-left: 0;
   border-top: 0;
 }
+/* En escritorio, escenario y ventana miden lo mismo y no crecen con el texto:
+   la ventana recorta por dentro, y la sala sigue cabiendo en una pantalla. */
 @media (min-width: 64rem) {
   .core-room__stage {
     aspect-ratio: auto;
-    min-height: clamp(22rem, 64vh, 38rem);
+    height: clamp(22rem, 64vh, 38rem);
   }
 }
 /* Dentro de la sala, el núcleo llena el marco: sin proporción propia ni fichas. */
@@ -535,7 +537,7 @@
 @media (min-width: 64rem) {
   .readout {
     min-height: 0;
-    height: 100%;
+    height: clamp(22rem, 64vh, 38rem);
   }
 }
 .readout__bar {
@@ -627,9 +629,10 @@
   }
 }
 
-/* Pantallas bajas: el escenario cede un poco para que la sala siga cabiendo. */
+/* Pantallas bajas: escenario y ventana ceden a la vez para que la sala siga cabiendo. */
 @media (min-width: 64rem) and (max-height: 50rem) {
-  .core-room__stage {
-    min-height: clamp(20rem, 60vh, 32rem);
+  .core-room__stage,
+  .readout {
+    height: clamp(20rem, 60vh, 32rem);
   }
 }
