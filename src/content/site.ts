@@ -157,6 +157,8 @@ export const synapse = {
   channel: 'SINAPSIS',
   state: 'FLUJO: ACTIVO',
   prompt: '>',
+  close: 'Cerrar el flujo de pensamiento de EVA',
+  reopen: 'Abrir el flujo de pensamiento de EVA',
 } as const;
 
 export const sections = {

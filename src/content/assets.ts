@@ -12,6 +12,17 @@ export interface EvaImage {
   focus: string;
 }
 
+/**
+ * Bucle de vídeo de EVA. La imagen sigue siendo el póster y lo único que se
+ * sirve en móvil: el vídeo pesa y ahí no aporta.
+ */
+export const heroLoop = {
+  src: '/eva/eva-loop.mp4',
+  type: 'video/mp4',
+  /** Aviso para quien mantenga esto: sin comprimir todavía. */
+  bytes: 3_888_331,
+} as const;
+
 export const images: Record<
   'heroPortrait' | 'closeUpPortrait' | 'humanPortrait' | 'aboutPortrait',
   EvaImage

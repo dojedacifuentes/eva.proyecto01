@@ -6,6 +6,7 @@ import { neuroscan } from '@/content/neuroscan';
 import { hero } from '@/content/site';
 import { EvaNeuroscan } from './EvaNeuroscan';
 import { EvaPortraitFrame } from './EvaPortraitFrame';
+import { EvaPortraitLoop } from './EvaPortraitLoop';
 
 /**
  * Tarjeta de EVA en la portada. El retrato completo es el disparador del
@@ -21,6 +22,7 @@ export function EvaProfile() {
         caption={hero.portraitCaption}
         sizes="(min-width: 64rem) 22rem, (min-width: 48rem) 30vw, 42vw"
         priority
+        overlay={<EvaPortraitLoop />}
       />
 
       <button

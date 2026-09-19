@@ -2,15 +2,14 @@ import type { CSSProperties } from 'react';
 import { EvaAcronymMesh } from '@/components/eva/EvaAcronymMesh';
 import { EvaDnaHelix } from '@/components/eva/EvaDnaHelix';
 import { EvaProfile } from '@/components/eva/EvaProfile';
-import { EvaThoughtStream } from '@/components/eva/EvaThoughtStream';
 import { hero, site } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
- * Portada: el acrónimo, el genoma y EVA mirándose a sí misma, y debajo la
- * franja donde escribe lo que está pensando. Sin texto corrido ni botones: lo
- * que hay que explicar se explica más abajo.
+ * Portada: el acrónimo, el genoma y EVA mirándose a sí misma. Sin texto
+ * corrido ni botones: lo que hay que explicar se explica más abajo, y lo que
+ * EVA está pensando vive en su panel flotante.
  */
 export function HeroEva() {
   return (
@@ -59,9 +58,6 @@ export function HeroEva() {
             </div>
           </div>
 
-          {/* Bajo las tres columnas, EVA escribiendo. Mismo texto que el flujo
-              del neuroescáner: aquí se asoma, ahí dentro se lee entero. */}
-          <EvaThoughtStream />
         </div>
 
         <p className="slide__foot mono">

@@ -334,7 +334,7 @@ html {
   display: grid;
   grid-template-columns: clamp(5.5rem, 12vw, 10rem) minmax(0, 1fr);
   align-items: stretch;
-  column-gap: clamp(0.75rem, 2vw, 1.75rem);
+  column-gap: clamp(0.25rem, 0.7vw, 0.6rem);
   margin-top: 0.9rem;
   min-height: clamp(14rem, 48vh, 28rem);
   border-left: 1px solid var(--eva-line-strong);
@@ -369,7 +369,7 @@ html {
   white-space: nowrap;
 }
 .acronym__word::before {
-  flex-basis: clamp(0.6rem, 1.8vw, 1.6rem);
+  flex-basis: clamp(0.5rem, 1.2vw, 1.1rem);
 }
 .acronym__index {
   margin-left: auto;

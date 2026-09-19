@@ -3,6 +3,7 @@
 | Activo | Ubicación | Origen | Licencia / permiso | Atribución visible |
 |---|---|---|---|---|
 | Retrato de EVA (hero, cíborg de medio cuerpo) | `public/eva/eva-cyborg-02.webp` | Entregado por el propietario del proyecto, 2026-09-19; convertido de JPEG a WebP | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
+| Bucle de vídeo de EVA | `public/eva/eva-loop.mp4` | Entregado por el propietario del proyecto, 2026-09-19; **sin recomprimir** (3,7 MB, 10 s, 720×1280, con pista de audio sin usar) | **Por confirmar por el propietario** | No |
 | Retrato de EVA (primer plano cíborg, en reserva) | `public/eva/eva-cyborg.webp` | Entregado por el propietario del proyecto, 2026-09-19; convertido de JPEG a WebP | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
 | Retrato de EVA (humano, en reserva) | `public/eva/eva-retrato.webp` | Entregado por el propietario del proyecto, 2026-09-18 | **Por confirmar por el propietario** (imagen propia de la identidad EVA) | No |
 | Retrato de EVA (consola) | `public/eva/eva-consola.webp` | Ídem | **Por confirmar por el propietario** | No |

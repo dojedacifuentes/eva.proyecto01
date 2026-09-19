@@ -16,6 +16,8 @@ const TYPE_MS = 26;
 const HOLD_MS = 1500;
 /** Cuántas frases ya escritas quedan a la vista por encima de la actual. */
 const HISTORY = 2;
+/** Lo que tarda el panel en desplegarse solo al cargar la página. */
+const OPEN_MS = 2200;
 
 const MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -39,37 +41,33 @@ function useReducedMotion() {
 }
 
 /**
- * Actividad cerebral artificial: EVA escribiendo sus pensamientos bajo el
- * acrónimo, el genoma y su propio retrato.
+ * Actividad cerebral artificial: un panel flotante abajo a la derecha donde
+ * EVA escribe lo que está pensando, como si hubiera abierto ella la ventana.
  *
- * Se teclea carácter a carácter y no para nunca: al llegar al final del flujo
- * vuelve a empezar. Fuera de pantalla se detiene, y con movimiento reducido
- * muestra las frases enteras sin mecanografía.
+ * Se despliega solo a los pocos segundos y se puede cerrar; cerrado deja una
+ * pastilla que lo vuelve a abrir. Se teclea carácter a carácter y no para
+ * nunca: al llegar al final del flujo vuelve a empezar. Con movimiento
+ * reducido muestra las frases enteras, sin mecanografía.
  */
 export function EvaThoughtStream() {
   const hostRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState(0);
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
   const line = LINES[index] ?? '';
   const done = typed >= line.length;
 
-  /* Fuera de pantalla no se teclea: nada de temporizadores invisibles. */
+  /* Se despliega solo, sin que nadie lo pida. */
   useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
-      rootMargin: '120px',
-    });
-    observer.observe(host);
-    return () => observer.disconnect();
+    const timer = setTimeout(() => setOpen(true), OPEN_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   /* Un carácter, o el salto a la frase siguiente. */
   useEffect(() => {
-    if (!visible || reduced) return;
+    if (!open || reduced) return;
     const timer = setTimeout(
       () => {
         if (done) {
@@ -82,7 +80,7 @@ export function EvaThoughtStream() {
       done ? HOLD_MS : TYPE_MS,
     );
     return () => clearTimeout(timer);
-  }, [visible, reduced, done, typed, index]);
+  }, [open, reduced, done, typed, index]);
 
   /*
    * Las frases ya escritas, sin dar la vuelta al final del flujo: al empezar no
@@ -94,7 +92,7 @@ export function EvaThoughtStream() {
     .map((at) => ({ at, text: LINES[at] }));
 
   return (
-    <section ref={hostRef} className="synapse" aria-label={synapse.title}>
+    <section ref={hostRef} className="synapse" data-open={open || undefined} aria-label={synapse.title}>
       <p className="synapse__head mono">
         <span className="synapse__title">{synapse.title}</span>
         <span aria-hidden="true" className="synapse__meta">
@@ -105,6 +103,16 @@ export function EvaThoughtStream() {
             <i key={bar} style={{ animationDelay: `${bar * 90}ms` }} />
           ))}
         </span>
+        <button
+          type="button"
+          className="synapse__toggle"
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+          data-cursor-label={open ? 'CERRAR' : 'ABRIR'}
+        >
+          <span className="sr-only">{open ? synapse.close : synapse.reopen}</span>
+          <span aria-hidden="true">{open ? '—' : '+'}</span>
+        </button>
       </p>
 
       {/* aria-live off: es ambiente, no información que haya que anunciar. */}

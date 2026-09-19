@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import type { ReactNode } from 'react';
 import type { EvaImage } from '@/content/assets';
 
 interface EvaPortraitFrameProps {
@@ -7,6 +8,8 @@ interface EvaPortraitFrameProps {
   priority?: boolean;
   tall?: boolean;
   sizes: string;
+  /** Capa sobre la imagen, dentro del marco: el bucle de vídeo la usa. */
+  overlay?: ReactNode;
 }
 
 /**
@@ -19,6 +22,7 @@ export function EvaPortraitFrame({
   priority = false,
   tall = false,
   sizes,
+  overlay,
 }: EvaPortraitFrameProps) {
   return (
     <figure className={`portrait${tall ? ' portrait--tall' : ''}`}>
@@ -45,6 +49,7 @@ export function EvaPortraitFrame({
             RETRATO PENDIENTE
           </div>
         )}
+        {overlay}
         {caption && (
           <figcaption className="portrait__caption mono">
             <span>{caption.id}</span>

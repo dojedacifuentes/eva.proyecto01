@@ -129,7 +129,7 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
 
     const covered = Array.from(
       document.querySelectorAll<HTMLElement>(
-        "main, header.header, footer.footer",
+        "main, header.header, footer.footer, .synapse",
       ),
     ).map((element) => ({ element, inert: element.inert }));
     for (const { element } of covered) element.inert = true;

@@ -5,6 +5,7 @@ import './interface.css';
 import './neuroscan.css';
 import './dna.css';
 import { EvaField } from '@/components/eva/EvaField';
+import { EvaThoughtStream } from '@/components/eva/EvaThoughtStream';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';
 import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main id="contenido">{children}</main>
         <SiteFooter />
+        <EvaThoughtStream />
         <ScrollReveal />
       </body>
     </html>
