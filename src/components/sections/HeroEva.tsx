@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { EvaDnaHelix } from '@/components/eva/EvaDnaHelix';
 import { EvaProfile } from '@/components/eva/EvaProfile';
 import { Rotator } from '@/components/eva/Rotator';
 import { flags, hero, site, studio, ui } from '@/content/site';
@@ -20,6 +21,9 @@ export function HeroEva() {
           </div>
 
           <div className="hero__grid">
+            {/* Genoma digital: capa decorativa, fuera del flujo y bajo el texto. */}
+            <EvaDnaHelix />
+
             <div className="hero__head">
               <p className="hero__label mono" data-rise style={rise(0)}>
                 {hero.label}

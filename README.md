@@ -1,6 +1,6 @@
 # EVA — landing v2.0
 
-Portada de **EVA, Entidad Virtual de Aprendizaje**: la interfaz que conecta cuatro universos
+Portada de **EVA, Entidad de Vigilancia y Autonomía**: la interfaz que conecta cuatro universos
 sobre inteligencia artificial, Derecho y educación — **EVA Academy**, **EVA News**,
 **EVA Arcade** y **EVA Lab**.
 

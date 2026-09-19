@@ -1,0 +1,134 @@
+/*
+ * EVA // DIGITAL GENOME
+ *
+ * Doble hélice en el hueco central del hero. Capa decorativa: fuera del flujo,
+ * sin eventos de puntero y por debajo del texto, así que no añade alto a la
+ * portada ni tapa nada legible.
+ */
+
+.dna {
+  position: absolute;
+  z-index: 0;
+  top: 46%;
+  translate: 0 -50%;
+  pointer-events: none;
+  /* Hueco entre el final de las palabras del acrónimo y los índices 01–03. */
+  left: 47%;
+  width: clamp(7.5rem, 14.5vw, 12.5rem);
+  opacity: 0;
+  animation: dna-in 1.6s var(--eva-ease) 0.45s both;
+}
+
+.dna__stage {
+  height: clamp(12rem, 25vh, 18rem);
+}
+.dna__stage canvas {
+  display: block;
+}
+
+/*
+ * El contenido del hero queda por encima de la hélice. Sólo .hero__head: dar
+ * position a .hero__portrait lo convertiría en bloque contenedor de .profile,
+ * que en móvil flota contra la rejilla. La hélice nunca llega hasta el retrato.
+ */
+.hero__grid {
+  position: relative;
+}
+.hero__head {
+  position: relative;
+  z-index: 1;
+}
+
+/* HUD: rótulos de escáner, no explicaciones. */
+.dna__hud {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+  text-align: center;
+  color: var(--eva-muted);
+  font-size: 0.46rem;
+  letter-spacing: 0.16em;
+  line-height: 1.6;
+}
+.dna__hud-title {
+  color: var(--eva-cyan);
+}
+.dna__hud-core {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.dna__hud-core i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--eva-cyan);
+  box-shadow: 0 0 6px rgba(128, 217, 239, 0.7);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes dna-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(-50% + 18px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 -50%;
+  }
+}
+
+/* ───────────── Adaptación ───────────── */
+
+/*
+ * Entre 48 y 64rem no queda hueco limpio: la hélice pasa a ser textura detrás
+ * del acrónimo, más pequeña y atenuada, y el HUD desaparece porque chocaba con
+ * el lede.
+ */
+@media (max-width: 63.99rem) {
+  .dna {
+    top: 31%;
+    left: 36%;
+    width: clamp(6rem, 17vw, 8.5rem);
+  }
+  .dna__stage {
+    height: clamp(8rem, 17vh, 11rem);
+  }
+  .dna__hud {
+    display: none;
+  }
+}
+
+/*
+ * En móvil no hay hueco: la rejilla es de una columna y el retrato ya ocupa la
+ * esquina. Aquí no se monta la escena (densityFor devuelve scene:false), así que
+ * el paquete de three.js ni siquiera se descarga; queda sólo el rótulo.
+ */
+@media (max-width: 47.99rem) {
+  .dna {
+    position: static;
+    translate: none;
+    width: auto;
+    animation: none;
+    opacity: 1;
+  }
+  .dna__stage {
+    display: none;
+  }
+  .dna__hud {
+    margin-top: 0;
+    text-align: left;
+    font-size: 0.44rem;
+  }
+  .dna__hud-core {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dna {
+    animation: none;
+    opacity: 1;
+  }
+}

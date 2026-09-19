@@ -9,6 +9,8 @@
  * repite.
  */
 
+import { site } from './site';
+
 export interface StreamFragment {
   id: string;
   /** Etiqueta del fragmento en la columna de pensamiento. */
@@ -62,7 +64,7 @@ export const neuroscan = {
     title: 'EVA // THOUGHT STREAM INTERCEPTED',
     subtitle: 'Lectura de pensamiento sintético en curso',
     state: 'THINKING // OBSERVING // RECONSTRUCTING',
-    expansion: 'Entidad de Vigilancia y Autonomía',
+    expansion: site.expansion,
     id: 'ID COGNITIVO: EVA-C7/B4',
     warning: [
       'No estás leyendo una explicación sobre EVA.',

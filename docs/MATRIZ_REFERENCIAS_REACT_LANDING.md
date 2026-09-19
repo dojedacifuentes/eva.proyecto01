@@ -21,4 +21,23 @@ clonaron); por eso ninguna decisión es «adoptar código».
 | [howler.js](https://github.com/goldfire/howler.js) · [use-sound](https://github.com/joshwcomeau/use-sound) | MIT | Gestor de audio, sprites | Descartadas: Web Audio sintetizado, sin archivos (`src/lib/sound.ts`) | Descartar | Licencias de sonidos | — |
 | [ashima/webgl-noise](https://github.com/ashima/webgl-noise) · [lygia](https://github.com/patriciogonzalezvivo/lygia) | MIT / revisar | Ruido procedural | Fase avanzada (roadmap) | Descartar por ahora | GPU móvil | — |
 
-**Resultado:** cero dependencias nuevas. Un solo sistema de movimiento (CSS) y un solo canvas.
+**Resultado (18 sept.):** cero dependencias nuevas. Un solo sistema de movimiento (CSS) y un
+solo canvas.
+
+## Ampliación — genoma digital 3D (19 de septiembre de 2026)
+
+Consulta sobre README y estructura pública; no se clonó ni se copió código de ninguno.
+
+| Fuente | Licencia | Patrón observado | Aplicación en EVA | Decisión | Atribución |
+|---|---|---|---|---|---|
+| [ssiddhantsharma/animated-dna](https://github.com/ssiddhantsharma/animated-dna) | MIT | Doble hélice en three.js vanilla | Confirmó el enfoque de curva + nodos | Reimplementar | No |
+| [danthi123/PrivDNA](https://github.com/danthi123/PrivDNA) | MIT | Hélice con sistema de partículas en Next.js + R3F | Confirmó la combinación R3F + polvo | Reimplementar | No |
+| [freepik / pikisuperstar — futuristic medical infographic](https://www.freepik.com) | Freepik Free (exige atribución visible) | Paleta y lenguaje de infografía médica | **Descartada**: la hélice se construye de forma procedural, así que la landing no contrae la obligación de atribuir | Descartar | — |
+
+La hélice de `EvaDnaHelix` es geometría propia: curvas de Catmull-Rom convertidas en tubos,
+barras y nodos instanciados, y un búfer de puntos con generador pseudoaleatorio con semilla.
+
+**Dependencias nuevas:** `three`, `@react-three/fiber`, `@react-three/drei`,
+`@react-three/postprocessing` (todas MIT). Viajan en un fragmento aparte de ~970 KB sin
+comprimir que **no entra en la carga inicial**: se descarga cuando la hélice aparece en
+pantalla, y en móvil no se descarga nunca.

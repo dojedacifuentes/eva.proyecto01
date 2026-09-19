@@ -8,7 +8,7 @@ const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 
 export const site = {
   name: 'EVA',
-  expansion: 'Entidad Virtual de Aprendizaje',
+  expansion: 'Entidad de Vigilancia y Autonomía',
   version: 'v3.0',
   locale: 'es_CL',
   seo: {
@@ -51,8 +51,8 @@ export const hero = {
   label: 'EVA // SISTEMA ACTIVO',
   acronym: [
     { letter: 'E', word: 'Entidad' },
-    { letter: 'V', word: 'Virtual' },
-    { letter: 'A', word: 'de Aprendizaje' },
+    { letter: 'V', word: 'de Vigilancia' },
+    { letter: 'A', word: 'y Autonomía' },
   ],
   online: 'EVA está en línea.',
   lede: 'Un espacio para aprender, comprender y experimentar con inteligencia artificial, Derecho y educación.',
@@ -89,6 +89,13 @@ export const studio = {
   services: ['Automatización documental', 'IA aplicada', 'Capacitación'],
   cta: 'Saber más',
   href: 'https://iusmachina.vercel.app/',
+} as const;
+
+/** Rótulos del genoma digital del hero. Decorativos: no describen nada real. */
+export const genome = {
+  title: 'EVA // DIGITAL GENOME',
+  sequence: 'SEQUENCE: C7B-04',
+  core: 'COGNITIVE CORE: ACTIVE',
 } as const;
 
 export const sections = {

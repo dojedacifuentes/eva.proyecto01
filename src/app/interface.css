@@ -330,7 +330,8 @@ html {
 }
 .hero__lede {
   margin-top: 1rem;
-  max-width: 33rem;
+  /* Se detiene antes del genoma: nada de texto por encima de la hélice. */
+  max-width: 26rem;
   font-size: 0.95rem;
   line-height: 1.6;
 }

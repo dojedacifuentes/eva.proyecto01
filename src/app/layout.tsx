@@ -3,6 +3,7 @@ import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import './interface.css';
 import './neuroscan.css';
+import './dna.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';
 import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
