@@ -41,3 +41,21 @@ barras y nodos instanciados, y un búfer de puntos con generador pseudoaleatorio
 `@react-three/postprocessing` (todas MIT). Viajan en un fragmento aparte de ~970 KB sin
 comprimir que **no entra en la carga inicial**: se descarga cuando la hélice aparece en
 pantalla, y en móvil no se descarga nunca.
+
+## Ampliación — núcleo neural 3D (19 de septiembre de 2026)
+
+Único repositorio externo autorizado para esta pieza. Se clonó fuera del proyecto para leerlo;
+se estudiaron `src/components/NeuralNetwork3D.jsx` y `src/utils/threejsUtils.js`.
+
+| Fuente | Licencia | Patrón observado | Aplicación en EVA | Decisión | Atribución |
+|---|---|---|---|---|---|
+| [zuck30/neural-network-studio](https://github.com/zuck30/neural-network-studio) | MIT | Red por capas en R3F: una esfera Phong por neurona escalada y coloreada por su activación en `useFrame`, una `<line>` por conexión, `OrbitControls` de drei, `Math.random()` en render, TensorFlow.js para entrenar | Confirmó el enfoque R3F + OrbitControls + animación directa de escala/emisión por activación. **No se copió código**: EVA usa `InstancedMesh` para las neuronas, un único búfer de líneas para las sinapsis, impulsos que recorren aristas, semilla determinista y una corteza procedural propia. Nada de TensorFlow, capas ni panel de entrenamiento | Reimplementar | No (sin fragmentos copiados; se documenta por transparencia) |
+
+El núcleo (`src/components/eva/neural/`) es geometría propia: dos hemisferios a partir de una
+esfera deformada con surcos por ruido de valor, cerebelo y tronco fusionados en una malla, un
+`ShaderMaterial` propio (fresnel, surcos emisivos, banda de escaneo) y una red de neuronas y
+sinapsis generada con la misma semilla en cada apertura.
+
+**Dependencias nuevas:** ninguna. Se reutilizan `three`, `@react-three/fiber`,
+`@react-three/drei` (`OrbitControls`) y `@react-three/postprocessing` (`Bloom`). El módulo
+3D del escáner se carga en diferido al abrir el neuroescáner.

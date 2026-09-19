@@ -71,7 +71,8 @@ El acento de cada universo se fija con `data-accent`.
 | Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice procedural en R3F con siete acciones: clonar, utilizar, mutar, escanear, desplegar, sonificar y descargar. `lib/genome.ts` guarda la secuencia con semilla fija (600 bases) y genera el FASTA y las notas. `lib/spin.ts` lleva la inercia del arrastre. |
 | Retrato | `eva/EvaProfile.tsx` → `EvaPortraitFrame.tsx` → `EvaPortraitLoop.tsx` | Marco técnico con la ficha del estudio. Encima, un bucle de vídeo mudo que sólo se carga en pantallas de 1024 px o más. Debajo siempre está la imagen, que hace de póster. |
 | Pensamiento | `eva/EvaThoughtStream.tsx` | Panel flotante abajo a la derecha, montado en el **layout** (acompaña toda la página, no sólo la portada). Se despliega solo a los 2,2 s y teclea sin parar. El texto sale de `content/neuroscan.ts` para que EVA no se contradiga entre lo que piensa fuera y lo que piensa dentro del escáner. |
-| Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa al pulsar el retrato. Inertiza `main`, `header`, `footer` y `.synapse`. |
+| Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa al pulsar el retrato. Inertiza `main`, `header`, `footer` y `.synapse`. Al abrirse enciende `lib/stage.ts` (`setCovered`) y el genoma congela su bucle hasta que se cierra. |
+| Núcleo neural | `eva/neural/EvaNeuralCore.tsx` + `NeuralScene.tsx`, `BrainShell.tsx`, `NeuralNetwork.tsx`, `neural-data.ts`, `neural-signal.ts`, `NeuralFallback.tsx` | El cerebro 3D del escáner. Ver §7. |
 | Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts` | Partículas que se enganchan al puntero y se vuelven cuadradas sobre lo interactivo; el cursor es un círculo que se convierte en cuadrado con esquinas de puntería. Comparten estado por un módulo, no por eventos por fotograma. |
 
 El genoma publica su estado en `.hero__grid` con `data-genome`, y el retrato
@@ -120,6 +121,17 @@ apareció dos veces en sitios distintos.
 10. Tras borrar o renombrar rutas, `tsc` falla con tipos viejos de `.next/`; se
     arregla con `npm run build`.
 11. En Windows git avisa de LF → CRLF. Es inofensivo.
+12. **`OrbitControls` escribe `touch-action: none` en línea, dos veces.** Drei se
+    conecta primero al canvas y, cuando el store publica `events.connected`,
+    se desconecta y se conecta al contenedor: cualquier `style.touchAction` que
+    pongas en un efecto queda pisado. La regla `.core__canvas > div` con
+    `!important` es la que manda; no la quites.
+13. **Un clic sobre un nodo 3D no es un clic si hubo arrastre.** R3F entrega
+    `event.delta` (píxeles entre pointerdown y click); el núcleo ignora los
+    clics con más de 6. Sin eso, soltar un giro sobre una región la seleccionaba.
+14. El módulo 3D del escáner llega por `next/dynamic` y R3F sólo arranca cuando
+    el contenedor mide algo: si el panel del navegador no pinta (trampa 4), el
+    escáner se queda en «Compilando núcleo neural» aunque el código esté bien.
 
 ---
 
@@ -166,7 +178,37 @@ Detalle histórico: `LANDING_ROADMAP.md`, `AUDITORIA_FINAL_LANDING_EVA.md`,
 
 ---
 
-## 7. Historia breve
+## 7. Núcleo neural 3D
+
+Rama `feat/eva-neural-core`. Sustituye el dibujo SVG del escáner por un cerebro
+sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selección.
+
+- **Qué se ve.** Dos hemisferios (esfera deformada en `neural-data.ts`, surcos
+  por ruido de valor, cara medial plana), cerebelo y tronco, fusionados en una
+  malla con un `ShaderMaterial` propio: base oscura translúcida, fresnel cian,
+  contraluz violeta, surcos que laten y una banda de escaneo que sube. Dentro,
+  neuronas instanciadas, sinapsis en un único `LineSegments` con colores por
+  vértice, impulsos que recorren aristas y se ramifican, y ocho nodos-región.
+- **Determinismo.** Todo sale de `buildBrain(detail, zones)` con la semilla
+  `0xe7a01`; la simulación usa otro LCG. Nada de `Math.random()`.
+- **Regiones.** Las ocho de `content/neuroscan.ts` con sus ids. La x del SVG
+  reparte hemisferios y la y va de la frente a la nuca (`hubSeed`). Hover =
+  previsualización (HUD + cursor de señal, no toca la selección); clic =
+  `selectZone` del escáner, descarga desde el nodo y giro para encararlo;
+  `undeclared` se enciende en magenta (`brain.core.alert`).
+- **Niveles.** `DETAIL` en `neural-data.ts`: low (240 neuronas, sin bloom),
+  mid (420), high (720, bloom 0.85, MSAA 4). Se elige una vez por apertura.
+- **Sin WebGL o si la escena revienta**, `NeuralFallback` (el SVG antiguo) es la
+  interfaz. Mientras carga, el mismo SVG late y se desvanece al primer fotograma.
+- **HTML manda.** Las regiones son botones (`.core__chip`) con `aria-pressed`,
+  foco y 44 px en táctil; el lienzo es `aria-hidden`. Restablecer centra,
+  restaura la cámara y suelta la región. Doble clic en el vacío recentra.
+- **Movimiento reducido:** sin giro, sin respiración, sin impulsos espontáneos,
+  sin barrido; la selección enciende la región sin descarga.
+- **Textos** nuevos en `neuroscan.brain.core`. Referencia externa estudiada y
+  descartada como copia: `MATRIZ_REFERENCIAS_REACT_LANDING.md`.
+
+## 8. Historia breve
 
 - **v2** (`e852f4d`) — «interfaz compacta». Apagó cursor, sonido y partículas
   buscando sobriedad. Fue un error de lectura del encargo.

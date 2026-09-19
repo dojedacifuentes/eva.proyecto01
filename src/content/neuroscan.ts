@@ -99,6 +99,26 @@ export const neuroscan = {
     lede: 'Ocho regiones declaradas. Selecciona una para leer su función.',
     idle: 'Sin región seleccionada. El escáner sigue midiendo de todos modos.',
     eeg: 'Actividad sintética',
+    /** Núcleo neural 3D: lecturas del lienzo y sus controles. */
+    core: {
+      title: 'EVA NEURAL CORE',
+      loading: 'Compilando núcleo neural',
+      flat: 'Sin WebGL: mapa plano activo',
+      reduced: 'Movimiento reducido: núcleo en reposo',
+      neurons: 'neuronas',
+      synapses: 'sinapsis',
+      idle: 'Actividad espontánea',
+      preview: 'Previsualizando',
+      active: 'Región activa',
+      hint: 'Arrastra para girar · doble clic recentra',
+      reset: 'Restablecer',
+      resetLabel: 'Centrar el cerebro, restaurar la cámara y soltar la región seleccionada',
+      regionsLabel: 'Regiones del núcleo neural',
+      /** Etiqueta del cursor de señal sobre el lienzo. */
+      cursor: 'GIRAR',
+      /** La región que se enciende en magenta al seleccionarla: la que EVA no quiere enseñar. */
+      alert: 'undeclared',
+    },
     zones: [
       {
         id: 'prediction',

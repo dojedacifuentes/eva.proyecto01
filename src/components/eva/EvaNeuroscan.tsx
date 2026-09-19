@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 import { images } from "@/content/assets";
 import { neuroscan } from "@/content/neuroscan";
 import { play } from "@/lib/sound";
+import { setCovered } from "@/lib/stage";
+import { EvaNeuralCore } from "./neural/EvaNeuralCore";
 
 type BeatKind = "label" | "line" | "aside" | "readout";
 
@@ -136,6 +138,8 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // El genoma queda tapado: congela su bucle hasta que el escáner se cierre.
+    setCovered(true);
     closeRef.current?.focus({ preventScroll: true });
 
     const onKey = (event: KeyboardEvent) => {
@@ -160,6 +164,7 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
+      setCovered(false);
       for (const { element, inert } of covered) element.inert = inert;
     };
   }, [onClose]);
@@ -419,100 +424,13 @@ export function EvaNeuroscan({ onClose }: EvaNeuroscanProps) {
           aria-label={neuroscan.brain.title}
         >
           <div className="brain">
-            {/* El escenario fija la proporción; svg y zonas lo llenan. */}
-            <div className="brain__stage">
-              <svg
-                viewBox="0 0 400 300"
-                role="img"
-                aria-label={neuroscan.brain.title}
-              >
-                <defs>
-                  <radialGradient id="brainGlow" cx="50%" cy="45%">
-                    <stop offset="0%" stopColor="rgba(128,217,239,0.22)" />
-                    <stop offset="100%" stopColor="rgba(128,217,239,0)" />
-                  </radialGradient>
-                </defs>
-                <ellipse
-                  cx="200"
-                  cy="150"
-                  rx="170"
-                  ry="130"
-                  fill="url(#brainGlow)"
-                />
-                <path
-                  className="brain__shell"
-                  d="M62 150c-4-42 30-78 74-84 22-22 70-26 96-6 40-8 82 16 90 52 26 14 30 56 8 78 2 32-30 56-64 50-26 20-70 20-94 2-40 6-76-16-80-46-26-8-36-26-30-46Z"
-                />
-                <path
-                  className="brain__fold"
-                  d="M96 120c34-6 52 14 60 38s30 40 62 34M140 76c6 30-10 48-30 60M244 62c-10 28 4 50 26 60M330 190c-30 4-52-10-62-32M172 242c4-28-8-46-30-56"
-                />
-                <g className="brain__links">
-                  {neuroscan.brain.zones.map((from, index) =>
-                    neuroscan.brain.zones
-                      .slice(index + 1)
-                      .map((to) => (
-                        <line
-                          key={`${from.id}-${to.id}`}
-                          x1={from.x}
-                          y1={from.y}
-                          x2={to.x}
-                          y2={to.y}
-                          data-active={zone === from.id || zone === to.id}
-                        />
-                      )),
-                  )}
-                </g>
-                <g className="brain__nodes">
-                  {neuroscan.brain.zones.map((item) => (
-                    <g key={item.id} data-active={zone === item.id}>
-                      <circle
-                        className="brain__halo"
-                        cx={item.x}
-                        cy={item.y}
-                        r="16"
-                      />
-                      <circle
-                        className="brain__node"
-                        cx={item.x}
-                        cy={item.y}
-                        r="5"
-                      />
-                      <text
-                        className="brain__code"
-                        x={item.x + 11}
-                        y={item.y + 4}
-                      >
-                        {item.code}
-                      </text>
-                    </g>
-                  ))}
-                </g>
-              </svg>
-
-              {/* Los botones van fuera del SVG: foco y teclado sin sorpresas. */}
-              <div className="brain__hits">
-                {neuroscan.brain.zones.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className="brain__hit"
-                    style={{
-                      left: `${(item.x / 400) * 100}%`,
-                      top: `${(item.y / 300) * 100}%`,
-                    }}
-                    aria-pressed={zone === item.id}
-                    onClick={() => selectZone(item.id)}
-                    onPointerEnter={() => setZone(item.id)}
-                    data-cursor-label={item.code}
-                  >
-                    <span className="sr-only">
-                      {item.code} — {item.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* El cerebro tridimensional y sus regiones. La selección sigue viviendo aquí. */}
+            <EvaNeuralCore
+              selected={zone}
+              reduced={reduced}
+              onSelect={selectZone}
+              onReset={() => setZone(null)}
+            />
 
             <span aria-hidden="true" className="brain__eeg">
               <svg viewBox="0 0 240 40" preserveAspectRatio="none">

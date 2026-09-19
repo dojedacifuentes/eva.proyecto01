@@ -1,12 +1,13 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { genome, site } from '@/content/site';
 import { sequenceId, toFasta, toNotes } from '@/lib/genome';
 import { isSoundEnabled, play, playSequence } from '@/lib/sound';
 import { pointerSignal } from '@/lib/pointer';
 import { spinSignal } from '@/lib/spin';
+import { isCovered, isCoveredOnServer, subscribeCovered } from '@/lib/stage';
 
 /** three.js no viaja en el paquete inicial: llega cuando la hélice entra en pantalla. */
 const DnaScene = dynamic(() => import('./dna/DnaScene'), { ssr: false });
@@ -64,6 +65,8 @@ export function EvaDnaHelix() {
   const [unwind, setUnwind] = useState(0);
   const [state, setState] = useState<State>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
+  /* Con el neuroescáner abierto encima, la hélice no se ve: su bucle se congela y se retoma al cerrar. */
+  const covered = useSyncExternalStore(subscribeCovered, isCovered, isCoveredOnServer);
 
   /* Densidad y movimiento reducido, sincronizados con el navegador. */
   useEffect(() => {
@@ -256,7 +259,7 @@ export function EvaDnaHelix() {
             pairs={density.pairs}
             particles={density.particles}
             reduced={reduced}
-            active={visible}
+            active={visible && !covered}
             clones={clones}
             pulse={pulse}
             mutate={mutate}

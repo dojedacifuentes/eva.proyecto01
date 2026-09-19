@@ -344,20 +344,196 @@
   border-radius: var(--eva-radius-lg);
   background: linear-gradient(160deg, rgba(10, 28, 45, 0.8), rgba(4, 12, 20, 0.9));
 }
-/* El escenario fija la altura: un svg con height:auto no aporta altura
-   intrínseca dentro de una rejilla y el cerebro quedaba recortado. */
-.brain__stage {
+
+/* ── Núcleo neural: el lienzo 3D, el mapa plano y sus controles ── */
+
+/* El escenario fija la altura: ni un svg con height:auto ni un canvas aportan
+   altura intrínseca dentro de una rejilla, y el cerebro quedaba recortado. */
+.core__stage {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--eva-radius-lg) var(--eva-radius-lg) 0 0;
+  background:
+    radial-gradient(60% 55% at 50% 48%, rgba(24, 74, 108, 0.35), transparent 70%),
+    #030a12;
 }
-.brain__stage > svg {
+@media (min-width: 64rem) {
+  .core__stage {
+    aspect-ratio: 5 / 4;
+  }
+}
+/* El lienzo recoge el puntero; pan-y deja pasar el desplazamiento vertical en táctil. */
+.core__canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+  cursor: grab;
+}
+/* Los controles de órbita escriben touch-action: none en línea al conectarse
+   (dos veces: al canvas y luego a su contenedor). El !important lo devuelve a
+   pan-y: el arrastre horizontal gira, el vertical sigue moviendo el escáner. */
+.core__canvas > div {
+  touch-action: pan-y !important;
+}
+.core__canvas:active {
+  cursor: grabbing;
+}
+.core__canvas canvas {
+  display: block;
+}
+/* El mapa plano cubre el lienzo mientras carga y se desvanece cuando el núcleo pinta. */
+.core__flat {
+  position: absolute;
+  inset: 0;
+  transition: opacity 900ms var(--eva-ease);
+}
+.core__flat[data-fading='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+.core__flat > svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
+/* Mientras carga, el mapa late despacio: se está compilando algo. */
+.core[data-phase='loading'] .core__flat > svg {
+  animation: core-wait 2.4s ease-in-out infinite;
+}
+@keyframes core-wait {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.core__hud {
+  position: absolute;
+  inset: 0.6rem 0.7rem auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--eva-muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.core__hud i {
+  color: var(--eva-line-strong);
+  font-style: normal;
+}
+.core__hud-id {
+  color: var(--eva-cyan);
+}
+.core__hud-id i,
+.core__hud-id::after {
+  color: var(--eva-muted);
+}
+.core__hud-read {
+  text-align: right;
+  transition: color var(--eva-normal) linear;
+}
+.core__hud-read[data-mode='preview'] {
+  color: var(--eva-text);
+}
+.core__hud-read[data-mode='active'] {
+  color: var(--eva-violet);
+}
+.core__hint {
+  position: absolute;
+  inset: auto 0.7rem 0.55rem;
+  color: rgba(142, 155, 163, 0.7);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+/* Sin puntero fino, la pista del ratón no ayuda. */
+@media (hover: none) {
+  .core__hint {
+    display: none;
+  }
+}
+
+/* Las regiones como botones de verdad: teclado, foco y áreas táctiles. */
+.core__regions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+  padding: 0.55rem 0.6rem;
+  border-top: 1px solid var(--eva-line);
+}
+@media (min-width: 48rem) {
+  .core__regions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+.core__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--eva-line);
+  border-radius: 3px;
+  color: var(--eva-soft);
+  background: transparent;
+  font: inherit;
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear,
+    background var(--eva-fast) linear;
+}
+.core__chip i {
+  color: var(--eva-cyan);
+  font-style: normal;
+}
+.core__chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.core__chip:hover,
+.core__chip[data-hover='true'] {
+  border-color: var(--eva-line-strong);
+  color: var(--eva-text);
+}
+.core__chip:focus-visible {
+  outline: 2px solid var(--eva-cyan);
+  outline-offset: 1px;
+}
+.core__chip[aria-pressed='true'] {
+  border-color: var(--eva-cyan);
+  color: var(--eva-cyan);
+  background: rgba(63, 216, 238, 0.09);
+}
+.core__chip--reset {
+  margin-left: auto;
+  color: var(--eva-muted);
+}
+.core__chip--reset i {
+  color: var(--eva-violet);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.core__chip--reset:hover,
+.core__chip--reset:focus-visible {
+  border-color: var(--eva-violet);
+  color: var(--eva-text);
+}
+@media (pointer: coarse) {
+  .core__chip {
+    min-height: 44px;
+  }
+}
+
+/* ── Mapa plano: el dibujo anterior, ahora carga y alternativa ── */
 .brain__shell {
   fill: rgba(16, 44, 68, 0.35);
   stroke: rgba(128, 217, 239, 0.45);

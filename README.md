@@ -6,9 +6,10 @@ sobre inteligencia artificial, Derecho y educación — **EVA Academy**, **EVA N
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Space Grotesk / JetBrains Mono.
-Sin librerías de animación, partículas, 3D ni audio: el movimiento es CSS, el fondo es un canvas
-2D propio y los microsonidos se sintetizan con Web Audio.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Space Grotesk / JetBrains Mono ·
+three.js con React Three Fiber, drei y postprocessing (genoma y núcleo neural, cargados en diferido).
+Sin librerías de animación ni de audio: el movimiento es CSS, el fondo es un canvas 2D propio y
+los microsonidos se sintetizan con Web Audio.
 
 ## Desarrollo
 
@@ -43,7 +44,8 @@ public/eva/            retratos de EVA
 src/
   app/                 layout, página, estilos globales, OG, robots, sitemap
   components/
-    eva/               EvaField (fondo), EvaSignalCursor, SoundControl, Rotator, EvaPortraitFrame
+    eva/               EvaField (fondo), EvaSignalCursor, SoundControl, EvaPortraitFrame, EvaDnaHelix,
+                       EvaNeuroscan; dna/ (hélice 3D) y neural/ (núcleo neural 3D del escáner)
     layout/            SiteHeader, MobileNavigation, SiteFooter
     sections/          HeroEva, ModuleGrid, FeaturedProject, AboutEva, ModuleSection,
                        NewsPreview, ArchiveStats, InstitutionalCTA
