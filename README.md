@@ -48,6 +48,7 @@ Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: textos y conmuta
 
 ## Documentación
 
+- [`HANDOFF.md`](docs/HANDOFF.md) — estado actual y siguiente paso
 - [`AUDITORIA_INICIAL_LANDING_EVA.md`](docs/AUDITORIA_INICIAL_LANDING_EVA.md)
 - [`AUDITORIA_FINAL_LANDING_EVA.md`](docs/AUDITORIA_FINAL_LANDING_EVA.md)
 - [`LANDING_ROADMAP.md`](docs/LANDING_ROADMAP.md)
