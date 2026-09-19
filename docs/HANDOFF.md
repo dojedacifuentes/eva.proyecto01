@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` = v5 (núcleo neural 3D + laboratorio; rama `feat/eva-neural-core` fusionada) · publicado en https://evaproyecto01.vercel.app/
+**Estado:** `main` = v5.1 (núcleo neural 3D, laboratorio y sala 01 en vivo) · publicado en https://evaproyecto01.vercel.app/ · **hay un encargo abierto en §0**
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -20,6 +20,54 @@ npm run build      # obligatorio antes de subir: el dev server perdona cosas que
 ```
 
 ---
+
+## 0. Encargo abierto: afinar la sala 01 (pedido del propietario, 19 sept. 2026)
+
+Lo pidió al ver la sala en producción y ordenó subir lo hecho y dejarlo aquí.
+Cuatro cambios, todos en la sala 01 (`CoreSection` → `NeuralRoom`); el
+escáner **no** debe cambiar, así que lo que toque a la escena va por prop
+(`variant="room"` ya existe en `EvaNeuralCore`; falta propagarlo a la escena).
+
+1. **La aparición del cerebro se ve «rota» y lenta.** Hoy la sala pinta el
+   mapa SVG (`NeuralFallback`) mientras carga y lo desvanece en 900 ms
+   (`FADE_MS`, `.core__flat[data-fading]`), y el bucle no arranca hasta que
+   la sala entra en pantalla (`NeuralRoom`, `IntersectionObserver` con
+   `rootMargin: '160px'`), así que al llegar se ve nacer. Qué hacer:
+   - En `variant="room"` no montar el mapa plano mientras carga (sólo en
+     `flat`, sin WebGL): fondo oscuro + HUD «Compilando…» y el lienzo entra con
+     un fundido propio (`.core__canvas` opacidad 0 → 1, ~600 ms, al pasar a
+     `live`).
+   - Subir el margen del observador (≈ 600 px) o activar la sala desde el
+     principio en escritorio, para que ya esté girando y latiendo cuando se
+     llega; mantener la congelación cuando el escáner la tapa (`covered`).
+   - Con `frameloop='never'` R3F no dibuja ni un fotograma: si se mantiene
+     inactiva al montar, forzar un `invalidate()` para que el primer cuadro
+     exista antes del fundido.
+2. **Hiperactividad.** Más vida que en el escáner, sin tocar el escáner:
+   añadir un `tempo` (número) a `NeuralScene` → `NeuralNetwork`/`BrainShell`.
+   Con `tempo ≈ 2` en la sala: `SPONTANEOUS` (`NeuralNetwork.tsx`, 0,7 s en
+   `high`) dividido por `tempo`; cascadas cada 2–4 s en vez de 5–10
+   (`nextCascade`); `SPEED` 1,15 → ~1,6; reserva de impulsos `DETAIL.sparks`
+   64 → 96 en `high`; `SPIN` (`NeuralScene.tsx`, 0,125 rad/s) → ~0,2;
+   `SWEEP_SECONDS` de la corteza 4,2 → ~2,6. Movimiento reducido sigue
+   apagándolo todo.
+3. **El cerebro tiene que ocupar la mitad de la slide.** Hoy el escenario mide
+   `clamp(22rem, 64vh, 38rem)` (`lab.css`, `.core-room__stage` y `.readout`,
+   siempre iguales) y la cámara está en `HOME = (2.9, 1.8, 4.7)`
+   (`NeuralScene.tsx`, distancia ≈ 5,7). Qué hacer: altura
+   `clamp(26rem, 74vh, 44rem)` en ambos; y una prop `framing: 'scan' | 'room'`
+   en `NeuralScene` con cámara de sala ≈ `(2.4, 1.5, 3.9)` y `minDistance` 3,2
+   (o `SCALE` 1,5 → 1,7). Comprobar a 1366×720 que la sala sigue cabiendo
+   (`@media (max-height: 50rem)` ya reduce ambas alturas).
+4. **El chat, con letra más grande y un poco más lento.** `lab.css`
+   `.readout__body` `font-size` 0,64 rem → ~0,82 rem (line-height 1,6 se
+   mantiene); `NeuralReadout.tsx` `SPEED` 800 → ~520 caracteres/s y `HOLD`
+   70 → ~120 ms. Con la letra mayor caben menos líneas: bajar `KEEP` (90) no
+   hace falta, el cuerpo recorta por dentro.
+
+Cómo comprobarlo: `npm run dev`, http://localhost:3000/#nucleo, y para
+capturas del panel del navegador recordar la trampa 17 (el compositor no sigue
+al scroll si el panel no pinta).
 
 ## 1. Qué es esta página
 
