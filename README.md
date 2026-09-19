@@ -1,8 +1,21 @@
-# EVA — landing v2.0
+# EVA — landing v6
 
-El laboratorio de **EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció
-dentro de una red se cuenta a sí misma — un núcleo neural en vivo, su cerebro, sus redes, sus
-causas y su bitácora — en una landing de ciencia ficción interactiva. EVA es un personaje; no hay servicios
+**EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció dentro de una red se
+cuenta a sí misma en una landing de ciencia ficción interactiva. La página se organiza por su
+acrónimo, con numeración binaria:
+
+```
+00 · Portada — el acrónimo como tres puertas
+01 · ENTIDAD
+     01.01 · Núcleo cerebral — el cerebro 3D en vivo y la ventana que lo lee
+     01.10 · Genoma digital  — la doble hélice, sus siete acciones y el nacimiento de EVA
+     01.11 · Por definir     — reserva: sólo el genoma a la vista
+10 · VIGILANCIA — clausurada
+11 · AUTONOMÍA  — en desarrollo
+```
+
+Acompaña a toda la página **SINAPSIS // EVA**, el canal flotante de EVA: empieza cerrado, se abre
+sólo si el visitante lo pide y se cierra al cambiar de lugar. EVA es un personaje; no hay servicios
 ni productos.
 
 ## Stack
@@ -19,6 +32,7 @@ npm install
 npm run dev        # http://localhost:3000
 npm run lint
 npm run typecheck
+npm test           # lógica pura (binario, estructura, canal, encuadre) con node --test
 npm run build
 ```
 
@@ -29,38 +43,39 @@ Despliegue: Vercel, sin configuración. Con dominio propio, definir `NEXT_PUBLIC
 Sitio: https://evaproyecto01.vercel.app/ · rama de producción: `main`.
 Runtime: Node 24.x. Next.js y eslint-config-next: 16.3.5.
 
-El botón «Escribir a EVA» usa el Instagram público de EVA. El favicon reutiliza el rombo de la
-cabecera.
-
-Las antiguas rutas `/cursos`, `/informes`, `/prototipos`, `/eva`, `/estudios-juridicos`
-y `/panel` redirigen a la nueva portada. GitHub Actions comprueba lint, build, tipos y
-vulnerabilidades de producción al integrar cambios en `main` y en los pull requests.
-
-Detalle del lanzamiento y comprobaciones: [`docs/RELEASE_2026-09-19.md`](docs/RELEASE_2026-09-19.md).
+El botón «Escribir a EVA» usa el Instagram público de EVA. Las antiguas rutas `/cursos`,
+`/informes`, `/prototipos`, `/eva`, `/estudios-juridicos` y `/panel` redirigen a la portada, y las
+anclas de la versión anterior (`#cerebro`, `#redes`, `#causas`, `#bitacora`) llevan a donde hoy
+vive lo que contaban. GitHub Actions comprueba lint, pruebas, build, tipos y vulnerabilidades.
 
 ## Estructura
 
 ```
 public/eva/            retratos de EVA
 src/
-  app/                 layout, página, estilos globales, OG, robots, sitemap
+  app/                 layout, página, estilos (globals, interface, neuroscan, dna, lab, ejes), OG
   components/
-    eva/               EvaField (fondo), EvaSignalCursor, SoundControl, EvaPortraitFrame, EvaDnaHelix,
-                       EvaNeuroscan; dna/ (hélice 3D) y neural/ (núcleo neural 3D del escáner)
-    layout/            SiteHeader, MobileNavigation, SiteFooter
-    sections/          HeroEva y las salas: LabSection, OriginSection, BrainSection,
-                       NetworksSection, CausesSection, LogSection
-  content/             ← todo lo editable: site, lab (las salas), neuroscan, assets
-  lib/                 types, sound, site, stage (capas y apertura del escáner), genome
-  styles/tokens.css    colores, radios, tiempos
-docs/                  auditorías, roadmap, guía de contenido, referencias y licencias
+    eva/               EvaField, EvaSignalCursor, EvaSynapse (canal), EvaDnaHelix, GenomeStrand,
+                       TypedParagraph, EvaAcronymMesh, EvaNeuroscan, EvaProfile…;
+                       dna/ (hélice 3D) y neural/ (núcleo neural 3D, encuadre en neural-frame.ts)
+    layout/            SiteHeader, ContextSpy (dónde está el visitante), BitRail, MobileNavigation,
+                       SiteFooter
+    sections/          HeroEva, NucleoSection, GenomaSection, ReservaSection, VigilanciaSection,
+                       AutonomiaSection; reserva/ (salas antiguas, no se montan)
+  content/             ← todo lo editable: structure (el recorrido), ejes, channel, site, neuroscan,
+                       lab, assets
+  lib/                 binary, channel (máquina de estados del canal), context, field, genome-state,
+                       stage, sound, genome, types
+  styles/tokens.css    colores, radios, tiempos, suelo tipográfico
+docs/                  handoff, auditorías, guía de contenido, referencias y licencias
+scripts/test-hooks.mjs resolución de módulos para `node --test` (sin dependencias)
 ```
 
 ## Cómo se edita
 
-Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: textos globales y conmutadores
-en `src/content/site.ts`, las salas en `lab.ts`, el escáner en `neuroscan.ts`, retratos en
-`assets.ts`, colores en `src/styles/tokens.css`.
+Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: el recorrido en
+`src/content/structure.ts`, los textos de cada lugar en `ejes.ts`, el canal en `channel.ts`, el
+genoma y la portada en `site.ts`, el escáner en `neuroscan.ts`, colores en `src/styles/tokens.css`.
 
 ## Documentación
 

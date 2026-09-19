@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` = v5.1 (núcleo neural 3D, laboratorio y sala 01 en vivo) · publicado en https://evaproyecto01.vercel.app/ · **hay un encargo abierto en §0**
+**Estado:** rama `feat/eva-ejes` = v6 (la página organizada en Entidad / Vigilancia / Autonomía, con numeración binaria y el canal SINAPSIS) · base: `main` v5.1 (`6dc9c14`), publicada en https://evaproyecto01.vercel.app/ · revisada en navegador a 1440×900, 1366×720, 768×1024 y 390×844 con cuatro correcciones encima (trampas 22 y 23, portada en móvil y suelo tipográfico) · **pendiente: integrar en `main`**
 **Fecha:** 19 de septiembre de 2026
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
@@ -21,70 +21,68 @@ npm run build      # obligatorio antes de subir: el dev server perdona cosas que
 
 ---
 
-## 0. Encargo abierto: afinar la sala 01 (pedido del propietario, 19 sept. 2026)
+## 0. Encargo resuelto en v6: la página por ejes (19 sept. 2026)
 
-Lo pidió al ver la sala en producción y ordenó subir lo hecho y dejarlo aquí.
-Cuatro cambios, todos en la sala 01 (`CoreSection` → `NeuralRoom`); el
-escáner **no** debe cambiar, así que lo que toque a la escena va por prop
-(`variant="room"` ya existe en `EvaNeuralCore`; falta propagarlo a la escena).
+El encargo abierto de la v5.1 (afinar la sala 01: aparición, hiperactividad,
+tamaño del cerebro y letra de la ventana) quedó resuelto dentro de una
+reorganización mayor pedida por el propietario:
 
-1. **La aparición del cerebro se ve «rota» y lenta.** Hoy la sala pinta el
-   mapa SVG (`NeuralFallback`) mientras carga y lo desvanece en 900 ms
-   (`FADE_MS`, `.core__flat[data-fading]`), y el bucle no arranca hasta que
-   la sala entra en pantalla (`NeuralRoom`, `IntersectionObserver` con
-   `rootMargin: '160px'`), así que al llegar se ve nacer. Qué hacer:
-   - En `variant="room"` no montar el mapa plano mientras carga (sólo en
-     `flat`, sin WebGL): fondo oscuro + HUD «Compilando…» y el lienzo entra con
-     un fundido propio (`.core__canvas` opacidad 0 → 1, ~600 ms, al pasar a
-     `live`).
-   - Subir el margen del observador (≈ 600 px) o activar la sala desde el
-     principio en escritorio, para que ya esté girando y latiendo cuando se
-     llega; mantener la congelación cuando el escáner la tapa (`covered`).
-   - Con `frameloop='never'` R3F no dibuja ni un fotograma: si se mantiene
-     inactiva al montar, forzar un `invalidate()` para que el primer cuadro
-     exista antes del fundido.
-2. **Hiperactividad.** Más vida que en el escáner, sin tocar el escáner:
-   añadir un `tempo` (número) a `NeuralScene` → `NeuralNetwork`/`BrainShell`.
-   Con `tempo ≈ 2` en la sala: `SPONTANEOUS` (`NeuralNetwork.tsx`, 0,7 s en
-   `high`) dividido por `tempo`; cascadas cada 2–4 s en vez de 5–10
-   (`nextCascade`); `SPEED` 1,15 → ~1,6; reserva de impulsos `DETAIL.sparks`
-   64 → 96 en `high`; `SPIN` (`NeuralScene.tsx`, 0,125 rad/s) → ~0,2;
-   `SWEEP_SECONDS` de la corteza 4,2 → ~2,6. Movimiento reducido sigue
-   apagándolo todo.
-3. **El cerebro tiene que ocupar la mitad de la slide.** Hoy el escenario mide
-   `clamp(22rem, 64vh, 38rem)` (`lab.css`, `.core-room__stage` y `.readout`,
-   siempre iguales) y la cámara está en `HOME = (2.9, 1.8, 4.7)`
-   (`NeuralScene.tsx`, distancia ≈ 5,7). Qué hacer: altura
-   `clamp(26rem, 74vh, 44rem)` en ambos; y una prop `framing: 'scan' | 'room'`
-   en `NeuralScene` con cámara de sala ≈ `(2.4, 1.5, 3.9)` y `minDistance` 3,2
-   (o `SCALE` 1,5 → 1,7). Comprobar a 1366×720 que la sala sigue cabiendo
-   (`@media (max-height: 50rem)` ya reduce ambas alturas).
-4. **El chat, con letra más grande y un poco más lento.** `lab.css`
-   `.readout__body` `font-size` 0,64 rem → ~0,82 rem (line-height 1,6 se
-   mantiene); `NeuralReadout.tsx` `SPEED` 800 → ~520 caracteres/s y `HOLD`
-   70 → ~120 ms. Con la letra mayor caben menos líneas: bajar `KEEP` (90) no
-   hace falta, el cuerpo recorta por dentro.
-
-Cómo comprobarlo: `npm run dev`, http://localhost:3000/#nucleo, y para
-capturas del panel del navegador recordar la trampa 17 (el compositor no sigue
-al scroll si el panel no pinta).
+- **Aparición:** en la sala ya no se cruza el mapa SVG con el 3D. Mientras
+  compila sólo se ve el HUD y una retícula; el lienzo entra con su propio
+  fundido de 600 ms. La escena se monta una pantalla antes de llegar
+  (`rootMargin: 100%`) y se anima desde 600 px antes. Inactiva usa
+  `frameloop='demand'`, no `never`: pinta su primer fotograma igual.
+- **Hiperactividad:** prop `tempo` (2 en la sala, 1 en el escáner) en
+  `NeuralScene` → `NeuralNetwork`/`BrainShell`: impulsos espontáneos ÷2,
+  cascadas cada 2–4 s, velocidad ×1,4, reserva de impulsos 64 → 96, giro
+  0,125 → 0,2 rad/s, barrido 4,2 → 2,6 s. Movimiento reducido lo apaga todo.
+- **Tamaño:** el cerebro ya no tiene escala fija. `neural-frame.ts` calcula
+  la escala con la proporción real del lienzo para llenar el 88 % de la
+  dimensión que limita (probado en `neural-frame.test.ts`), y los anillos se
+  atan al mismo marco. En la sala ocupa media sección a todo el alto
+  (escenario `clamp(24rem, 68vh, 44rem)`); en el escáner, la columna central
+  es la más ancha y en móvil el cerebro va primero.
+- **Ventana de lectura:** 0,82 rem, 520 caracteres/s, pausa 120 ms. Y un fallo
+  que no estaba en el encargo: en móvil la ventana no tenía alto y crecía
+  ~190 px por segundo estirando la sección; ahora tiene alto fijo en todos los
+  anchos (`contain: size` en escritorio).
 
 ## 1. Qué es esta página
 
-Una landing de una sola ruta (`src/app/page.tsx`) partida en secciones que
-**caben una a una en la pantalla**. Cada sección es `.slide` con
-`min-height: 100svh` y `scroll-snap-align`. Si añades contenido a una sección,
-comprueba que sigue cupiendo a 1440×900 y a 1366×720 antes de darla por buena.
+Una landing de una sola ruta (`src/app/page.tsx`) organizada por el acrónimo,
+con numeración binaria real (`lib/binary.ts`):
 
-Orden actual: portada → **Núcleo** (el cerebro 3D con la ventana que lo lee)
-→ **Cerebro** → **Redes** → **Causas** → **Bitácora**. Son las cinco salas del
-laboratorio de EVA: ella contándose. La sala Origen («No nací. Aparecí.») duró un
-commit: el propietario la cambió por el núcleo en vivo (su texto sigue en
-`e58b34a`). Los cuatro universos (Academy, News, Arcade, Lab), el destacado
-y la sección Cursos salieron de la página por decisión del propietario: esto es
-el laboratorio personal de un personaje, no un catálogo de servicios ni de
-productos. Su código y sus colecciones quedan en el historial (último commit con
-ellos: `751d6ca`) por si «luego reorganizamos la info».
+```
+00 · Portada — el acrónimo como tres puertas, y el retrato que abre el escáner
+01 · ENTIDAD
+     01.01 · Núcleo cerebral — cerebro 3D en vivo + ventana de lectura + 8 regiones
+     01.10 · Genoma digital  — hélice 3D, 7 acciones, párrafo del nacimiento (se teclea una vez)
+     01.11 · Por definir     — banda de reserva: el genoma a la vista, sin tema asignado
+10 · VIGILANCIA — clausurada (la «V» quieta con faja de clausura; el fondo se frena)
+11 · AUTONOMÍA  — en desarrollo (la «A» a medio ensamblar; registro listo para subsecciones)
+```
+
+**Todo el recorrido sale de `src/content/structure.ts`:** cabecera, riel de
+bits, menú móvil, pie, pies de slide, portada y canal leen de ahí. Los códigos
+se calculan; no se escriben a mano. Cada sección es `.slide` con
+`min-height: 100svh` y `scroll-snap-align` (salvo la banda 01.11); si añades
+contenido, comprueba que sigue cabiendo a 1440×900 y a 1366×720.
+
+**SINAPSIS // EVA** (`EvaSynapse`, reglas en `lib/channel.ts`) sustituye al
+antiguo panel de pensamiento, que se abría solo a los 2,2 s: empieza cerrado
+(botón de 48 px abajo a la derecha), se abre sólo con clic o tecla, se cierra
+al cambiar de lugar (por scroll con 400 ms de histéresis, o al pulsar un enlace
+interno), avisa una vez por lugar sin abrirse, conserva el hilo y retoma una
+frase interrumpida donde quedó. Si el visitante retrocede para leer, se detiene
+y ofrece «retomar el hilo». En escritorio el contenido se aparta para dejarle
+sitio (`html[data-channel='open']`), así abierto no tapa controles; en móvil es
+una hoja inferior. Guiones en `content/channel.ts`.
+
+Las salas de la v5 (Cerebro, Redes, Causas, Bitácora) salieron del recorrido:
+sus textos siguen en `content/lab.ts` y sus componentes en
+`components/sections/reserva/`, compilando pero sin montar, para reutilizarlos
+cuando Vigilancia, Autonomía o 01.11 tengan contenido. No asignarlos sin
+decisión del propietario.
 
 EVA es un personaje, no un chatbot real. Todo lo que «hace» en pantalla —clonar
 su genoma, escanearse el cerebro, pensar en voz alta— es ficción declarada. No
@@ -106,41 +104,45 @@ hay backend, no hay IA detrás, no se guarda nada. Mantenlo así o dilo en panta
 ## 3. Cómo está armado
 
 **Todo el texto vive en `src/content/`.** Los componentes no llevan literales ni
-URLs. `site.ts` lleva lo global: `flags`, `nav`, `hero`, `genome`, `synapse`,
-`sections.footer`, `ui`. `lab.ts` lleva las cinco salas (`rooms`, `navItems`,
-`lab.origin/brain/networks/causes/log`). `neuroscan.ts` lleva el escáner y es la
-fuente de todo lo que las salas repiten (regiones, declaración dataísta,
-respuestas del interrogatorio): EVA no se contradice entre salas. `assets.ts`,
-los retratos. Guía de estilo editorial en `CONTENT_GUIDE.md`.
+URLs. `structure.ts` lleva el recorrido (ejes, subsecciones, estados, acentos y
+códigos). `ejes.ts`, los textos de cada lugar. `channel.ts`, los rótulos y guiones
+del canal. `site.ts`, lo global: `flags`, `nav`, `hero`, `genome`,
+`sections.footer`, `ui`. `neuroscan.ts` lleva el escáner y es la fuente de todo
+lo que se repite (regiones, flujo, declaración dataísta, respuestas): EVA no se
+contradice. `lab.ts` guarda las salas en reserva y el vocabulario de la ventana
+de lectura. `assets.ts`, los retratos. Guía editorial y reglas del binario en
+`CONTENT_GUIDE.md`.
 
-**Estilos.** Tokens en `src/styles/tokens.css`. Cinco hojas en `src/app/`:
-`globals.css` (base y secciones), `interface.css` (slides, cursor, portada),
-`neuroscan.css` (el escáner), `dna.css` (genoma, panel de pensamiento y vídeo) y
-`lab.css` (las salas). El acento de cada sala se fija con `data-accent` desde
-`rooms`.
+**Estilos.** Tokens en `src/styles/tokens.css` (incluye el suelo tipográfico:
+nada por debajo de 11 px, y el carril del canal, `--eva-dock`). Seis hojas en
+`src/app/`: `globals.css` (base), `interface.css` (slides, cursor, portada),
+`neuroscan.css` (escáner y núcleo), `dna.css` (genoma y vídeo), `lab.css` (salas
+en reserva) y `ejes.css` (todo lo de v6: ejes, navegación, riel, secciones,
+canal). El acento de cada lugar sale de `structure.ts`; Vigilancia y Autonomía
+lo redefinen con `[data-axis]`.
 
-**Servidor por defecto.** Sólo son cliente los componentes de
-`src/components/eva/` más `MobileNavigation`, `NavSpy` y `SoundControl`. Las
-salas (`components/sections/*Section.tsx`, sobre `LabSection`) son de servidor;
-el único botón vivo que llevan es `NeuroscanTrigger`, que pide abrir el escáner
-con un evento (`lib/stage.ts`) y `EvaProfile` lo atiende.
+**Servidor por defecto.** Son cliente los componentes de `src/components/eva/`
+más `MobileNavigation`, `ContextSpy`, `BitRail` y `SoundControl`. Las secciones
+(`components/sections/*Section.tsx`) son de servidor y pasan sus textos a las
+piezas vivas como huecos (`head`, `copy`, `aside`). El escáner se abre desde
+cualquier sitio con un evento (`lib/stage.ts`) que atiende `EvaProfile`.
 
-### La portada, pieza por pieza
+### Las piezas
 
 | Pieza | Archivo | Qué hace |
 |---|---|---|
-| Acrónimo | `eva/EvaAcronymMesh.tsx` | Rasteriza E / V / A en un lienzo oculto con Orbitron, muestrea los píxeles opacos en nodos y los une con aristas largas. La letra es una malla, no un polígono dibujado a mano: si cambias la fuente, cambian las letras. Una única onda viajera recorre toda la red, así se mueve como tela y no como enjambre. |
-| Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice procedural en R3F con siete acciones: clonar, utilizar, mutar, escanear, desplegar, sonificar y descargar. `lib/genome.ts` guarda la secuencia con semilla fija (600 bases) y genera el FASTA y las notas. `lib/spin.ts` lleva la inercia del arrastre. |
-| Retrato | `eva/EvaProfile.tsx` → `EvaPortraitFrame.tsx` → `EvaPortraitLoop.tsx` | Marco técnico con la ficha del estudio. Encima, un bucle de vídeo mudo que sólo se carga en pantallas de 1024 px o más. Debajo siempre está la imagen, que hace de póster. |
-| Pensamiento | `eva/EvaThoughtStream.tsx` | Panel flotante abajo a la derecha, montado en el **layout** (acompaña toda la página, no sólo la portada). Se despliega solo a los 2,2 s y teclea sin parar. El texto sale de `content/neuroscan.ts` para que EVA no se contradiga entre lo que piensa fuera y lo que piensa dentro del escáner. |
-| Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa al pulsar el retrato. Inertiza `main`, `header`, `footer` y `.synapse`. Al abrirse enciende `lib/stage.ts` (`setCovered`) y el genoma congela su bucle hasta que se cierra. |
-| Núcleo neural | `eva/neural/EvaNeuralCore.tsx` + `NeuralScene.tsx`, `BrainShell.tsx`, `NeuralNetwork.tsx`, `neural-data.ts`, `neural-signal.ts`, `NeuralFallback.tsx` | El cerebro 3D, en el escáner (`variant="scan"`) y en la sala 01 (`variant="room"`). Ver §7. |
-| Sala 01 | `eva/neural/NeuralRoom.tsx` + `NeuralReadout.tsx` | El mismo cerebro, con todos sus efectos, junto a la ventana «NEURAL READOUT» que teclea a 800 caracteres/s: aritmética de red, contadores de relaciones, un pensamiento suelto, volcados binarios y la lectura de la región que se pulse. Se congela fuera de pantalla y cuando el escáner la tapa. |
-| Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts` | Partículas que se enganchan al puntero y se vuelven cuadradas sobre lo interactivo; el cursor es un círculo que se convierte en cuadrado con esquinas de puntería. Comparten estado por un módulo, no por eventos por fotograma. |
-
-El genoma publica su estado en `.hero__grid` con `data-genome`, y el retrato
-reacciona desde CSS. Son el mismo sistema visto dos veces; no pases props entre
-hermanos para esto.
+| Estructura | `content/structure.ts` + `lib/binary.ts` | El árbol del recorrido y sus códigos. `contextNodes` son los lugares que se pueden estar mirando; `hashAliases`, las anclas antiguas. |
+| Dónde está el visitante | `layout/ContextSpy.tsx` + `lib/context.ts` | Observa la franja central de la pantalla, espera 400 ms y publica el lugar. Marca `aria-current`, escribe `html[data-axis]` y `html[data-node]`, tiñe y frena el fondo, cierra el canal al pulsar un enlace interno. |
+| Canal | `eva/EvaSynapse.tsx` + `lib/channel.ts` + `content/channel.ts` | Máquina de estados pura y probada; la mecanografía escribe directo en el DOM y reserva el alto de cada línea. |
+| Acrónimo | `eva/EvaAcronymMesh.tsx` | Malla de nodos a partir de Orbitron. Modos `alive` (portada), `sealed` (Vigilancia: quieta, con estremecimientos) y `building` (Autonomía: aristas que se conectan y se sueltan); paletas `signal`, `seal`, `growth`. Se detiene fuera de pantalla. |
+| Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice con siete acciones y purga. Ahora también en móvil (`quality='low'`: sin bloom). Publica su estado en `<html data-genome>` (`lib/genome-state`) y sacude el fondo (`lib/field`). |
+| Cinta del genoma | `eva/GenomeStrand.tsx` | La misma secuencia de 600 bases, en 2D, magenta y violeta, cruzando la banda 01.11. |
+| Párrafo del nacimiento | `eva/TypedParagraph.tsx` | Se teclea una vez por visita; el texto completo está en el DOM desde el principio (invisible lo no escrito), así no salta nada y se lee sin JavaScript. |
+| Retrato | `eva/EvaProfile.tsx` → `EvaPortraitFrame.tsx` → `EvaPortraitLoop.tsx` | Igual que en v5; abre el escáner. |
+| Escáner | `eva/EvaNeuroscan.tsx` | Modal a pantalla completa. Cierra el canal al abrirse y devuelve el foco a quien lo abrió. El cerebro va primero y en la columna más ancha. |
+| Núcleo neural | `eva/neural/*` | Ver §0 y §7. Encuadre en `neural-frame.ts`. |
+| Riel de bits | `layout/BitRail.tsx` | A partir de 1.280 px: cuatro celdas que se encienden con el código del lugar, y una marca por lugar. |
+| Fondo y cursor | `eva/EvaField.tsx`, `eva/EvaSignalCursor.tsx`, `lib/pointer.ts`, `lib/field.ts` | Como en v5, más el tinte por eje, la quietud de Vigilancia y las sacudidas del genoma. |
 
 ---
 
@@ -161,10 +163,11 @@ apareció dos veces en sitios distintos.
    `Math.random()` en render (usa el LCG con semilla que ya está), nada de
    `setState` dentro de efectos, y no mutes lo que devuelve un hook ni las props
    — `useThree().camera` incluido; escala un grupo propio en su lugar.
-3. **`window` en inicializadores de estado.** `EvaThoughtStream` **sí** se
-   renderiza en el servidor. Un `useState(() => window.matchMedia(...))` pasa el
-   dev server y revienta el build. Usa `useSyncExternalStore` con instantánea de
-   servidor, como está ahora.
+3. **`window` en inicializadores de estado.** `EvaSynapse`, `TypedParagraph` y
+   `EvaNeuralCore` **sí** se renderizan en el servidor. Un
+   `useState(() => window.matchMedia(...))` pasa el dev server y revienta el
+   build. Usa `useSyncExternalStore` con instantánea de servidor, como está ahora
+   (`lib/motion`, `lib/context`, `lib/channel-store`).
 4. **El panel del navegador engaña.** Cuando la vista previa pierde el foco,
    `requestAnimationFrame` se congela: 0 fotogramas, el canvas de R3F en blanco,
    los callbacks del `IntersectionObserver` sin entregar (así que el vídeo ni se
@@ -198,8 +201,8 @@ apareció dos veces en sitios distintos.
 15. **`EvaNeuralCore` se renderiza en el servidor** desde que vive en la sala 01.
     Nada de `document` ni `window` en inicializadores: la detección de WebGL y
     de dispositivo va detrás de `useIsClient` (`useSyncExternalStore`) y está
-    cacheada por página (`webglSupported`, `deviceTier`). Hasta hidratar se
-    pinta el mapa plano.
+    cacheada por página (`webglSupported`, `deviceTier`, `coarsePointer`). Hasta
+    hidratar sólo se ve el HUD; el mapa plano queda para cuando no hay WebGL.
 16. **Dos escenas del núcleo comparten `coreSignal`** (sala y escáner). No chocan
     porque nunca están activas a la vez: el escáner enciende `setCovered` y la
     sala congela su bucle. Si algún día conviven, el signal tiene que ser por escena.
@@ -207,35 +210,60 @@ apareció dos veces en sitios distintos.
     con la cabecera abajo: el compositor se queda en y=0 mientras no hay
     fotogramas. No es la página. Para ver una sala, cárgala con `main`
     desplazado por `margin-top` negativo o lleva el panel a primer plano.
+18. **La vista previa del panel arranca en la raíz original del proyecto**, no
+    en un worktree: en la sesión de la v6 levantó la copia local antigua (Next
+    16.2.6, título «Inteligencia, aprendizaje y experimentación») en vez de la
+    rama nueva. Antes de revisar nada, mira en los registros qué versión de Next
+    arrancó y el título de la pestaña.
+19. **`frameloop='demand'`, no `'never'`, para congelar una escena.** Con
+    `never` R3F no dibuja ni el primer fotograma y el lienzo queda en blanco
+    hasta que se activa; con `demand` pinta al montar y al redimensionar.
+20. **La clase `.synapse` es un contrato**: el escáner y el menú móvil inertizan
+    el canal por ese nombre, y además le piden que se cierre
+    (`requestChannelClose`). Si la renombras, cambia los dos selectores.
+21. **Un nodo sólo cuenta como «lugar» si se sostiene 400 ms** en la franja
+    central (`CONTEXT_DWELL_MS`). Sin esa espera, el desplazamiento suave de un
+    enlace pasaba por las secciones intermedias y el canal avisaba de todas.
+22. **Dos `EffectComposer` en la misma página se pisan el tamaño.**
+    `@react-three/postprocessing` (3.1.1) mide el lienzo en un `Vector2`
+    compartido por todos sus composers y lo lee más tarde, en un `useEffect`;
+    entre medias, el `useFrame` de cualquier otra escena activa vuelve a
+    escribirlo. Cuando el genoma monta (una pantalla antes de verse, con la
+    sala del cerebro animando) su renderer arranca con el tamaño del cerebro y
+    la hélice sale recortada hasta el siguiente `resize`. `ComposerSizeGuard`
+    va detrás del composer en cada `<Canvas>` y devuelve el renderer a
+    `state.size`. Si añades una escena con bloom, ponlo también.
+23. **Lo que un bucle escribe en el DOM no puede ser hijo de React.** La
+    ventana de lectura teclea creando `<p>` a mano dentro de un contenedor
+    que React también rellena (las líneas de arranque). Si el bucle borra un
+    nodo de React, la siguiente reconciliación —al cambiar `reduced`, por
+    ejemplo— lanza `removeChild` sobre un nodo que ya no es hijo, el commit
+    falla y **la página entera se desmonta** (de rebote, un `<Canvas>` a
+    medio configurar conecta eventos sobre `null`). El bucle sólo desahucia
+    líneas suyas (`typed`) y las retira al pasar a movimiento reducido.
 
 ---
 
 ## 5. Pendiente, por impacto
 
-1. **El vídeo pesa 3,71 MB**, sin recomprimir y con una pista de audio que no se
-   usa. En la máquina donde se integró no había ffmpeg. Está mitigado —sólo se
-   pide a partir de 1024 px, sólo al entrar en pantalla, y debajo queda la imagen
-   de 116 kB— pero no resuelto. A 720p sin audio debería bajar a 600–900 kB.
-2. **Permiso de publicación de retratos y vídeo**: todo figura como «por
-   confirmar por el propietario» en `ASSET_LICENSES.md`. Hay que cerrarlo.
-3. El contacto es el Instagram público («Escribir a EVA»). No inventar otro canal.
-4. Isotipo en `src/app/icon.svg` y Open Graph definitiva.
-5. Revisión de los textos de humor de EVA por el propietario, ahora también los
-   de `lab.ts`.
-6. Las colecciones de los universos (proyectos, noticias, rutas) ya no están en
-   el árbol; si vuelven a hacer falta, están en `751d6ca`.
-7. Capturas y tratamiento de imagen quedan sin objeto mientras no haya fichas.
-8. Sección de contacto propia: hoy no existe y las redirecciones antiguas van a `/`.
-9. `prefers-reduced-motion` está implementado en todas las piezas pero **nunca se
-   ha probado de punta a punta**. Igual Safari iOS y lector de pantalla.
-10. **Reorganizar la información del laboratorio** con el propietario: las cinco
-    salas son una primera pasada («luego reorganizaremos la info»). Los textos
-    nuevos de `lab.ts` también esperan su revisión de humor y de tono.
-
-Detalle histórico: `LANDING_ROADMAP.md`, `AUDITORIA_FINAL_LANDING_EVA.md`,
-`RELEASE_2026-09-19.md`.
-
----
+1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
+   con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
+   encargo entera: cerebro, hélice, canal (cerrado al cargar, aviso, abrir,
+   cerrar al cambiar de sección, retomar hilo), regiones por teclado, escáner
+   (Escape y foco de vuelta), anclas antiguas, menú móvil y movimiento
+   reducido. Falta mirarla en Safari iOS y con lector de pantalla (punto 7).
+   Nota: las anclas dejan unos 90 px de la sección anterior a la vista en
+   móvil (`scroll-padding-top` + `scroll-margin-top`, CSS heredado de v5).
+2. **Contenido de Vigilancia, Autonomía y 01.11**: decisión del propietario.
+   Las salas en reserva están disponibles.
+3. **Revisión de tono** de los textos nuevos: párrafo del nacimiento
+   (`ejes.genoma.birth`), explicaciones del canal (`channel.scripts`) y líneas
+   de estado.
+4. **El vídeo pesa 3,71 MB**, sin recomprimir y con audio que no se usa.
+5. **Permiso de publicación de retratos y vídeo** (`ASSET_LICENSES.md`).
+6. El contacto es el Instagram público. No inventar otro canal.
+7. `prefers-reduced-motion`, Safari iOS y lector de pantalla: implementados,
+   nunca probados de punta a punta.
 
 ## 6. Reglas editoriales que conviene mantener
 
@@ -294,6 +322,11 @@ sintético en WebGL, dentro del mismo `.brain` y con la misma lógica de selecci
   con siete funciones, retrato en vídeo, escáner neurodigital y el pensamiento de
   EVA como panel flotante. Fuera el texto introductorio, los botones, el rotador
   y la franja de Misión / Visión / Objetivos.
-- **v5** (esta) — el escáner cambia el dibujo por un cerebro sintético en
+- **v5** — el escáner cambia el dibujo por un cerebro sintético en
   WebGL (§7) y la página deja de ser un catálogo: fuera los cuatro universos, el
   destacado y Cursos; entran las cinco salas del laboratorio de EVA.
+- **v6** (esta) — la página por ejes: Entidad (núcleo cerebral, genoma
+  digital, reserva), Vigilancia y Autonomía, con numeración binaria real; el
+  canal SINAPSIS sustituye al panel que se abría solo; cerebro encuadrado por
+  proporción; genoma con su propia subsección y usable en móvil; regiones y
+  métricas en español; salas antiguas en reserva.

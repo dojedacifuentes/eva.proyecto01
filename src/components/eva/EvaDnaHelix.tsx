@@ -1,53 +1,69 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { genome, site } from '@/content/site';
+import { bin } from '@/lib/binary';
+import { clearGenome, publishGenome, type GenomeState } from '@/lib/genome-state';
 import { sequenceId, toFasta, toNotes } from '@/lib/genome';
 import { isSoundEnabled, play, playSequence } from '@/lib/sound';
 import { pointerSignal } from '@/lib/pointer';
 import { spinSignal } from '@/lib/spin';
 import { isCovered, isCoveredOnServer, subscribeCovered } from '@/lib/stage';
 
-/** three.js no viaja en el paquete inicial: llega cuando la hélice entra en pantalla. */
+/** three.js no viaja en el paquete inicial: llega cuando el visitante se acerca a la hélice. */
 const DnaScene = dynamic(() => import('./dna/DnaScene'), { ssr: false });
 
-/** Densidad según el ancho: menos pares y menos polvo en pantallas chicas. */
+/**
+ * Densidad según el ancho. La escena y sus acciones existen en todas las
+ * pantallas —antes, por debajo de 768 px no se montaba y por debajo de 1024 no
+ * había botones—; lo que cambia es cuánto se dibuja y si hay postprocesado.
+ */
 function densityFor(width: number) {
-  if (width < 768) return { pairs: 14, particles: 40, scene: false, controls: false };
-  // En tablet la hélice se recuesta tras el acrónimo: no hay sitio limpio para
-  // los botones, así que ahí el genoma se mira pero no se toca.
-  if (width < 1024) return { pairs: 20, particles: 70, scene: true, controls: false };
-  return { pairs: 28, particles: 110, scene: true, controls: true };
+  if (width < 768) return { pairs: 16, particles: 36, quality: 'low' as const };
+  if (width < 1024) return { pairs: 22, particles: 70, quality: 'high' as const };
+  return { pairs: 28, particles: 110, quality: 'high' as const };
 }
-
-type State =
-  | 'active'
-  | 'cloning'
-  | 'using'
-  | 'mutating'
-  | 'scanning'
-  | 'unwinding'
-  | 'sounding'
-  | 'exporting';
 
 /** Cuántas notas se tocan al sonificar: unos cuatro segundos. */
 const NOTES = 26;
 
-/** Cuánto dura el estado alterado antes de volver a ACTIVE. */
+/** Cuánto dura el estado alterado antes de volver a ACTIVO. */
 const STATE_MS = 6000;
 
+/** Ancho del contador de copias: el original más cuatro clones caben en tres bits. */
+const CLONE_BITS = 3;
+
 /**
- * Genoma digital de EVA: doble hélice procedural en el hueco central del hero,
- * con dos acciones — clonar la secuencia y utilizarla.
+ * Genoma digital de EVA: doble hélice procedural con siete acciones —clonar,
+ * utilizar, mutar, escanear, desplegar, sonificar y descargar— más la purga de
+ * copias.
  *
- * Es ficción: no copia, descarga ni registra nada. Sólo cambia lo que se ve en
- * pantalla y lo que EVA contesta.
+ * Es ficción: no copia ni registra nada (la descarga es un archivo de texto
+ * generado en el navegador). Sólo cambia lo que se ve y lo que EVA contesta.
  *
- * El lienzo no recibe eventos; los botones sí. Nada de esto ocupa espacio en el
- * flujo, así que la portada sigue cabiendo en una pantalla.
+ * Vive en su propia subsección (01.10). Su estado se publica en `<html
+ * data-genome>` y cada acción sacude el campo de partículas: el genoma y la
+ * página son el mismo tejido.
+ *
+ * La sección le pasa sus piezas de texto como huecos (`head`, `copy`, `foot`):
+ * así la rejilla es una sola —hélice a un lado, lectura y consola al otro— y
+ * en móvil el orden es título, hélice, acciones y párrafo.
  */
-export function EvaDnaHelix() {
+interface EvaDnaHelixProps {
+  head?: ReactNode;
+  copy?: ReactNode;
+  foot?: ReactNode;
+}
+
+export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const nearRef = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -55,6 +71,7 @@ export function EvaDnaHelix() {
   const sounded = useRef(0);
   const exported = useRef(0);
 
+  const [close, setClose] = useState(false);
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [density, setDensity] = useState<ReturnType<typeof densityFor> | null>(null);
@@ -63,7 +80,7 @@ export function EvaDnaHelix() {
   const [mutate, setMutate] = useState(0);
   const [scan, setScan] = useState(0);
   const [unwind, setUnwind] = useState(0);
-  const [state, setState] = useState<State>('active');
+  const [state, setState] = useState<GenomeState>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
   /* Con el neuroescáner abierto encima, la hélice no se ve: su bucle se congela y se retoma al cerrar. */
   const covered = useSyncExternalStore(subscribeCovered, isCovered, isCoveredOnServer);
@@ -84,15 +101,27 @@ export function EvaDnaHelix() {
     };
   }, []);
 
-  /* Fuera de pantalla, el bucle de render se congela. */
+  /* Dos umbrales: uno lejano que monta la escena y otro cercano que la anima. */
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
+    const mount = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setClose(true);
+        mount.disconnect();
+      },
+      { rootMargin: '100% 0px' },
+    );
+    const live = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
       rootMargin: '120px',
     });
-    observer.observe(host);
-    return () => observer.disconnect();
+    mount.observe(host);
+    live.observe(host);
+    return () => {
+      mount.disconnect();
+      live.disconnect();
+    };
   }, []);
 
   /* Proximidad del puntero al área, en un ref: no provoca renders. */
@@ -130,20 +159,14 @@ export function EvaDnaHelix() {
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  /*
-   * El genoma y el retrato son el mismo sistema visto dos veces. Publicar el
-   * estado en la rejilla del hero deja que el retrato reaccione desde CSS, sin
-   * pasar props entre hermanos.
-   */
+  /* El estado se publica para toda la página: el CSS lo lee y el fondo se sacude. */
   useEffect(() => {
-    const grid = hostRef.current?.closest('.hero__grid');
-    if (!grid) return;
-    grid.setAttribute('data-genome', state);
-    return () => grid.removeAttribute('data-genome');
+    publishGenome(state);
+    return clearGenome;
   }, [state]);
 
-  /** Deja el estado alterado y programa la vuelta a ACTIVE. */
-  const announce = useCallback((next: State, lines: readonly string[]) => {
+  /** Deja el estado alterado y programa la vuelta a ACTIVO. */
+  const announce = useCallback((next: GenomeState, lines: readonly string[]) => {
     setState(next);
     setReply(lines);
     clearTimeout(timer.current);
@@ -212,7 +235,6 @@ export function EvaDnaHelix() {
 
   /* Arrastrar sobre la hélice la gira; el impulso se frena solo en la escena. */
   const onDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!interactive) return;
     spinSignal.dragging = true;
     dragX.current = event.clientX;
     // El puntero puede haberse ido entre el evento y esta línea.
@@ -237,27 +259,28 @@ export function EvaDnaHelix() {
     setClones(0);
   };
 
-  const drift = (clones * genome.driftPerClone).toFixed(1);
-  const interactive = density?.controls === true;
+  const drift = (clones * genome.driftPerClone).toFixed(1).replace('.', ',');
 
   return (
     <div ref={hostRef} className="dna" data-state={state}>
+      {head && <div className="dna__head">{head}</div>}
       <div
         className="dna__stage"
         aria-hidden="true"
-        data-grab={interactive || undefined}
-        data-cursor={interactive ? 'grab' : undefined}
-        data-cursor-label="GIRAR"
-        title={interactive ? genome.spin : undefined}
+        data-grab=""
+        data-cursor="grab"
+        data-cursor-label={genome.spinCursor}
+        title={genome.spin}
         onPointerDown={onDragStart}
         onPointerMove={onDragMove}
         onPointerUp={onDragEnd}
         onPointerCancel={onDragEnd}
       >
-        {density?.scene && (
+        {density && close && (
           <DnaScene
             pairs={density.pairs}
             particles={density.particles}
+            quality={density.quality}
             reduced={reduced}
             active={visible && !covered}
             clones={clones}
@@ -270,61 +293,63 @@ export function EvaDnaHelix() {
         )}
       </div>
 
-      <p className="dna__hud mono">
-        <span className="dna__hud-title">{genome.title}</span>
-        <span>{genome.sequence}</span>
-        <span className="dna__hud-core">
-          <i aria-hidden="true" />
-          {genome.core}: {genome.states[state]}
-        </span>
-        <span className="dna__hud-count">
-          {genome.clonesLabel}: {String(clones + 1).padStart(2, '0')} · {genome.driftLabel}: {drift}%
-        </span>
-      </p>
+      <div className="dna__console">
+        <p className="dna__hud mono">
+          <span className="dna__hud-title">{genome.title}</span>
+          <span>{genome.sequence}</span>
+          <span className="dna__hud-core">
+            <i aria-hidden="true" />
+            {genome.core}: {genome.states[state]}
+          </span>
+          <span className="dna__hud-count">
+            {genome.clonesLabel}: <b data-bin="">{bin(clones + 1, CLONE_BITS)}</b> · {genome.driftLabel}:{' '}
+            {drift} %
+          </span>
+        </p>
 
-      {interactive && (
-        <>
-          <div className="dna__actions">
-            <button type="button" className="dna__btn mono" onClick={onClone} data-cursor-label="CLONAR">
-              {genome.actions.clone}
+        <div className="dna__actions" role="group" aria-label={genome.actionsLabel}>
+          <button type="button" className="dna__btn mono" onClick={onClone} data-cursor-label="CLONAR">
+            {genome.actions.clone}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onUse} data-cursor-label="UTILIZAR">
+            {genome.actions.use}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onMutate} data-cursor-label="MUTAR">
+            {genome.actions.mutate}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onScan} data-cursor-label="ESCANEAR">
+            {genome.actions.scan}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onUnwind} data-cursor-label="DESPLEGAR">
+            {genome.actions.unwind}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onSound} data-cursor-label="SONIFICAR">
+            {genome.actions.sound}
+          </button>
+          <button type="button" className="dna__btn mono" onClick={onDownload} data-cursor-label="DESCARGAR">
+            {genome.actions.download}
+          </button>
+          {clones > 0 && (
+            <button
+              type="button"
+              className="dna__btn dna__btn--ghost mono"
+              onClick={onPurge}
+              data-cursor-label="PURGAR"
+            >
+              {genome.actions.purge}
             </button>
-            <button type="button" className="dna__btn mono" onClick={onUse} data-cursor-label="UTILIZAR">
-              {genome.actions.use}
-            </button>
-            <button type="button" className="dna__btn mono" onClick={onMutate} data-cursor-label="MUTAR">
-              {genome.actions.mutate}
-            </button>
-            <button type="button" className="dna__btn mono" onClick={onScan} data-cursor-label="ESCANEAR">
-              {genome.actions.scan}
-            </button>
-            <button type="button" className="dna__btn mono" onClick={onUnwind} data-cursor-label="DESPLEGAR">
-              {genome.actions.unwind}
-            </button>
-            <button type="button" className="dna__btn mono" onClick={onSound} data-cursor-label="SONIFICAR">
-              {genome.actions.sound}
-            </button>
-            <button type="button" className="dna__btn mono" onClick={onDownload} data-cursor-label="DESCARGAR">
-              {genome.actions.download}
-            </button>
-            {clones > 0 && (
-              <button
-                type="button"
-                className="dna__btn dna__btn--ghost dna__btn--wide mono"
-                onClick={onPurge}
-                data-cursor-label="PURGAR"
-              >
-                {genome.actions.purge}
-              </button>
-            )}
-          </div>
+          )}
+        </div>
 
-          <p className="dna__reply" role="status">
-            {reply.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </p>
-        </>
-      )}
+        <p className="dna__reply" role="status">
+          {reply.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </p>
+        {foot}
+      </div>
+
+      {copy && <div className="dna__copy">{copy}</div>}
     </div>
   );
 }

@@ -83,6 +83,18 @@ export function deviceTier(): Tier {
   return tier;
 }
 
+let coarse: boolean | null = null;
+
+/**
+ * El puntero principal es un dedo. Ahí el zoom de la escena se apaga: el
+ * pellizco es del navegador, y quitárselo deja al visitante sin ampliar la página.
+ * Una sola vez por página, como el nivel de detalle. Sólo en cliente.
+ */
+export function coarsePointer(): boolean {
+  coarse ??= window.matchMedia('(pointer: coarse)').matches;
+  return coarse;
+}
+
 /** Hay WebGL de verdad, no sólo la API: se pide un contexto y se suelta al instante. */
 export function detectWebGL(): boolean {
   try {

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { lab } from '@/content/lab';
 import { neuroscan } from '@/content/neuroscan';
+import { bin } from '@/lib/binary';
 import { seeded } from './neural-data';
 
 /**
@@ -20,12 +21,18 @@ const { readout } = lab.core;
 const { labels } = readout;
 const { zones } = neuroscan.brain;
 
-/** Caracteres por segundo. Muy rápido a propósito: se lee el ritmo, no cada cifra. */
-const SPEED = 800;
+/** Caracteres por segundo. Rápido a propósito: se lee el ritmo, no cada cifra. */
+const SPEED = 520;
 /** Pausa al cerrar cada línea, en milisegundos: así se perciben como unidades. */
-const HOLD = 70;
-/** Líneas que se conservan en pantalla; por encima, las más viejas se van. */
-const KEEP = 90;
+const HOLD = 120;
+/**
+ * Líneas que se conservan en el DOM; por encima, las más viejas se van. La
+ * ventana tiene alto fijo y recorta por dentro: con cuarenta sobra para
+ * llenarla en cualquier pantalla.
+ */
+const KEEP = 40;
+/** Ancho de los contadores de ciclo: seis bits dan para sesenta y tres vueltas. */
+const CYCLE_BITS = 6;
 /** Frases sueltas del flujo de pensamiento, para que a veces piense en palabras. */
 const THOUGHTS = neuroscan.stream.flatMap((fragment) => fragment.lines).filter((line) => line.length < 70);
 
@@ -38,7 +45,8 @@ interface Line {
 
 const number = new Intl.NumberFormat('es-CL');
 const decimal = (value: number, digits: number) => value.toFixed(digits).replace('.', ',');
-const pad = (value: number) => String(value).padStart(2, '0');
+/** Los ciclos son identificadores, no medidas: van en binario, y dan la vuelta al agotar el ancho. */
+const pad = (value: number) => bin(value % 2 ** CYCLE_BITS, CYCLE_BITS);
 
 /**
  * Generador de líneas. Lleva su propio reloj de ciclos: cada tantas líneas
@@ -151,6 +159,13 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
   const bodyRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef(stats);
   const queue = useRef<Line[]>([]);
+  /*
+   * Las líneas que ha creado el bucle, en orden. Son las únicas que el bucle
+   * puede quitar: las de arranque las renderiza React y, si el bucle las
+   * borrara, React fallaría al retirarlas al pasar a movimiento reducido
+   * (removeChild sobre un nodo que ya no es hijo) y tumbaría la página.
+   */
+  const typed = useRef<HTMLParagraphElement[]>([]);
   const [feed] = useState(() => createFeed(0xe7a02));
   /* Con movimiento reducido no hay mecanografía: una lectura fija, de un generador aparte. */
   const [frozen] = useState(() => {
@@ -166,6 +181,13 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
   useEffect(() => {
     if (selected) queue.current.push(...feed.region(selected));
   }, [selected, feed]);
+
+  /* Al pasar a movimiento reducido, React pinta la lectura fija; lo tecleado se retira. */
+  useEffect(() => {
+    if (!reduced) return;
+    for (const line of typed.current) line.remove();
+    typed.current = [];
+  }, [reduced]);
 
   /* El bucle de escritura: una línea nueva cada vez que acaba la anterior. */
   useEffect(() => {
@@ -194,9 +216,10 @@ export function NeuralReadout({ selected, stats, active, reduced }: NeuralReadou
         current = document.createElement('p');
         current.dataset.kind = line.kind;
         body.appendChild(current);
+        typed.current.push(current);
         text = line.text;
         shown = 0;
-        while (body.childElementCount > KEEP) body.firstElementChild?.remove();
+        while (typed.current.length > KEEP) typed.current.shift()?.remove();
       }
 
       carry += delta * SPEED;

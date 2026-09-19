@@ -1,9 +1,10 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
+import { ComposerSizeGuard } from '@/components/eva/ComposerSizeGuard';
 import { pointerSignal } from '@/lib/pointer';
 import { spinSignal } from '@/lib/spin';
 
@@ -435,6 +436,7 @@ function Clone({ geo, index, reduced }: { geo: Geometries; index: number; reduce
 function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind, nearRef }: SceneProps) {
   const geo = useGeometries();
   const frame = useRef<THREE.Group>(null);
+  const narrow = useThree((state) => state.size.width < state.size.height);
   const energy = useRef(0);
   const mutation = useRef(0);
   const scanProgress = useRef(2);
@@ -477,10 +479,12 @@ function Stage({ pairs, particles, reduced, clones, pulse, mutate, scan, unwind,
     }
 
     /* Encuadre: la escena se encoge a medida que aparecen copias, en vez de
-       mover la cámara (que es valor de hook y no se puede mutar). */
+       mover la cámara (que es valor de hook y no se puede mutar). En un lienzo
+       vertical —móvil— las copias se abren hacia los lados y hay menos ancho:
+       se encoge más, para que sigan cabiendo. */
     const node = frame.current;
     if (node) {
-      const target = 1 / (1 + clones * 0.21);
+      const target = 1 / (1 + clones * (narrow ? 0.36 : 0.21));
       node.scale.setScalar(node.scale.x + (target - node.scale.x) * Math.min(1, step * 2.4));
     }
   });
@@ -519,17 +523,26 @@ export interface SceneProps {
 }
 
 export interface DnaSceneProps extends SceneProps {
-  /** `never` congela el bucle cuando la hélice sale de pantalla. */
+  /** `false` deja el bucle a demanda cuando la hélice sale de pantalla. */
   active: boolean;
+  /**
+   * `low` en móvil: sin postprocesado y con menos resolución. El bloom es lo
+   * más caro de la escena, y en un teléfono convive con el cerebro una pantalla
+   * más arriba.
+   */
+  quality?: 'low' | 'high';
 }
 
-export default function DnaScene({ active, ...scene }: DnaSceneProps) {
+export default function DnaScene({ active, quality = 'high', ...scene }: DnaSceneProps) {
+  const low = quality === 'low';
   return (
     <Canvas
-      dpr={[1, 1.6]}
-      frameloop={active ? 'always' : 'never'}
+      dpr={low ? [1, 1.3] : [1, 1.6]}
+      /* A demanda y no `never`: inactiva no se anima, pero pinta su primer
+         fotograma y se repinta si el lienzo cambia de tamaño. */
+      frameloop={active ? 'always' : 'demand'}
       camera={{ position: [0, 0, 9.2], fov: 32 }}
-      gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: low, alpha: true, powerPreference: 'high-performance' }}
       style={{ pointerEvents: 'none' }}
     >
       <ambientLight intensity={0.46} />
@@ -539,9 +552,12 @@ export default function DnaScene({ active, ...scene }: DnaSceneProps) {
 
       <Stage {...scene} />
 
-      <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.7} luminanceThreshold={0.24} luminanceSmoothing={0.4} mipmapBlur />
-      </EffectComposer>
+      {!low && (
+        <EffectComposer enableNormalPass={false}>
+          <Bloom intensity={0.7} luminanceThreshold={0.24} luminanceSmoothing={0.4} mipmapBlur />
+        </EffectComposer>
+      )}
+      <ComposerSizeGuard />
     </Canvas>
   );
 }

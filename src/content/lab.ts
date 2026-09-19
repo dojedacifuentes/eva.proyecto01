@@ -1,10 +1,15 @@
 /**
- * EVA // LABORATORIO
+ * EVA // LABORATORIO — EN RESERVA
  *
- * Las salas de la landing después de la portada: origen, cerebro, redes,
- * causas y bitácora. Es EVA contándose a sí misma, no un sitio ofreciendo
- * algo. Ficción declarada, como el neuroescáner: nada de lo que EVA afirma
- * describe el funcionamiento real de esta página.
+ * Las salas de la versión anterior (cerebro, redes, causas y bitácora) salieron
+ * del recorrido visible cuando la página se reorganizó en los tres ejes del
+ * acrónimo (`structure.ts`). Sus textos se conservan aquí, íntegros, para
+ * reutilizarlos cuando Vigilancia, Autonomía o la subsección pendiente reciban
+ * contenido. Sus componentes están en `components/sections/reserva/`: siguen
+ * compilando, pero ninguna página los monta. No se han asignado a ningún eje.
+ *
+ * Lo único vivo de este archivo es `lab.core.readout`: el vocabulario de la
+ * ventana de lectura del núcleo cerebral.
  *
  * Reglas de voz (CONTENT_GUIDE.md): primero informa, después remata; un
  * remate por bloque; ego alto, hostilidad cero; sin nombres de personas.
@@ -12,7 +17,7 @@
  * contradice entre salas.
  */
 
-import type { AccentToken, NavItem } from '@/lib/types';
+import type { AccentToken } from '@/lib/types';
 
 export interface LabRoom {
   id: string;
@@ -21,23 +26,13 @@ export interface LabRoom {
   accent: AccentToken;
 }
 
-/** Las salas, en el orden de la página. La cabecera, el pie y los pies de slide leen de aquí. */
+/** Las salas en reserva, con el código decimal que tenían. Sólo las lee `reserva/LabSection`. */
 export const rooms: readonly LabRoom[] = [
-  { id: 'nucleo', code: '01', name: 'Núcleo', accent: 'cyan' },
   { id: 'cerebro', code: '02', name: 'Cerebro', accent: 'violet' },
   { id: 'redes', code: '03', name: 'Redes', accent: 'cyan' },
   { id: 'causas', code: '04', name: 'Causas', accent: 'magenta' },
   { id: 'bitacora', code: '05', name: 'Bitácora', accent: 'yellow' },
 ] as const;
-
-/** Las salas como destinos de navegación: cabecera, menú móvil y pie leen de aquí. */
-export const navItems: readonly NavItem[] = rooms.map(({ id, code, name, accent }) => ({
-  id,
-  code,
-  name,
-  accent,
-  href: `#${id}`,
-}));
 
 export const lab = {
   /** Pie de la última sala: vuelta a la portada. Las demás enlazan a la siguiente. */

@@ -37,13 +37,38 @@ const WAVE = 5.2;
 const WAVE_SPEED = 0.0016;
 const PUSH = 90;
 
-const TOP = [95, 226, 244] as const;
-const MID = [138, 146, 255] as const;
-const BOTTOM = [232, 92, 200] as const;
+type Rgb = readonly [number, number, number];
 
-/** Color del degradado vertical: cian arriba, violeta en medio, magenta abajo. */
-function tint(depth: number): [number, number, number] {
-  const [from, to, t] = depth < 0.5 ? [TOP, MID, depth * 2] : [MID, BOTTOM, (depth - 0.5) * 2];
+const CYAN: Rgb = [95, 226, 244];
+const VIOLET: Rgb = [138, 146, 255];
+const MAGENTA: Rgb = [232, 92, 200];
+
+/**
+ * Degradados verticales (arriba, medio, abajo). `signal` es el del acrónimo
+ * entero: cian, violeta, magenta. `seal` y `growth` son los de una letra sola,
+ * cuando hace de puerta de su eje: Vigilancia en magenta, Autonomía en violeta.
+ */
+const PALETTES = {
+  signal: [CYAN, VIOLET, MAGENTA],
+  seal: [MAGENTA, [200, 110, 232], VIOLET],
+  growth: [VIOLET, [186, 118, 244], MAGENTA],
+} as const satisfies Record<string, readonly [Rgb, Rgb, Rgb]>;
+
+export type MeshPalette = keyof typeof PALETTES;
+
+/**
+ * Cómo se comporta la malla.
+ * `alive` ondea como una tela (el acrónimo de la portada).
+ * `sealed` está quieta: casi no ondea y, cada tanto, una franja se estremece
+ *   un instante. La quietud es un gesto animado, no una animación apagada.
+ * `building` está a medio ensamblar: los nodos están todos, pero las aristas
+ *   intentan conectarse y se sueltan, sin terminar nunca de cerrar la letra.
+ */
+export type MeshMode = 'alive' | 'sealed' | 'building';
+
+function tint(palette: MeshPalette, depth: number): [number, number, number] {
+  const [top, mid, bottom] = PALETTES[palette];
+  const [from, to, t] = depth < 0.5 ? [top, mid, depth * 2] : [mid, bottom, (depth - 0.5) * 2];
   return [
     Math.round(from[0] + (to[0] - from[0]) * t),
     Math.round(from[1] + (to[1] - from[1]) * t),
@@ -67,6 +92,9 @@ interface MeshProps {
    * lienzo no entiende `var()`, así que se resuelve al rasterizar.
    */
   fontVar: string;
+  mode?: MeshMode;
+  palette?: MeshPalette;
+  className?: string;
 }
 
 /**
@@ -81,14 +109,23 @@ interface MeshProps {
  * Rasterizar el texto en vez de escribir polígonos a mano deja que la forma la
  * ponga la tipografía: si cambia la fuente, cambian las letras.
  */
-export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
+export function EvaAcronymMesh({
+  letters,
+  fontVar,
+  mode = 'alive',
+  palette = 'signal',
+  className = 'acronym__canvas',
+}: MeshProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /* Las letras llegan como un array nuevo en cada render: lo que importa es su contenido. */
+  const word = letters.join('');
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
 
+    const glyphs = [...word];
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let nodes: Node[] = [];
     let links: [number, number][] = [];
@@ -96,6 +133,7 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
     let height = 0;
     let frame = 0;
     let stopped = false;
+    let onScreen = true;
 
     /** Rasteriza las letras y saca de ahí los nodos y sus vecinos. */
     const build = () => {
@@ -116,18 +154,18 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
 
       const family =
         getComputedStyle(document.documentElement).getPropertyValue(fontVar).trim() || 'sans-serif';
-      const rowHeight = height / letters.length;
+      const rowHeight = height / glyphs.length;
 
       // Se mide a 100px y se escala: la letra llena el lienzo por donde tope.
       paint.font = `800 100px ${family}`;
-      const widest = Math.max(...letters.map((letter) => paint.measureText(letter).width));
+      const widest = Math.max(...glyphs.map((letter) => paint.measureText(letter).width));
       const size = Math.min((width * 0.98) / (widest / 100), rowHeight * 0.94);
 
       paint.fillStyle = '#fff';
       paint.textAlign = 'center';
       paint.textBaseline = 'middle';
       paint.font = `800 ${size}px ${family}`;
-      letters.forEach((letter, row) => {
+      glyphs.forEach((letter, row) => {
         paint.fillText(letter, width / 2, rowHeight * (row + 0.5));
       });
 
@@ -217,11 +255,33 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
     const swell = (node: Node, time: number) => {
       if (reduced.matches) return { x: node.homeX, y: node.homeY };
       const travel = node.homeX * 0.026 + node.homeY * 0.05 - time * WAVE_SPEED;
-      const amplitude = node.satellite ? WAVE * 1.5 : WAVE;
+      let amplitude = node.satellite ? WAVE * 1.5 : WAVE;
+      let jolt = 0;
+      if (mode === 'sealed') {
+        // Sellada: la tela casi no respira. Cada pocos segundos, una franja
+        // horizontal se estremece durante un instante y vuelve a quedarse quieta.
+        amplitude *= 0.07;
+        const cycle = time % 5200;
+        if (cycle < 190) {
+          const band = ((Math.floor(time / 5200) * 0.37) % 1) * height;
+          if (Math.abs(node.homeY - band) < height * 0.09) jolt = Math.sin(time * 0.09) * 5;
+        }
+      }
       return {
-        x: node.homeX + Math.sin(travel) * amplitude,
+        x: node.homeX + Math.sin(travel) * amplitude + jolt,
         y: node.homeY + Math.cos(travel * 0.8 + node.phase * 0.35) * amplitude * 0.62,
       };
+    };
+
+    /**
+     * En construcción, cada arista tiene su propio pulso: intenta conectarse,
+     * aguanta un momento y se suelta. Nunca están todas a la vez.
+     */
+    const bond = (index: number, time: number) => {
+      if (mode !== 'building') return 1;
+      if (reduced.matches) return index % 3 === 0 ? 0 : 0.8;
+      const wave = Math.sin(time * 0.0011 + index * 1.91);
+      return Math.max(0, Math.min(1, (wave - 0.12) * 2.4));
     };
 
     const draw = (time: number) => {
@@ -249,14 +309,16 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
       }
 
       context.lineWidth = 0.65;
-      for (const [a, b] of links) {
+      for (let index = 0; index < links.length; index++) {
+        const [a, b] = links[index];
         const first = nodes[a];
         const second = nodes[b];
-        const [r, g, bl] = tint((first.depth + second.depth) / 2);
+        const [r, g, bl] = tint(palette, (first.depth + second.depth) / 2);
         const span = Math.hypot(first.x - second.x, first.y - second.y);
         // Los hilos largos se apagan: dan profundidad sin ensuciar la letra.
         const fade = Math.max(0, 1 - span / (LINK * 2.4));
-        const alpha = (first.satellite || second.satellite ? 0.13 : 0.4) * fade;
+        const alpha =
+          (first.satellite || second.satellite ? 0.13 : 0.4) * fade * bond(index, time);
         if (alpha < 0.012) continue;
         context.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
         context.beginPath();
@@ -268,7 +330,7 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
       /* Dos discos por nodo: uno grande y casi transparente hace de halo, el
          otro marca el punto. Sale más barato que shadowBlur en cada nodo. */
       for (const node of nodes) {
-        const [r, g, b] = tint(node.depth);
+        const [r, g, b] = tint(palette, node.depth);
         const pulse = reduced.matches ? 1 : 0.75 + Math.sin(time * 0.002 + node.phase) * 0.25;
         const weight = node.satellite ? 0.4 : node.edge ? 1 : 0.6;
         context.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.16 * pulse * weight})`;
@@ -288,9 +350,10 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
       frame = requestAnimationFrame(tick);
     };
 
+    /* Fuera de pantalla no se dibuja: ahora hay tres mallas en la página, no una. */
     const start = () => {
       cancelAnimationFrame(frame);
-      if (document.hidden) return;
+      if (document.hidden || !onScreen) return;
       frame = requestAnimationFrame(tick);
     };
 
@@ -308,15 +371,24 @@ export function EvaAcronymMesh({ letters, fontVar }: MeshProps) {
 
     const observer = new ResizeObserver(rebuild);
     observer.observe(canvas);
+    const spy = new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+        start();
+      },
+      { rootMargin: '120px' },
+    );
+    spy.observe(canvas);
     document.addEventListener('visibilitychange', start);
 
     return () => {
       stopped = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
+      spy.disconnect();
       document.removeEventListener('visibilitychange', start);
     };
-  }, [letters, fontVar]);
+  }, [word, fontVar, mode, palette]);
 
-  return <canvas ref={canvasRef} className="acronym__canvas" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }

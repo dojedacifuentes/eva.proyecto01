@@ -1,23 +1,26 @@
-import { BrainSection } from '@/components/sections/BrainSection';
-import { CausesSection } from '@/components/sections/CausesSection';
-import { CoreSection } from '@/components/sections/CoreSection';
+import { AutonomiaSection } from '@/components/sections/AutonomiaSection';
+import { GenomaSection } from '@/components/sections/GenomaSection';
 import { HeroEva } from '@/components/sections/HeroEva';
-import { LogSection } from '@/components/sections/LogSection';
-import { NetworksSection } from '@/components/sections/NetworksSection';
+import { NucleoSection } from '@/components/sections/NucleoSection';
+import { ReservaSection } from '@/components/sections/ReservaSection';
+import { VigilanciaSection } from '@/components/sections/VigilanciaSection';
 
 /**
- * El laboratorio de EVA: la portada y, detrás, las cinco salas en las que
- * ella se cuenta. El orden es el de `content/lab.ts` (`rooms`).
+ * El recorrido de EVA, en el orden de `content/structure.ts`: la portada (00)
+ * y los tres ejes del acrónimo. Entidad (01) es un contenedor: sus lugares son
+ * sus tres subsecciones. Vigilancia (10) y Autonomía (11) son un lugar cada una.
  */
 export default function HomePage() {
   return (
     <>
       <HeroEva />
-      <CoreSection />
-      <BrainSection />
-      <NetworksSection />
-      <CausesSection />
-      <LogSection />
+      <div id="entidad" className="axis-group" data-axis="entidad">
+        <NucleoSection />
+        <GenomaSection />
+        <ReservaSection />
+      </div>
+      <VigilanciaSection />
+      <AutonomiaSection />
     </>
   );
 }

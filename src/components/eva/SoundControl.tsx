@@ -35,7 +35,7 @@ export function SoundControl() {
       aria-pressed={on}
       aria-label={ui.sound.label}
       data-sound-toggle=""
-      data-cursor-label={on ? 'MUTE' : 'SOUND'}
+      data-cursor-label={on ? ui.sound.cursorOn : ui.sound.cursorOff}
       onClick={toggle}
     >
       <span aria-hidden="true" className="sound__bars">

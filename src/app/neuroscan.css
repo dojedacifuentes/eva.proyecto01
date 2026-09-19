@@ -171,18 +171,43 @@
   border-top: 1px solid var(--eva-line);
 }
 
+/*
+ * El cerebro manda. En el DOM va primero, así en móvil es lo primero que se ve
+ * al abrir el escáner (antes quedaba a casi mil píxeles, debajo del flujo de
+ * pensamiento). En escritorio ocupa la columna central, que es la más ancha:
+ * con el reparto anterior el lienzo medía 523×418 en una pantalla de 1440 y el
+ * retrato de la derecha era más grande que el cerebro.
+ */
 @media (min-width: 64rem) {
   .scan__body {
-    grid-template-columns: 1.05fr 1.3fr 0.85fr;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.55fr) minmax(0, 0.7fr);
+    grid-auto-flow: dense;
     overflow: hidden;
   }
   .scan__col {
     overflow-y: auto;
     min-height: 0;
+    grid-row: 1;
+  }
+  .scan__col--stream {
+    grid-column: 1;
+  }
+  .scan__col--brain {
+    grid-column: 2;
+  }
+  .scan__col--eva {
+    grid-column: 3;
   }
   .scan__col + .scan__col {
     border-top: 0;
+  }
+  .scan__col--brain,
+  .scan__col--eva {
     border-left: 1px solid var(--eva-line);
+  }
+  /* El retrato acompaña: no vuelve a ser la pieza más grande del escáner. */
+  .subject__frame {
+    max-height: 34vh;
   }
 }
 
@@ -348,27 +373,73 @@
 /* ── Núcleo neural: el lienzo 3D, el mapa plano y sus controles ── */
 
 /* El escenario fija la altura: ni un svg con height:auto ni un canvas aportan
-   altura intrínseca dentro de una rejilla, y el cerebro quedaba recortado. */
+   altura intrínseca dentro de una rejilla, y el cerebro quedaba recortado.
+   No lleva fondo opaco ni recorte: el cerebro no vive en una caja. Un velo
+   radial lo separa del fondo y el lienzo se deshace por los bordes. */
 .core__stage {
   position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
+  aspect-ratio: 1 / 1;
   border-radius: var(--eva-radius-lg) var(--eva-radius-lg) 0 0;
-  background:
-    radial-gradient(60% 55% at 50% 48%, rgba(24, 74, 108, 0.35), transparent 70%),
-    #030a12;
+  background: radial-gradient(58% 54% at 50% 48%, rgba(24, 74, 108, 0.3), transparent 72%);
 }
 @media (min-width: 64rem) {
   .core__stage {
-    aspect-ratio: 5 / 4;
+    aspect-ratio: auto;
+    height: clamp(22rem, 58vh, 40rem);
   }
 }
-/* El lienzo recoge el puntero; pan-y deja pasar el desplazamiento vertical en táctil. */
+/*
+ * El lienzo recoge el puntero; pan-y deja pasar el desplazamiento vertical en
+ * táctil. La máscara es una elipse inscrita en el marco: opaca hasta el 84 %
+ * y transparente justo en el borde, así que ni el halo ni los anillos dibujan
+ * nunca el rectángulo del lienzo. El cerebro llena el 88 % de la dimensión que
+ * limita (`FILL` en neural-frame): sus polos rozan el fundido sólo al girar.
+ */
 .core__canvas {
   position: absolute;
   inset: 0;
   touch-action: pan-y;
   cursor: grab;
+  opacity: 0;
+  transition: opacity 600ms var(--eva-ease);
+  mask-image: radial-gradient(ellipse closest-side at 50% 50%, #000 84%, transparent 100%);
+}
+/* El núcleo ya pinta: entra con su propio fundido, sin dibujo previo que cruzar. */
+.core[data-phase='fading'] .core__canvas,
+.core[data-phase='live'] .core__canvas {
+  opacity: 1;
+}
+/* Mientras compila: una retícula que late en el centro. */
+.core__wait {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5.5rem;
+  height: 5.5rem;
+  translate: -50% -50%;
+  border: 1px solid var(--eva-line-strong);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: core-wait 1.6s ease-in-out infinite;
+}
+.core__wait::before,
+.core__wait::after {
+  content: '';
+  position: absolute;
+  background: var(--eva-cyan);
+  opacity: 0.6;
+}
+.core__wait::before {
+  top: 50%;
+  left: -0.6rem;
+  right: -0.6rem;
+  height: 1px;
+}
+.core__wait::after {
+  left: 50%;
+  top: -0.6rem;
+  bottom: -0.6rem;
+  width: 1px;
 }
 /* Los controles de órbita escriben touch-action: none en línea al conectarse
    (dos veces: al canvas y luego a su contenedor). El !important lo devuelve a
@@ -382,15 +453,10 @@
 .core__canvas canvas {
   display: block;
 }
-/* El mapa plano cubre el lienzo mientras carga y se desvanece cuando el núcleo pinta. */
+/* El mapa plano es la interfaz sólo cuando no hay WebGL: ya no se cruza con el 3D al cargar. */
 .core__flat {
   position: absolute;
   inset: 0;
-  transition: opacity 900ms var(--eva-ease);
-}
-.core__flat[data-fading='true'] {
-  opacity: 0;
-  pointer-events: none;
 }
 .core__flat > svg {
   position: absolute;
@@ -398,13 +464,10 @@
   width: 100%;
   height: 100%;
 }
-/* Mientras carga, el mapa late despacio: se está compilando algo. */
-.core[data-phase='loading'] .core__flat > svg {
-  animation: core-wait 2.4s ease-in-out infinite;
-}
 @keyframes core-wait {
   50% {
-    opacity: 0.55;
+    opacity: 0.35;
+    scale: 0.92;
   }
 }
 
@@ -415,8 +478,8 @@
   justify-content: space-between;
   gap: 0.75rem;
   color: var(--eva-muted);
-  font-size: 0.52rem;
-  letter-spacing: 0.12em;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   pointer-events: none;
 }
@@ -444,9 +507,9 @@
 .core__hint {
   position: absolute;
   inset: auto 0.7rem 0.55rem;
-  color: rgba(142, 155, 163, 0.7);
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
+  color: rgba(142, 155, 163, 0.85);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.08em;
   pointer-events: none;
 }
 /* Sin puntero fino, la pista del ratón no ayuda. */
@@ -481,7 +544,7 @@
   color: var(--eva-soft);
   background: transparent;
   font: inherit;
-  font-size: 0.56rem;
+  font-size: var(--eva-type-micro);
   letter-spacing: 0.06em;
   text-align: left;
   cursor: pointer;
@@ -512,6 +575,19 @@
   border-color: var(--eva-cyan);
   color: var(--eva-cyan);
   background: rgba(63, 216, 238, 0.09);
+}
+/* La región que EVA no enseña: «1000», la única con el bit alto encendido. */
+.core__chip[data-alert] {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--eva-magenta) 50%, transparent);
+}
+.core__chip[data-alert] i {
+  color: var(--eva-magenta);
+}
+.core__chip[data-alert][aria-pressed='true'] {
+  border-color: var(--eva-magenta);
+  color: var(--eva-magenta);
+  background: rgba(240, 122, 185, 0.1);
 }
 .core__chip--reset {
   margin-left: auto;
@@ -1026,7 +1102,8 @@
   border-radius: 3px;
   color: var(--eva-cyan);
   background: rgba(4, 14, 24, 0.86);
-  font-size: 0.5rem;
+  /* El suelo tipográfico (tokens.css): antes iba a 8 px. */
+  font-size: var(--eva-type-micro);
   opacity: 0.75;
   transition: opacity var(--eva-normal) linear;
 }

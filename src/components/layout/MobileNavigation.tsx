@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { nav } from '@/content/site';
+import { requestChannelClose } from '@/lib/channel-store';
 import type { NavItem } from '@/lib/types';
 
 /** Menú móvil: botón con aria-expanded, cierre con Escape y al elegir destino. */
@@ -13,11 +14,13 @@ export function MobileNavigation({ items }: { items: NavItem[] }) {
 
   useEffect(() => {
     if (!open) return;
+    // El menú tapa la página entera: el canal de EVA se pliega antes de quedar inerte.
+    requestChannelClose();
     const button = buttonRef.current;
     const desktop = window.matchMedia('(min-width: 64rem)');
     const previousOverflow = document.body.style.overflow;
     const covered = Array.from(document.querySelectorAll<HTMLElement>(
-      'main, footer, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
+      'main, footer, .synapse, .rail, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
     )).map((element) => ({ element, inert: element.inert }));
     for (const { element } of covered) element.inert = true;
 
@@ -80,18 +83,47 @@ export function MobileNavigation({ items }: { items: NavItem[] }) {
         <span aria-hidden="true" className="menu-btn__icon" />
       </button>
 
-      <nav ref={menuRef} id="menu-movil" className="mobile-menu" aria-label="Menú principal" hidden={!open}>
+      <nav ref={menuRef} id="menu-movil" className="mobile-menu" aria-label={nav.menuLabel} hidden={!open}>
         {items.map((item) => (
-          <a
-            key={item.id}
-            href={item.href}
-            data-accent={item.accent}
-            data-sound="open"
-            onClick={() => selectDestination(item.href)}
-          >
-            <span className="mono">{item.code}</span>
-            {item.name}
-          </a>
+          <div key={item.id} className="mobile-menu__axis" data-accent={item.accent}>
+            <a
+              href={item.href}
+              data-nav-target={item.id}
+              data-state={item.state}
+              data-sound="open"
+              aria-label={`${item.name}, ${item.ordinal}${
+                item.state === 'active' ? '' : `, ${item.stateLabel?.toLowerCase()}`
+              }`}
+              onClick={() => selectDestination(item.href)}
+            >
+              <span aria-hidden="true" className="mono" data-bin="">
+                {item.code}
+              </span>
+              <span aria-hidden="true">{item.name}</span>
+              {item.state !== 'active' && (
+                <span aria-hidden="true" className="mobile-menu__state mono">
+                  {item.stateLabel}
+                </span>
+              )}
+            </a>
+            {item.children.map((child) => (
+              <a
+                key={child.id}
+                className="mobile-menu__sub"
+                href={child.href}
+                data-nav-target={child.id}
+                data-state={child.state}
+                data-sound="open"
+                aria-label={`${child.name}, ${child.ordinal}`}
+                onClick={() => selectDestination(child.href)}
+              >
+                <span aria-hidden="true" className="mono" data-bin="">
+                  {child.code}
+                </span>
+                <span aria-hidden="true">{child.name}</span>
+              </a>
+            ))}
+          </div>
         ))}
         <a
           href={nav.contact.href}

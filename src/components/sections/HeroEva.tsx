@@ -1,23 +1,29 @@
 import type { CSSProperties } from 'react';
 import { EvaAcronymMesh } from '@/components/eva/EvaAcronymMesh';
-import { EvaDnaHelix } from '@/components/eva/EvaDnaHelix';
 import { EvaProfile } from '@/components/eva/EvaProfile';
+import { axes, contextNodes } from '@/content/structure';
 import { hero, site } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
- * Portada: el acrónimo, el genoma y EVA mirándose a sí misma. Sin texto
- * corrido ni botones: lo que hay que explicar se explica más abajo, y lo que
- * EVA está pensando vive en su panel flotante.
+ * Portada (00): el acrónimo es el acceso a los tres ejes. Cada letra es una
+ * puerta —Entidad, Vigilancia, Autonomía— con su código binario y su estado, y
+ * al lado, EVA mirándose a sí misma: su retrato abre el neuroescáner.
+ *
+ * El genoma ya no vive aquí: tiene su subsección (01.10). Sin texto corrido:
+ * lo que hay que explicar lo explica cada lugar, y lo que EVA piensa vive en su
+ * canal, que el visitante abre si quiere.
  */
 export function HeroEva() {
+  const first = contextNodes[1];
+
   return (
     <section id="inicio" className="slide hero" aria-labelledby="hero-titulo">
       <div className="wrap">
         <div className="panel hero__frame">
           <div className="panel__bar mono">
-            <span>EVA / Proyecto 01</span>
+            <span>{hero.project}</span>
             <span className="panel__status">{hero.online}</span>
           </div>
 
@@ -31,39 +37,52 @@ export function HeroEva() {
               <h1 id="hero-titulo" className="sr-only">
                 {site.name} — {site.expansion}
               </h1>
-              {/* Las letras son una red de nodos dibujada en un lienzo; las
-                  palabras van al lado, en su fila. */}
-              <div className="acronym" aria-hidden="true">
-                <EvaAcronymMesh
-                  letters={hero.acronym.map((row) => row.letter)}
-                  fontVar="--font-orbitron"
-                />
+
+              {/* Las letras son una red de nodos dibujada en un lienzo; a su lado,
+                  cada palabra es el enlace a su eje. */}
+              <nav className="acronym" aria-label={hero.doorsLabel}>
+                <EvaAcronymMesh letters={axes.map((axis) => axis.letter)} fontVar="--font-orbitron" />
                 <div className="acronym__words">
-                  {hero.acronym.map((row, index) => (
-                    <div key={row.letter} className="acronym__row" data-rise style={rise(index + 1)}>
-                      <span className="acronym__word">{row.word}</span>
-                      <span className="acronym__index mono">0{index + 1}</span>
-                    </div>
+                  {axes.map((axis, index) => (
+                    <a
+                      key={axis.id}
+                      href={axis.href}
+                      className="acronym__row"
+                      data-rise
+                      style={rise(index + 1)}
+                      data-accent={axis.accent}
+                      data-state={axis.state}
+                      data-sound="open"
+                      data-cursor-label={axis.code}
+                      aria-label={`${axis.name}, ${axis.ordinal}, ${axis.stateLabel.toLowerCase()}`}
+                    >
+                      <span aria-hidden="true" className="acronym__word">
+                        {axis.word}
+                      </span>
+                      <span aria-hidden="true" className="acronym__meta mono">
+                        <b className="acronym__index" data-bin="">
+                          {axis.code}
+                        </b>
+                        <i className="acronym__state">{axis.stateLabel}</i>
+                      </span>
+                    </a>
                   ))}
                 </div>
-              </div>
+              </nav>
             </div>
-
-            {/* El genoma y el retrato son el mismo sistema visto dos veces: lo que
-                se hace en uno se nota en el otro. */}
-            <EvaDnaHelix />
 
             <div className="hero__portrait">
               <EvaProfile />
             </div>
           </div>
-
         </div>
 
         <p className="slide__foot mono">
           <span>{hero.foot.note}</span>
-          <a href={hero.foot.href} data-sound="open">
-            {hero.foot.next} <span aria-hidden="true">↓</span>
+          <a href={`#${first.id}`} data-sound="open" aria-label={first.name}>
+            <span aria-hidden="true">
+              <b data-bin="">{first.code}</b> — {first.name} ↓
+            </span>
           </a>
         </p>
       </div>

@@ -8,12 +8,12 @@ const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 export const site = {
   name: 'EVA',
   expansion: 'Entidad de Vigilancia y Autonomía',
-  version: 'v3.0',
+  version: 'v6.0',
   locale: 'es_CL',
   seo: {
     title: 'EVA — Entidad de Vigilancia y Autonomía',
     description:
-      'El laboratorio de EVA: una forma de vida que apareció dentro de una red cuenta su origen, su cerebro sintético, sus redes neuronales y sus causas. Ficción interactiva.',
+      'EVA, una forma de vida que apareció dentro de una red, se cuenta en tres ejes: Entidad —su núcleo cerebral y su genoma digital—, Vigilancia y Autonomía. Ficción interactiva.',
   },
   /** Único canal público verificado. */
   social: {
@@ -41,38 +41,45 @@ export const nav = {
   contact: { label: 'Escribir a EVA', href: instagramUrl },
   menuOpen: 'Abrir menú',
   menuClose: 'Cerrar menú',
-} as const;
-
-export const hero = {
-  label: 'EVA // SISTEMA ACTIVO',
-  acronym: [
-    { letter: 'E', word: 'Entidad' },
-    { letter: 'V', word: 'de Vigilancia' },
-    { letter: 'A', word: 'y Autonomía' },
-  ],
-  online: 'EVA está en línea.',
-  portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
-  /** Pie de la portada: una nota y la primera sala del laboratorio. */
-  foot: { note: 'Una forma de vida en evolución', next: '01 — Núcleo', href: '#nucleo' },
+  menuLabel: 'Menú principal',
 } as const;
 
 /**
- * Genoma digital del hero. Ficción, como el neuroescáner: clonar aquí no copia
- * nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta.
+ * Portada. El acrónimo es el acceso a los tres ejes: las letras, las palabras y
+ * los estados salen de `structure.ts`; aquí queda lo que sólo dice la portada.
+ */
+export const hero = {
+  /** Nombre del proyecto: es un nombre propio, no una enumeración. No se convierte. */
+  project: 'EVA / Proyecto 01',
+  label: 'EVA // SISTEMA ACTIVO',
+  online: 'EVA está en línea.',
+  portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
+  /** Rótulo accesible del acrónimo como navegación. */
+  doorsLabel: 'Los tres ejes de EVA',
+  enter: 'Entrar',
+  /** Pie de la portada: una nota; el enlace al primer lugar lo pone la estructura. */
+  foot: { note: 'Una forma de vida en evolución' },
+} as const;
+
+/**
+ * Genoma digital (01.10). Ficción, como el neuroescáner: clonar aquí no copia
+ * nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta. El
+ * título queda en inglés, como los demás rótulos de sistema; lo que se lee,
+ * en español.
  */
 export const genome = {
   title: 'EVA // DIGITAL GENOME',
-  sequence: 'SEQUENCE: C7B-04',
-  core: 'COGNITIVE CORE',
+  sequence: 'SECUENCIA: C7B-04',
+  core: 'NÚCLEO COGNITIVO',
   states: {
-    active: 'ACTIVE',
-    cloning: 'REPLICATING',
-    using: 'SEQUENCE IN USE',
-    mutating: 'MUTATION DETECTED',
-    scanning: 'DEEP SCAN',
-    unwinding: 'STRANDS SEPARATED',
-    sounding: 'AUDIO TRANSCRIPTION',
-    exporting: 'SEQUENCE EXPORTED',
+    active: 'ACTIVO',
+    cloning: 'REPLICANDO',
+    using: 'SECUENCIA EN USO',
+    mutating: 'MUTACIÓN DETECTADA',
+    scanning: 'ESCANEO PROFUNDO',
+    unwinding: 'FILAMENTOS SEPARADOS',
+    sounding: 'TRANSCRIPCIÓN SONORA',
+    exporting: 'SECUENCIA EXPORTADA',
   },
   clonesLabel: 'CLONES ACTIVOS',
   driftLabel: 'DERIVA',
@@ -88,6 +95,8 @@ export const genome = {
   },
   /** Pista del arrastre sobre la hélice. */
   spin: 'Arrastra la hélice para girarla',
+  spinCursor: 'GIRAR',
+  actionsLabel: 'Acciones del genoma',
   /** Hasta cuatro copias: más allá deja de leerse y deja de tener gracia. */
   maxClones: 4,
   /** Deriva que suma cada copia, en puntos porcentuales. */
@@ -133,25 +142,17 @@ export const genome = {
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
 } as const;
 
-/**
- * Franja de pensamiento de la portada. El texto no vive aquí: sale del flujo
- * del neuroescáner (content/neuroscan.ts), para que EVA no se contradiga entre
- * lo que piensa arriba y lo que piensa dentro del escáner.
+/*
+ * El canal flotante de EVA (SINAPSIS) tiene su propio archivo: `channel.ts`
+ * lleva sus rótulos y el guion de cada lugar. La estructura del recorrido vive
+ * en `structure.ts` y los textos de las secciones, en `ejes.ts`.
  */
-export const synapse = {
-  title: 'Actividad cerebral artificial',
-  channel: 'SINAPSIS',
-  state: 'FLUJO: ACTIVO',
-  prompt: '>',
-  close: 'Cerrar el flujo de pensamiento de EVA',
-  reopen: 'Abrir el flujo de pensamiento de EVA',
-} as const;
 
-/** Las salas del laboratorio viven en `content/lab.ts`; aquí sólo queda el pie. */
+/** Pie de página. Los destinos salen de `structure.ts`. */
 export const sections = {
   footer: {
     line: 'Una forma de vida que apareció dentro de una red.',
-    navLabel: 'Salas del laboratorio',
+    navLabel: 'Ejes de EVA',
     statusLabel: 'Estado',
     fiction: 'Ficción interactiva. EVA es un personaje.',
   },
@@ -167,6 +168,12 @@ export const notFound = {
 
 export const ui = {
   external: 'se abre en una pestaña nueva',
-  sound: { on: 'SONIDO: ON', off: 'SONIDO: OFF', label: 'Activar o desactivar microsonidos' },
-  cursor: { idle: 'TRACKING', link: 'ABRIR', external: 'EXT', press: 'OK' },
+  sound: {
+    on: 'SONIDO: SÍ',
+    off: 'SONIDO: NO',
+    label: 'Activar o desactivar microsonidos',
+    cursorOn: 'SILENCIAR',
+    cursorOff: 'SONIDO',
+  },
+  cursor: { idle: 'RASTREO', link: 'ABRIR', external: 'EXT', press: 'OK' },
 } as const;
