@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
+import { ComposerSizeGuard } from '@/components/eva/ComposerSizeGuard';
 import { pointerSignal } from '@/lib/pointer';
 import { spinSignal } from '@/lib/spin';
 
@@ -556,6 +557,7 @@ export default function DnaScene({ active, quality = 'high', ...scene }: DnaScen
           <Bloom intensity={0.7} luminanceThreshold={0.24} luminanceSmoothing={0.4} mipmapBlur />
         </EffectComposer>
       )}
+      <ComposerSizeGuard />
     </Canvas>
   );
 }

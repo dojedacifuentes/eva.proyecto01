@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import * as THREE from 'three';
+import { ComposerSizeGuard } from '@/components/eva/ComposerSizeGuard';
 import type { BrainZone } from '@/content/neuroscan';
 import { BrainShell } from './BrainShell';
 import { NeuralNetwork } from './NeuralNetwork';
@@ -399,6 +400,7 @@ export default function NeuralScene({
           />
         </EffectComposer>
       )}
+      <ComposerSizeGuard />
     </Canvas>
   );
 }
