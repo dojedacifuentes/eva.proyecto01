@@ -10,22 +10,63 @@ type NavModule = Pick<Module, 'id' | 'code' | 'name' | 'href' | 'accent'>;
 export function MobileNavigation({ modules }: { modules: NavModule[] }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+  const destinationRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    const button = buttonRef.current;
+    const desktop = window.matchMedia('(min-width: 64rem)');
+    const previousOverflow = document.body.style.overflow;
+    const covered = Array.from(document.querySelectorAll<HTMLElement>(
+      'main, footer, .header .wordmark, .header .status, .header .nav, .header__contact, .header [data-sound-toggle]',
+    )).map((element) => ({ element, inert: element.inert }));
+    for (const { element } of covered) element.inert = true;
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setOpen(false);
-        buttonRef.current?.focus();
+      }
+      if (event.key === 'Tab') {
+        const controls = [button, ...Array.from(menuRef.current?.querySelectorAll('a') ?? [])]
+          .filter((element): element is HTMLButtonElement | HTMLAnchorElement => element !== null);
+        const current = controls.indexOf(document.activeElement as HTMLButtonElement | HTMLAnchorElement);
+        const next = (current + (event.shiftKey ? -1 : 1) + controls.length) % controls.length;
+        event.preventDefault();
+        controls[next]?.focus();
       }
     };
+    const onDesktop = () => {
+      if (desktop.matches) setOpen(false);
+    };
     document.body.style.overflow = 'hidden';
+    menuRef.current?.querySelector('a')?.focus();
     window.addEventListener('keydown', onKey);
+    desktop.addEventListener('change', onDesktop);
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = previousOverflow;
+      for (const { element, inert } of covered) element.inert = inert;
       window.removeEventListener('keydown', onKey);
+      desktop.removeEventListener('change', onDesktop);
+      const destination = destinationRef.current;
+      destinationRef.current = null;
+      const target = destination ? document.getElementById(destination.slice(1)) : null;
+      if (target) {
+        target.tabIndex = -1;
+        target.focus({ preventScroll: true });
+      } else if (desktop.matches) {
+        document.querySelector<HTMLElement>('.header .wordmark')?.focus({ preventScroll: true });
+      } else {
+        button?.focus({ preventScroll: true });
+      }
     };
   }, [open]);
+
+  const selectDestination = (href: string) => {
+    destinationRef.current = href;
+    setOpen(false);
+  };
 
   return (
     <>
@@ -41,20 +82,20 @@ export function MobileNavigation({ modules }: { modules: NavModule[] }) {
         <span aria-hidden="true" className="menu-btn__icon" />
       </button>
 
-      <nav id="menu-movil" className="mobile-menu" aria-label="Menú principal" hidden={!open}>
+      <nav ref={menuRef} id="menu-movil" className="mobile-menu" aria-label="Menú principal" hidden={!open}>
         {modules.map((module) => (
           <a
             key={module.id}
             href={module.href}
             data-accent={module.accent}
             data-sound="open"
-            onClick={() => setOpen(false)}
+            onClick={() => selectDestination(module.href)}
           >
             <span className="mono">{module.code}</span>
             {module.name}
           </a>
         ))}
-        <a href={nav.contact.href} onClick={() => setOpen(false)}>
+        <a href={nav.contact.href} onClick={() => selectDestination(nav.contact.href)}>
           <span className="mono">→</span>
           {nav.contact.label}
         </a>

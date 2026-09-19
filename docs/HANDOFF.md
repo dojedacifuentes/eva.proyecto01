@@ -1,5 +1,9 @@
 # Handoff — landing de EVA v2
 
+> Actualización 2026-09-19: la v2 se publicó en GitHub y Vercel por solicitud del propietario.
+> El estado de abajo corresponde a la entrega original del ZIP. Para el estado posterior,
+> consultar [RELEASE_2026-09-19.md](RELEASE_2026-09-19.md).
+
 **Fecha:** 2026-09-18 · **Rama:** `landing-eva-v2` · **Base:** `main` @ `de4c587` (v0.1 intacta)
 
 ## Estado

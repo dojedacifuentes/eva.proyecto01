@@ -22,6 +22,20 @@ npm run build
 
 Despliegue: Vercel, sin configuración. Con dominio propio, definir `NEXT_PUBLIC_SITE_URL`.
 
+## Producción
+
+Sitio: https://evaproyecto01.vercel.app/ · rama de producción: `main`.
+Runtime: Node 24.x. Next.js y eslint-config-next: 16.3.5.
+
+El botón de contacto usa el Instagram público de EVA. Las noticias siguen marcadas como
+demostración. El favicon reutiliza el rombo de la cabecera.
+
+Las antiguas rutas `/cursos`, `/informes`, `/prototipos`, `/eva`, `/estudios-juridicos`
+y `/panel` redirigen a la nueva portada. GitHub Actions comprueba lint, build, tipos y
+vulnerabilidades de producción al integrar cambios en `main` y en los pull requests.
+
+Detalle del lanzamiento y comprobaciones: [`docs/RELEASE_2026-09-19.md`](docs/RELEASE_2026-09-19.md).
+
 ## Estructura
 
 ```

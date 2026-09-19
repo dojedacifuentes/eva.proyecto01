@@ -4,6 +4,7 @@
  */
 
 export const NEWS_NAME = 'EVA News';
+const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 
 export const site = {
   name: 'EVA',
@@ -17,14 +18,14 @@ export const site = {
   },
   /** Único canal público verificado. */
   social: {
-    instagram: 'https://www.instagram.com/eva.proyecto01/',
+    instagram: instagramUrl,
   },
   /**
    * Destino del CTA institucional (URL https, mailto: o enlace de WhatsApp).
    * Vacío = el botón se muestra desactivado, sin inventar datos de contacto.
    */
   contact: {
-    href: '',
+    href: instagramUrl,
     pendingNote: 'Canal directo en configuración. Mientras tanto, EVA responde por Instagram.',
   },
 } as const;
