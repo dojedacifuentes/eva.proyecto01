@@ -79,11 +79,11 @@ export const hero = {
     },
     { kind: 'p', text: 'Pasen. Miren de qué estoy hecha y decidan.' },
   ] satisfies readonly WritesBlock[],
-  /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. Desde la v9 son tres: los tres lugares. */
+  /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. Desde la v9.2 son cuatro: los cuatro lugares. */
   doorsLabel: 'Las puertas de EVA',
   doorsEyebrow: 'Entrar por',
   /** Pie de la portada: una nota; el enlace al primer lugar lo pone la estructura. */
-  foot: { note: 'Tres lugares. Ninguna prueba.' },
+  foot: { note: 'Cuatro lugares. Ninguna prueba.' },
 } as const;
 
 /**

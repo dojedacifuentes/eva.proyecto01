@@ -18,7 +18,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const CHROME = process.env.CHROME ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const PLACES = ['inicio', 'consciencia', 'genoma', 'cerebro'];
+const PLACES = ['inicio', 'consciencia', 'genoma', 'cerebro', 'cuerpo'];
 /** Segundos de observación por lugar. */
 const DWELL = 4;
 

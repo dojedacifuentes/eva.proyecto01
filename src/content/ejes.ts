@@ -113,7 +113,7 @@ export const ejes = {
       views: {
         profile: {
           name: 'Perfil',
-          kicker: 'LECTURA EXTERIOR · 1 DE 2',
+          kicker: 'LECTURA EXTERIOR',
           hud: 'PERFIL · VÍDEO',
           writes: [
             { kind: 'label', text: 'CHASIS' },
