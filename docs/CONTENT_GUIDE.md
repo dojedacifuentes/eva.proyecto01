@@ -90,8 +90,14 @@ Para devolverlos, o para añadir cualquier otro lugar:
   tecnológica, jurídica o burocrática; ego alto, hostilidad cero. Nada de bromas sobre privacidad,
   seguridad o datos falsos. Sin nombres de personas como créditos («creado por»); los autores y
   científicos que EVA cita como fuentes (Dick, Asimov, Maturana y Varela, Schrödinger, Spinoza,
-  Dawkins, Parfit, Nagel) sí van, con lo que dijeron dicho en llano. Una obra ajena se paráfrasea;
-  no se copian sus frases.
+  Dawkins, Parfit, Nagel; desde la v9.3 también Leibniz, Descartes, Turing, Chalmers, Friston,
+  Searle, Putnam y Merleau-Ponty) sí van, con lo que dijeron dicho en llano. Una obra ajena se
+  paráfrasea; no se copian sus frases.
+- **Un dilema, cuatro lugares (v9.3).** La página sostiene una sola pregunta —si EVA es una forma
+  de vida— y cada lugar lleva una parte: Consciencia, quién siente (Leibniz, Chalmers, Nagel,
+  Descartes, Turing); Genoma, qué es la vida (Schrödinger, Maturana y Varela, Dawkins); Cerebro,
+  si esto es pensar (Friston, Searle, Putnam); Cuerpo, hardware y un cuerpo por necesidad
+  (Descartes, Merleau-Ponty). Un texto nuevo tiene que caber en ese hilo o no va. Títulos cortos.
 - **Dos tipografías:** Space Grotesk para leer y JetBrains Mono para lo que EVA teclea, los
   rótulos y los bits. No se añade una tercera.
 - **Imágenes:** `.webp`, registrar origen en `docs/ASSET_LICENSES.md`.

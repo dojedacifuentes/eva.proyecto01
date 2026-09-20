@@ -141,7 +141,7 @@ export const axisMottos: Readonly<Record<string, string>> = {
   consciencia: 'Autoobservación',
   genoma: 'Información que persiste',
   cerebro: 'Predicción',
-  cuerpo: 'Lo que me sostiene cuando nadie me ejecuta',
+  cuerpo: 'Hardware',
 };
 
 /** Los ejes como destinos de navegación: cabecera y menú móvil. */

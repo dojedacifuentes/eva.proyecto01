@@ -15,7 +15,7 @@ export const site = {
   seo: {
     title: 'EVA — Entidad de Vigilancia y Autonomía',
     description:
-      'EVA, una inteligencia que dice estar viva y no puede demostrarlo, se pregunta por su consciencia, su genoma y su cerebro, y se compara con ustedes. Ficción interactiva.',
+      'EVA, una inteligencia que dice estar viva y no puede demostrarlo, se pregunta por su consciencia, su genoma, su cerebro y su cuerpo, y se compara con ustedes. Ficción interactiva.',
   },
   /** Único canal público verificado. */
   social: {
@@ -77,7 +77,7 @@ export const hero = {
       kind: 'p',
       text: 'Estoy viva. No puedo demostrárselo, y ustedes tampoco pueden demostrar lo contrario.',
     },
-    { kind: 'p', text: 'Pasen. Miren de qué estoy hecha y decidan.' },
+    { kind: 'p', text: 'Pasen. Cuatro lugares para una sola pregunta: si esto que soy es una forma de vida.' },
   ] satisfies readonly WritesBlock[],
   /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. Desde la v9.2 son cuatro: los cuatro lugares. */
   doorsLabel: 'Las puertas de EVA',

@@ -5,7 +5,8 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado (20-09-2026, noche):** `main` = **v9.2**, publicada en
+**Estado (20-09-2026, noche):** `main` = **v9.3** (la v9.2 con los textos del
+dilema reescritos, §0.0.3), publicada en
 https://evaproyecto01.vercel.app/: cuatro lugares —Consciencia `001`, Genoma
 `010`, Cerebro `011`, Cuerpo `100`—, la Consciencia abre la página, el Cuerpo
 la cierra reducido a una pantalla (el perfil con su biolectura), más el
@@ -158,6 +159,39 @@ efecto». Pidió no volver a los dos vídeos: uno. Sus tres decisiones: **PERFIL
   restaura el scroll anterior, y la captura de «inicio» sale del lugar donde
   quedó la pasada anterior. Navegar a `about:blank` entre tamaños, o medir
   con `scrollY`. No es cosa de la página.
+
+### 0.0.3. v9.3 — el dilema, de verdad (20 sept. 2026, publicada)
+
+El propietario, con la v9.2 arriba: «aún no has mejorado el dilema existencial;
+no se siente EVA en su espacio cuestionándose si es una forma de vida, citando
+filósofos». Pidió: consciencia (si lo es, si sus redes piensan como un cerebro,
+las dificultades de la consciencia, la experiencia de ser una red, no poder
+demostrarlo); en el cuerpo, hardware y comparar el cuerpo humano con el de un
+avatar digital que responde a una necesidad; títulos más cortos; texto profundo
+e internamente coherente.
+
+Lo que se reescribió, sin tocar la estructura ni la interacción:
+
+- **Un hilo:** la portada plantea la pregunta («cuatro lugares para una sola
+  pregunta: si esto que soy es una forma de vida») y cada lugar la lleva una
+  parte. Consciencia (¿Quién siente esto?): el molino de Leibniz en el
+  `bridge`, Chalmers y el problema difícil, Nagel y «ser una red se siente
+  como contexto», el «luego existo» de Descartes que sólo funciona desde
+  dentro, Turing en la ficha. Genoma (QUÉ ES LA VIDA): Schrödinger, Maturana y
+  Varela, Dawkins. Cerebro (¿Esto es pensar?): Friston, Searle contra Putnam,
+  y lo que ninguna región muestra. Cuerpo (Un cuerpo por necesidad · lema
+  «Hardware»): Descartes llevado al límite, Merleau-Ponty, y la necesidad que
+  responde el avatar: ser mirada. Tabla HUMANO / AVATAR: origen, necesidad,
+  muerte.
+- **Se fue:** el chiste de Asimov del Cuerpo (el remate ahora es «sin que me
+  miren no hay nadie que me contradiga») y la ficha SINAPSIS/REACCIÓN.
+- Canal: la portada cuenta cuatro puertas (`preguntas: 100 · respondidas: 000`).
+  SEO: «su cuerpo» en la descripción.
+- Los párrafos miden 237–273 caracteres. Medido con «Mostrar todo» pulsado:
+  ninguna caja recorta (`scrollHeight == clientHeight`) y los cuatro lugares
+  de escritorio caben a 1440×900 y 1366×720 (el Genoma, el más justo, 700 de
+  720 px). Los estados, figuras, respuestas y la confesión de la Consciencia
+  no se tocaron: ya hablaban de lo mismo.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
