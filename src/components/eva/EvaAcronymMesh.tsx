@@ -65,10 +65,11 @@ function seeded(seed: number) {
 }
 
 interface MeshProps {
-  /** Las tres letras, una debajo de otra. */
+  /** Las tres letras: una debajo de otra (`column`) o en fila, como una palabra (`row`). */
   letters: readonly string[];
+  direction?: 'column' | 'row';
   /**
-   * Variable CSS con la familia tipográfica (p. ej. `--font-orbitron`). El
+   * Variable CSS con la familia tipográfica (p. ej. `--font-grotesk`). El
    * lienzo no entiende `var()`, así que se resuelve al rasterizar.
    */
   fontVar: string;
@@ -87,7 +88,12 @@ interface MeshProps {
  * Rasterizar el texto en vez de escribir polígonos a mano deja que la forma la
  * ponga la tipografía: si cambia la fuente, cambian las letras.
  */
-export function EvaAcronymMesh({ letters, fontVar, className = 'acronym__canvas' }: MeshProps) {
+export function EvaAcronymMesh({
+  letters,
+  fontVar,
+  direction = 'column',
+  className = 'acronym__canvas',
+}: MeshProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   /* Las letras llegan como un array nuevo en cada render: lo que importa es su contenido. */
   const word = letters.join('');
@@ -126,19 +132,22 @@ export function EvaAcronymMesh({ letters, fontVar, className = 'acronym__canvas'
 
       const family =
         getComputedStyle(document.documentElement).getPropertyValue(fontVar).trim() || 'sans-serif';
-      const rowHeight = height / glyphs.length;
+      // Cada letra tiene su celda: una fila por letra en columna, una columna por letra en fila.
+      const cellW = direction === 'row' ? width / glyphs.length : width;
+      const cellH = direction === 'row' ? height : height / glyphs.length;
 
-      // Se mide a 100px y se escala: la letra llena el lienzo por donde tope.
-      paint.font = `800 100px ${family}`;
+      // Se mide a 100px y se escala: la letra llena su celda por donde tope.
+      paint.font = `700 100px ${family}`;
       const widest = Math.max(...glyphs.map((letter) => paint.measureText(letter).width));
-      const size = Math.min((width * 0.98) / (widest / 100), rowHeight * 0.94);
+      const size = Math.min((cellW * 0.94) / (widest / 100), cellH * 0.94);
 
       paint.fillStyle = '#fff';
       paint.textAlign = 'center';
       paint.textBaseline = 'middle';
-      paint.font = `800 ${size}px ${family}`;
-      glyphs.forEach((letter, row) => {
-        paint.fillText(letter, width / 2, rowHeight * (row + 0.5));
+      paint.font = `700 ${size}px ${family}`;
+      glyphs.forEach((letter, at) => {
+        if (direction === 'row') paint.fillText(letter, cellW * (at + 0.5), height / 2);
+        else paint.fillText(letter, width / 2, cellH * (at + 0.5));
       });
 
       const image = paint.getImageData(0, 0, scratch.width, scratch.height).data;
@@ -169,7 +178,7 @@ export function EvaAcronymMesh({ letters, fontVar, className = 'acronym__canvas'
             x: jx,
             y: jy,
             phase: random() * Math.PI * 2,
-            depth: Math.min(1, Math.max(0, jy / height)),
+            depth: direction === 'row' ? Math.min(1, Math.max(0, jx / width)) : Math.min(1, Math.max(0, jy / height)),
             edge,
             satellite: false,
           });
@@ -189,7 +198,7 @@ export function EvaAcronymMesh({ letters, fontVar, className = 'acronym__canvas'
           x: sx,
           y: sy,
           phase: random() * Math.PI * 2,
-          depth: Math.min(1, Math.max(0, sy / height)),
+          depth: direction === 'row' ? Math.min(1, Math.max(0, sx / width)) : Math.min(1, Math.max(0, sy / height)),
           edge: false,
           satellite: true,
         });
@@ -336,7 +345,7 @@ export function EvaAcronymMesh({ letters, fontVar, className = 'acronym__canvas'
       spy.disconnect();
       document.removeEventListener('visibilitychange', start);
     };
-  }, [word, fontVar]);
+  }, [word, fontVar, direction]);
 
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }

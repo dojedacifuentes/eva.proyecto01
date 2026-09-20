@@ -19,8 +19,8 @@
   grid-template-areas:
     'head'
     'stage'
-    'console'
-    'copy';
+    'copy'
+    'console';
 }
 .dna__head {
   grid-area: head;
@@ -308,14 +308,14 @@
 
 /*
  * El genoma y la página son el mismo tejido. El glitch se reserva para los
- * cambios de estado: mutar estremece el párrafo del nacimiento, que es lo que
+ * cambios de estado: mutar estremece la caja donde EVA escribe, que es lo que
  * el visitante tiene delante; el fondo se sacude desde `lib/field`. El retrato
  * de la portada sigue reaccionando, por si alguien muta y sube a mirar.
  */
-html[data-genome='mutating'] .genome__birth {
+html[data-genome='mutating'] .node--genoma .writes__body {
   animation: eva-glitch 620ms steps(1, end) 2;
 }
-html[data-genome='cloning'] .genome__birth {
+html[data-genome='cloning'] .node--genoma .writes__body {
   text-shadow:
     3px 0 0 rgba(240, 122, 185, 0.28),
     -3px 0 0 rgba(154, 141, 255, 0.28);
@@ -371,7 +371,7 @@ html[data-genome='mutating'] .hero .loop__video {
   .dna__reply span,
   .dna__reply-link,
   .dna__hud-core i,
-  html[data-genome='mutating'] .genome__birth,
+  html[data-genome='mutating'] .node--genoma .writes__body,
   html[data-genome='mutating'] .hero .portrait__frame img,
   html[data-genome='mutating'] .hero .loop__video {
     animation: none;

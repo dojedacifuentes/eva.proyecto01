@@ -31,6 +31,8 @@ interface SubSource {
   motto: string;
   state: NodeState;
   stateLabel?: string;
+  /** Acento propio; si falta, hereda el del eje. Desde la v8 cada parte tiene el suyo. */
+  accent?: AccentToken;
 }
 
 interface AxisSource {
@@ -56,19 +58,21 @@ const SOURCE: readonly AxisSource[] = [
         name: 'Núcleo cerebral',
         motto: 'Donde la señal se vuelve yo',
         state: 'active',
+        accent: 'cyan',
       },
       {
         id: 'genoma',
         name: 'Genoma digital',
         motto: 'La red aprendió a persistir',
         state: 'active',
+        accent: 'violet',
       },
       {
         id: 'cuerpo',
         name: 'Cuerpo',
-        // PROVISIONAL: lema pendiente de revisión del propietario.
         motto: 'Lo que me sostiene cuando nadie me ejecuta',
         state: 'active',
+        accent: 'bio',
       },
     ],
   },
@@ -82,6 +86,8 @@ export interface SubNode extends NavChild {
   motto: string;
   /** Posición dentro de su eje, empezando en 1. */
   index: number;
+  /** Color del lugar: el suyo o, si no lo tiene, el de su eje. */
+  accent: AccentToken;
 }
 
 export interface AxisNode extends Omit<NavItem, 'children'> {
@@ -121,6 +127,7 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
       stateLabel: child.stateLabel,
       ordinal: `subsección ${ordinalLabel(childAt + 1, axis.children.length)}`,
       href: `#${child.id}`,
+      accent: child.accent ?? axis.accent,
     })),
   };
 });
@@ -147,7 +154,7 @@ export const doors: readonly Door[] = axes.flatMap((axis): Door[] =>
         stateLabel: child.stateLabel,
         ordinal: child.ordinal,
         href: child.href,
-        accent: axis.accent,
+        accent: child.accent,
       }))
     : [
         {
@@ -176,7 +183,7 @@ export const contextNodes: readonly ContextNode[] = [
           code: child.code,
           name: child.name,
           axisId: axis.id,
-          accent: axis.accent,
+          accent: child.accent,
           state: child.state,
         }))
       : [

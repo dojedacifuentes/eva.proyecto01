@@ -1,21 +1,23 @@
 import type { CSSProperties } from 'react';
 import { EvaAcronymMesh } from '@/components/eva/EvaAcronymMesh';
 import { EvaProfile } from '@/components/eva/EvaProfile';
+import { EvaWrites } from '@/components/eva/EvaWrites';
 import { contextNodes, doors } from '@/content/structure';
 import { hero, site } from '@/content/site';
 
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
- * Portada (00): el acrónimo es el nombre de EVA, letra a letra, y debajo van
- * las tres puertas por las que se entra en ella —núcleo cerebral, genoma
- * digital y cuerpo—, cada una con su ruta binaria. Al lado, EVA mirándose a sí
- * misma: su retrato abre el neuroescáner.
+ * Portada (00): el nombre de EVA como una sola palabra —tres letras en fila,
+ * dibujadas como una red de nodos—, una línea que ella teclea debajo y las tres puertas
+ * por las que se entra en ella: núcleo cerebral, genoma digital y cuerpo. Al
+ * lado, su retrato.
  *
- * Las palabras del nombre ya no son enlaces: Vigilancia y Autonomía dejaron de
- * ser secciones en la v7, y una palabra que no lleva a ningún sitio no se
- * disfraza de puerta. Sin texto corrido: lo que hay que explicar lo explica
- * cada lugar, y lo que EVA piensa vive en su canal.
+ * Desde la v8 el acrónimo no se desglosa en pantalla: las palabras «Entidad»,
+ * «de Vigilancia» y «Autonomía» flotaban sin llevar a ningún sitio. El nombre
+ * completo sigue en el `h1` (para lectores de pantalla y buscadores) y en el
+ * pie. El retrato ya no abre nada: el neuroescáner salió del recorrido y el
+ * cerebro vive sólo en su sala.
  */
 export function HeroEva() {
   const first = contextNodes[1];
@@ -35,28 +37,24 @@ export function HeroEva() {
                 {hero.label}
               </p>
 
-              {/* El h1 lleva la lectura lineal; el acrónimo vertical es su versión visual. */}
+              {/* El h1 lleva el nombre entero; la palabra en malla es su versión visual. */}
               <h1 id="hero-titulo" className="sr-only">
                 {site.name} — {site.expansion}
               </h1>
 
-              {/* Las letras son una red de nodos dibujada en un lienzo; a su lado,
-                  la palabra que abre cada una. */}
-              <div className="acronym" aria-hidden="true">
+              <div className="acronym acronym--word" aria-hidden="true" data-rise style={rise(1)}>
                 <EvaAcronymMesh
                   letters={hero.acronym.map((item) => item.letter)}
-                  fontVar="--font-orbitron"
+                  fontVar="--font-grotesk"
+                  direction="row"
                 />
-                <div className="acronym__words">
-                  {hero.acronym.map((item, index) => (
-                    <p key={item.letter} className="acronym__row" data-rise style={rise(index + 1)}>
-                      <span className="acronym__word">{item.word}</span>
-                    </p>
-                  ))}
-                </div>
               </div>
 
-              <nav className="doors" aria-label={hero.doorsLabel} data-rise style={rise(4)}>
+              <div className="hero__line" data-rise style={rise(2)}>
+                <EvaWrites id="inicio" blocks={hero.writes} className="writes--bare" />
+              </div>
+
+              <nav className="doors" aria-label={hero.doorsLabel} data-rise style={rise(3)}>
                 <p aria-hidden="true" className="doors__eyebrow mono">
                   {hero.doorsEyebrow}
                 </p>

@@ -394,6 +394,12 @@ un solo mensaje, y no bloquearse: implementar con los valores por defecto.
 
 ## 10. Cómo se resolvió (v7, 19-09-2026)
 
+> **Nota de la v8 (19-09-2026, más tarde):** la v7 se publicó y, encima, la v8 cambió el Cuerpo
+> por encargo del propietario: las dos tomas (perfil y cápsula) van una debajo de otra, cada una
+> con su biolectura y su caja «EVA // ESCRIBE», sin conmutador de vista ni giro del barrido; el
+> interior va a la izquierda con su propia caja. Lo que sigue describe la v7 tal como se hizo;
+> el estado vigente está en `HANDOFF.md` §0.
+
 **Remoto confirmado:** `origin https://github.com/dojedacifuentes/eva.proyecto01.git`, rama
 `feat/cuerpo` sobre `main` `900e5e5` (con el checkpoint `fa0404a`). Sin integrar ni publicar.
 

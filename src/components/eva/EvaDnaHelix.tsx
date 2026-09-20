@@ -1,14 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { genome, site } from '@/content/site';
 import { subById } from '@/content/structure';
 import { bin } from '@/lib/binary';
@@ -17,7 +10,6 @@ import { sequenceId, toFasta, toNotes } from '@/lib/genome';
 import { isSoundEnabled, play, playSequence } from '@/lib/sound';
 import { pointerSignal } from '@/lib/pointer';
 import { spinSignal } from '@/lib/spin';
-import { isCovered, isCoveredOnServer, subscribeCovered } from '@/lib/stage';
 
 /** three.js no viaja en el paquete inicial: llega cuando el visitante se acerca a la hélice. */
 const DnaScene = dynamic(() => import('./dna/DnaScene'), { ssr: false });
@@ -59,8 +51,8 @@ const body = subById('cuerpo')?.sub;
  * página son el mismo tejido.
  *
  * La sección le pasa sus piezas de texto como huecos (`head`, `copy`, `foot`):
- * así la rejilla es una sola —hélice a un lado, lectura y consola al otro— y
- * en móvil el orden es título, hélice, acciones y párrafo.
+ * así la rejilla es una sola —hélice a un lado, la caja de EVA y la consola al
+ * otro— y en móvil el orden es título, hélice, caja y acciones.
  */
 interface EvaDnaHelixProps {
   head?: ReactNode;
@@ -89,8 +81,6 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
   const [express, setExpress] = useState(0);
   const [state, setState] = useState<GenomeState>('active');
   const [reply, setReply] = useState<readonly string[]>([genome.idle]);
-  /* Con el neuroescáner abierto encima, la hélice no se ve: su bucle se congela y se retoma al cerrar. */
-  const covered = useSyncExternalStore(subscribeCovered, isCovered, isCoveredOnServer);
 
   /* Densidad y movimiento reducido, sincronizados con el navegador. */
   useEffect(() => {
@@ -297,7 +287,7 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
             particles={density.particles}
             quality={density.quality}
             reduced={reduced}
-            active={visible && !covered}
+            active={visible}
             clones={clones}
             pulse={pulse}
             mutate={mutate}
@@ -310,9 +300,8 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
       </div>
 
       <div className="dna__console">
+        {/* Una sola línea de estado: lo demás lo cuenta EVA en su caja. */}
         <p className="dna__hud mono">
-          <span className="dna__hud-title">{genome.title}</span>
-          <span>{genome.sequence}</span>
           <span className="dna__hud-core">
             <i aria-hidden="true" />
             {genome.core}: {genome.states[state]}

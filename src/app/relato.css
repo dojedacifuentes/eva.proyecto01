@@ -1,0 +1,703 @@
+/*
+ * EVA // RELATO — la v8: EVA escribe cada lugar.
+ *
+ * Lo nuevo de la v8, en una hoja: la caja donde EVA teclea el contenido de
+ * cada slide (`.writes`), los títulos con degradado tecnológico, el botón del
+ * canal SINAPSIS más presente, el Cuerpo con sus tres lecturas apiladas y los
+ * ajustes para que cada slide siga cabiendo en una pantalla sin bajar.
+ *
+ * Dos tipografías y ninguna más: Space Grotesk para leer, JetBrains Mono para
+ * lo que EVA teclea, los rótulos y los bits. El color: la Entidad es cian; el
+ * genoma, violeta y magenta; el cuerpo, verde de cápsula y magenta. Cada lugar
+ * lo pone `[data-accent]` (tokens.css) y todo lo de aquí lo lee de `--accent`.
+ */
+
+/* ───────────── Títulos con degradado: el color de cada lugar ───────────── */
+
+.node .h2,
+.interior__title {
+  background: linear-gradient(100deg, var(--eva-text) 0%, var(--accent) 55%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-wrap: balance;
+}
+.node__code {
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 80%, transparent);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.node .eyebrow {
+  color: var(--accent);
+}
+.node .eyebrow::before {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* ───────────── La caja donde EVA escribe ───────────── */
+
+/*
+ * Una terminal pequeña, con el color del lugar: barra arriba, cuerpo en mono,
+ * líneas de barrido y un resplandor de acento en el borde. Lo que falta por
+ * escribir ocupa su sitio, invisible: la caja tiene su alto final desde el
+ * primer fotograma. Sin JavaScript se lee entera.
+ */
+.writes {
+  --writes-glow: color-mix(in srgb, var(--accent) 24%, transparent);
+  position: relative;
+  display: grid;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 36%, var(--eva-line-strong));
+  border-radius: var(--eva-radius-lg);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 42%),
+    rgba(3, 9, 16, 0.86);
+  box-shadow:
+    0 18px 60px -30px var(--writes-glow),
+    inset 0 1px 0 rgba(209, 240, 255, 0.05);
+  overflow: hidden;
+  isolation: isolate;
+}
+/* Nada de dentro ensancha la caja: la barra (rótulos sin salto) y la tabla se ajustan a ella. */
+.writes > * {
+  min-width: 0;
+}
+/* Líneas de barrido muy tenues: pantalla, no papel. */
+.writes::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(226, 233, 238, 0.028) 3px 4px);
+  pointer-events: none;
+}
+/* Marca de encendido: una barra de acento que recorre el borde superior. */
+.writes::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 1.2rem;
+  width: 3.4rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 16px var(--accent);
+  opacity: 0.9;
+}
+.writes[data-status='typing']::before {
+  animation: writes-scan 5s var(--eva-ease) infinite;
+}
+@keyframes writes-scan {
+  0%,
+  100% {
+    left: 1.2rem;
+  }
+  50% {
+    left: calc(100% - 4.6rem);
+  }
+}
+.writes__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  padding: 0.38rem 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, var(--eva-line));
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+}
+.writes__title {
+  color: var(--accent);
+  white-space: nowrap;
+}
+.writes__place {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--eva-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.writes__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+/* «Mostrar todo», en la barra, justo antes del estado. */
+.writes__skip {
+  margin-left: auto;
+  min-height: 24px;
+  padding: 0 0.45rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--eva-muted);
+  background: transparent;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear;
+}
+.writes__skip:hover,
+.writes__skip:focus-visible {
+  border-color: var(--accent);
+  color: var(--eva-text);
+}
+/* Escrita del todo, el estado se va al borde. */
+.writes[data-done] .writes__status {
+  margin-left: auto;
+}
+.writes__status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.writes[data-status='done'] .writes__status i,
+.writes[data-status='paused'] .writes__status i {
+  animation: none;
+  opacity: 0.55;
+}
+.writes__body {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem 0.95rem 0.95rem;
+  min-width: 0;
+}
+.writes__body > * {
+  margin: 0;
+  min-width: 0;
+}
+/* El párrafo tecleado va en mono: es EVA en su terminal, no un texto maquetado. */
+.writes__p {
+  color: var(--eva-text);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.005em;
+  line-height: 1.6;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.writes__label {
+  color: var(--accent);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.16em;
+}
+.writes__label:not(:first-child) {
+  margin-top: 0.2rem;
+}
+/* La consigna: mono, con el segundo acento y un resplandor. */
+.writes__slogan {
+  color: var(--accent-2);
+  font-size: var(--eva-type-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.45;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent-2) 45%, transparent);
+}
+.writes__slogan span {
+  display: inline;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-2) 45%, transparent);
+}
+/* La ficha: clave en acento, valor en claro. */
+.writes__spec {
+  display: grid;
+  gap: 0.25rem;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: none;
+}
+.writes__spec > div {
+  display: grid;
+  grid-template-columns: 6.2rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.writes__spec dt {
+  color: var(--accent);
+  letter-spacing: 0.12em;
+}
+.writes__spec dd {
+  margin: 0;
+  color: var(--eva-soft);
+}
+/* La tabla de equivalencia: tres columnas, cabecera en acento. */
+.writes__table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.06em;
+  line-height: 1.45;
+  text-transform: none;
+}
+.writes__table th,
+.writes__table td {
+  padding: 0.3rem 0.4rem 0.3rem 0;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--eva-line);
+}
+.writes__table thead th {
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  border-bottom-color: color-mix(in srgb, var(--accent) 40%, var(--eva-line));
+}
+.writes__table tbody th {
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+.writes__table td {
+  color: var(--eva-soft);
+}
+.writes__table td:last-child {
+  color: var(--eva-text);
+}
+.writes__table tr:last-child > * {
+  border-bottom: 0;
+}
+
+/* Lo no escrito: invisible pero presente. Sólo mientras el navegador teclea. */
+.writes[data-armed]:not([data-done]) .writes__rest {
+  visibility: hidden;
+}
+.writes[data-armed]:not([data-done]) [data-block]:not([data-shown]),
+.writes[data-armed]:not([data-done]) [data-row]:not([data-shown]) {
+  opacity: 0;
+}
+.writes [data-block],
+.writes [data-row] {
+  transition: opacity 260ms var(--eva-ease);
+}
+.writes__caret {
+  display: inline-block;
+  width: 0;
+  overflow: visible;
+  color: var(--accent);
+  opacity: 0;
+}
+.writes__p[data-typing] .writes__caret {
+  opacity: 1;
+  animation: blink 0.9s steps(1) infinite;
+}
+
+/* Sin cabecera (la portada): sólo el cuerpo, más ligero. */
+.writes--bare {
+  border-radius: var(--eva-radius);
+}
+.writes--bare .writes__body {
+  padding: 0.65rem 0.85rem;
+}
+/* Apretada (el interior): comparte columna con el registro de órganos. */
+.writes--tight {
+  margin-top: 0.6rem;
+}
+.writes--tight .writes__body {
+  gap: 0.4rem;
+  padding: 0.65rem 0.85rem 0.75rem;
+}
+
+/* ───────────── Portada ───────────── */
+
+.hero .writes {
+  --accent: var(--eva-cyan);
+  --accent-2: var(--eva-magenta);
+}
+.hero .writes__p {
+  font-size: 0.875rem;
+}
+
+/* ───────────── 01.10 · la hélice a la derecha, la caja a la izquierda ───────────── */
+
+/*
+ * Los elementos gráficos alternan de lado a lo largo de la página: cerebro a la
+ * izquierda (01.01), hélice a la derecha (01.10), perfil a la izquierda,
+ * cápsula a la derecha e interior a la izquierda (01.11).
+ */
+@media (min-width: 64rem) {
+  .dna {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas:
+      'head stage'
+      'copy stage'
+      'console stage';
+    align-items: start;
+  }
+}
+/* Un velo oscuro detrás de la hélice: se funde con el fondo en vez de flotar sobre él. */
+.dna__stage::before {
+  content: '';
+  position: absolute;
+  inset: -6% -14%;
+  z-index: 0;
+  background: radial-gradient(52% 58% at 50% 50%, rgba(28, 16, 54, 0.5), transparent 72%);
+  pointer-events: none;
+}
+.dna__stage canvas {
+  z-index: 1;
+}
+/* La consola del genoma, compacta: estado en una línea, ocho acciones bajas y una respuesta corta. */
+.dna__console {
+  gap: 0.45rem;
+}
+.dna__hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+}
+.dna__actions .dna__btn {
+  min-height: 36px;
+}
+.dna__reply {
+  min-height: 2.6rem;
+  font-size: 0.84rem;
+}
+.node--genoma .h2 {
+  font-size: clamp(1.4rem, 1.9vw, 1.8rem);
+}
+@media (min-width: 64rem) {
+  .dna {
+    row-gap: 0.7rem;
+  }
+  .dna__stage {
+    height: clamp(24rem, 70vh, 40rem);
+  }
+}
+
+/* ───────────── 01.11 · las tres lecturas, apiladas ───────────── */
+
+/* Cada toma: el marco a un lado y, al otro, la caja y dos botones. Sin cabecera propia
+   (la de la sección va sobre la primera) y sin conmutador de vista: las dos están. */
+.bio {
+  --bio-h: clamp(22rem, 58vh, 36rem);
+}
+/* La cinta del genoma abre el primer slide, más baja: es un umbral, no un protagonista. */
+.node--cuerpo .strand__canvas {
+  height: clamp(5rem, 12vh, 7.5rem);
+}
+.node--cuerpo .strand {
+  margin-bottom: 0.6rem;
+}
+.node--cuerpo .h2 {
+  font-size: clamp(1.4rem, 1.9vw, 1.8rem);
+}
+@media (min-width: 64rem) {
+  .bio {
+    grid-template-columns: calc(var(--bio-h) * 9 / 16) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: 'figure console';
+    align-items: center;
+  }
+  /* La cápsula, al otro lado: el marco a la derecha y la caja a la izquierda. */
+  .bio[data-view='front'] {
+    grid-template-columns: minmax(0, 1fr) calc(var(--bio-h) * 9 / 16);
+    grid-template-areas: 'console figure';
+  }
+}
+.bio__figure {
+  gap: 0.5rem;
+}
+.bio__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 24rem;
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+}
+@media (min-width: 64rem) {
+  .bio__caption {
+    max-width: none;
+  }
+}
+.bio__caption .bio__kicker {
+  color: var(--eva-bio);
+}
+.bio__console {
+  gap: 0.6rem;
+}
+.bio__actions {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+.bio__start {
+  grid-column: auto;
+}
+.node--cuerpo .node__head {
+  margin-bottom: 0.9rem;
+}
+/* La segunda toma y el interior: menos aire arriba, ya no abren nada. */
+#cuerpo-capsula,
+#cuerpo-interior {
+  padding-top: clamp(1rem, 3vh, 2rem);
+}
+/* El modelo interior, a la izquierda como los demás elementos gráficos; todo más apretado para caber. */
+@media (min-width: 64rem) {
+  .interior {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas:
+      'stage head'
+      'stage console';
+    row-gap: 0.6rem;
+  }
+  .interior__stage {
+    height: clamp(24rem, 66vh, 38rem);
+  }
+  .interior__title {
+    font-size: clamp(1.3rem, 1.7vw, 1.6rem);
+  }
+}
+.organ-panel {
+  min-height: 7.5rem;
+}
+.interior__console {
+  gap: 0.5rem;
+}
+.interior__console .dna__btn {
+  min-height: 36px;
+}
+.node--cuerpo .dna__reply {
+  min-height: 2.6rem;
+  font-size: 0.84rem;
+}
+
+/* ───────────── SINAPSIS: el botón, más presente ───────────── */
+
+/*
+ * Cerrado ya no es un disco oscuro de 48 px: es un nodo de 56 px con anillo
+ * de acento, halo que respira y un rótulo «EVA» a su izquierda en escritorio.
+ * Abierto, el anillo se enciende del todo.
+ */
+.synapse__button {
+  width: 56px;
+  height: 56px;
+  border: 1px solid color-mix(in srgb, var(--eva-cyan) 70%, transparent);
+  color: var(--eva-cyan);
+  background:
+    radial-gradient(circle at 50% 40%, rgba(63, 216, 238, 0.22), transparent 62%),
+    rgba(5, 13, 22, 0.94);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(63, 216, 238, 0.14),
+    0 0 26px rgba(63, 216, 238, 0.28);
+  transition:
+    border-color var(--eva-fast) linear,
+    box-shadow var(--eva-normal) var(--eva-ease),
+    color var(--eva-fast) linear;
+}
+.synapse__button:hover,
+.synapse__button:focus-visible,
+.synapse[data-open] .synapse__button {
+  border-color: var(--eva-cyan);
+  color: var(--eva-text);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(63, 216, 238, 0.16),
+    0 0 38px rgba(63, 216, 238, 0.45),
+    0 0 70px rgba(240, 122, 185, 0.2);
+}
+/* El halo: un anillo que se expande desde el botón y se apaga. */
+.synapse__halo {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--eva-cyan);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: synapse-halo 3.2s ease-out infinite;
+}
+.synapse[data-open] .synapse__halo {
+  animation-duration: 1.8s;
+}
+@keyframes synapse-halo {
+  0% {
+    opacity: 0.85;
+    scale: 1;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    scale: 1.85;
+  }
+}
+.synapse__glyph i {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 10px currentColor;
+}
+.synapse__glyph {
+  gap: 8px;
+}
+.synapse__glyph::after {
+  left: 8px;
+  background: #fff;
+  box-shadow: 0 0 8px #fff;
+}
+/* El rótulo: a la izquierda del botón, sólo con puntero fino y sitio. */
+.synapse__tag {
+  position: absolute;
+  right: calc(100% + 0.7rem);
+  top: 50%;
+  translate: 0 -50%;
+  display: none;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--eva-cyan) 40%, var(--eva-line-strong));
+  border-radius: 999px;
+  color: var(--eva-text);
+  background: rgba(5, 13, 22, 0.92);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  box-shadow: 0 0 20px rgba(63, 216, 238, 0.16);
+  transition:
+    opacity var(--eva-normal) var(--eva-ease),
+    translate var(--eva-normal) var(--eva-ease);
+}
+.synapse__tag b {
+  color: var(--eva-cyan);
+  font-weight: 600;
+}
+@media (min-width: 48rem) and (hover: hover) {
+  .synapse__tag {
+    display: inline-flex;
+  }
+  /* Cuando hay aviso, el aviso manda: el rótulo se aparta. */
+  .synapse[data-toast]:not([data-open]) .synapse__tag,
+  .synapse[data-open] .synapse__tag {
+    opacity: 0;
+    translate: 6px -50%;
+    pointer-events: none;
+  }
+}
+/* El aviso, con el mismo acento. */
+.synapse__toast {
+  border-color: color-mix(in srgb, var(--eva-cyan) 45%, var(--eva-line-strong));
+  box-shadow: 0 0 24px rgba(63, 216, 238, 0.14);
+}
+/* El panel abierto: el borde también se enciende. */
+.synapse[data-open] .synapse__panel {
+  border-color: color-mix(in srgb, var(--eva-cyan) 40%, var(--eva-line-strong));
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(63, 216, 238, 0.12);
+}
+.synapse__head {
+  background: linear-gradient(90deg, rgba(63, 216, 238, 0.08), transparent 60%);
+}
+
+/* ───────────── Móvil ───────────── */
+
+@media (max-width: 47.99rem) {
+  /* El retrato flota arriba a la derecha: las letras le dejan ese hueco. */
+  .acronym--word {
+    margin-right: 5.6rem;
+  }
+  /* El rótulo de la cinta no cabe sin pisarla: en móvil la cinta habla sola. */
+  .strand__label {
+    display: none;
+  }
+  .writes__place {
+    display: none;
+  }
+}
+
+/* ───────────── Cada slide cabe bajo la cabecera ───────────── */
+
+/*
+ * Un slide medía 100svh y se alineaba bajo la cabecera fija: sus últimos 60 px
+ * quedaban siempre fuera de la pantalla. Ahora mide lo que queda bajo ella, y
+ * el aire de cada sección es menor: el contenido, no el margen, llena el slide.
+ */
+/*
+ * Y el desplazamiento aterriza justo bajo la cabecera: antes se sumaban el
+ * `scroll-padding-top` del documento y el `scroll-margin-top` de cada slide, y
+ * cada lugar quedaba unos 70 px más abajo de lo que debía (con su pie fuera de
+ * la pantalla). Manda sólo el `scroll-padding` del documento.
+ */
+html {
+  scroll-padding-top: var(--eva-header);
+}
+.slide,
+.node--cuerpo {
+  min-height: calc(100svh - var(--eva-header));
+  scroll-margin-top: 0;
+}
+.node--cuerpo {
+  min-height: 0;
+}
+.section {
+  padding-block: clamp(1.25rem, 3vh, 2.5rem);
+}
+
+/* ───────────── Pantallas bajas: la caja se aprieta ───────────── */
+
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .writes__body {
+    gap: 0.4rem;
+    padding: 0.65rem 0.8rem 0.75rem;
+  }
+  .writes__p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+  .writes__spec {
+    gap: 0.15rem;
+  }
+  .bio {
+    --bio-h: clamp(21rem, 62vh, 32rem);
+  }
+  .core[data-variant='room'] .core__stage {
+    height: clamp(18rem, 52vh, 28rem);
+  }
+  .core-room__reading {
+    min-height: 4.4rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
+  }
+  .interior__stage {
+    height: clamp(20rem, 58vh, 34rem);
+  }
+  .interior__title {
+    font-size: 1.2rem;
+  }
+  .organ-panel {
+    min-height: 4.5rem;
+  }
+  .node--cuerpo .dna__reply,
+  .dna__reply {
+    min-height: 1.8rem;
+  }
+  .interior {
+    row-gap: 0.4rem;
+  }
+  .interior__console .dna__btn,
+  .dna__actions .dna__btn {
+    min-height: 34px;
+  }
+  .writes--tight .writes__body {
+    gap: 0.3rem;
+    padding: 0.5rem 0.75rem 0.6rem;
+  }
+}
+
+/* ───────────── Movimiento reducido ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .writes::before,
+  .writes[data-status='typing']::before,
+  .writes__status i,
+  .synapse__halo {
+    animation: none;
+  }
+  .writes [data-block],
+  .writes [data-row] {
+    transition: none;
+  }
+}

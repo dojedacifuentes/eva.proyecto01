@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { capsuleFrontLoop, capsuleLoop, images, type EvaImage, type EvaLoop } from '@/content/assets';
-import { ejes, type BodyView, type SweepDirection } from '@/content/ejes';
+import { ejes, type BodyView } from '@/content/ejes';
 import { bin, bitsFor } from '@/lib/binary';
 import { clearBody, publishBody } from '@/lib/body-state';
 import { useMediaQuery } from '@/lib/media';
@@ -15,7 +15,7 @@ import { FROZEN, HIT, OUT, createScan, detectEdges, traceEdges, type Scan } from
 
 const copy = ejes.cuerpo.exterior;
 
-/** Cada vista, su vídeo y su póster. Los dos son el mismo cuerpo, desde fuera. */
+/** Cada vista, su vídeo y su póster. Las dos son el mismo cuerpo, desde fuera. */
 const MEDIA: Record<BodyView, { video: EvaLoop; poster: EvaImage }> = {
   profile: { video: capsuleLoop, poster: images.capsuleProfile },
   front: { video: capsuleFrontLoop, poster: images.capsuleFront },
@@ -24,13 +24,12 @@ const MEDIA: Record<BodyView, { video: EvaLoop; poster: EvaImage }> = {
 /** Megabytes con coma decimal: es una medida, así que va en decimal. */
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1).replace('.', ',')} MB`;
 
-const SWEEPS: readonly SweepDirection[] = ['down', 'up', 'right', 'left'];
 /** El contador de pasadas se escribe en cuatro bits: es un nombre, no una medida. */
 const CYCLE_BITS = 4;
 const POINT_BITS = bitsFor(copy.points.profile.length);
-/** Cada cuánto se publican el recuento de bordes y el avance, en milisegundos. */
+/** Cada cuánto se publica el avance de la pasada, en milisegundos. */
 const READOUT_MS = 140;
-/** En el trazado directo, uno de cada tantos píxeles de borde. */
+/** Con movimiento reducido los bordes salen ya trazados: uno de cada tantos píxeles de borde. */
 const TRACE_EVERY = 3;
 
 const CYAN = '63, 216, 238';
@@ -46,7 +45,10 @@ interface Still {
 }
 
 interface BioReadingProps {
-  head?: ReactNode;
+  /** Qué toma se lee: el perfil o la cápsula. Cada una es una instancia. */
+  view: BodyView;
+  /** Lo que EVA escribe junto a esta toma. */
+  writes?: ReactNode;
   foot?: ReactNode;
 }
 
@@ -81,22 +83,23 @@ function paintStill(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement
 }
 
 /**
- * BIOLECTURA: la lectura exterior del cuerpo de EVA. Sobre el vídeo de perfil
- * —o sobre el de la cápsula— pasa una tanda de filas de partículas que
- * se detienen donde encuentran un borde y así van dibujando el contorno. El
- * motor es `scan.ts` (técnica de collidingScopes/scanlines, MIT); aquí están el
- * lienzo, los dos recursos, el HUD y los botones.
+ * BIOLECTURA: la lectura exterior del cuerpo de EVA. Sobre el vídeo de una
+ * toma —el perfil o la cápsula— pasa una tanda de filas de partículas que se
+ * detienen donde encuentran un borde y así van dibujando el contorno. El motor
+ * es `scan.ts` (técnica de collidingScopes/scanlines, MIT); aquí están el
+ * lienzo, el recurso, el HUD y los botones.
  *
  * Todo ocurre en el navegador: los bordes se calculan una vez, a partir del
  * fotograma que se está viendo, en un lienzo fuera de pantalla. No hay cámara,
  * no se sube nada y no se guarda nada. Es ficción, como el genoma.
  *
- * Las dos vistas son vídeo y se comportan igual: en escritorio arrancan solas
- * al entrar en pantalla; en pantallas estrechas y con movimiento reducido se
- * quedan en su primer fotograma, que hace de póster, y sólo se descargan si el
- * visitante lo pide. Sólo se monta el vídeo de la vista que se mira.
+ * Desde la v8 las dos tomas van una debajo de otra, cada una con su
+ * biolectura y su caja de EVA: nada se abre con clic. El vídeo arranca solo
+ * al entrar en pantalla en escritorio; en pantallas estrechas y con
+ * movimiento reducido se queda en su primer fotograma, que hace de póster, y
+ * sólo se descarga si el visitante lo pide.
  */
-export function BioReading({ head, foot }: BioReadingProps) {
+export function BioReading({ view, writes, foot }: BioReadingProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -108,12 +111,8 @@ export function BioReading({ head, foot }: BioReadingProps) {
   const reduced = useReducedMotion();
   const wide = useMediaQuery('(min-width: 64rem)');
 
-  const [view, setView] = useState<BodyView>('profile');
-  const [sweep, setSweep] = useState<SweepDirection>('down');
   const [status, setStatus] = useState<Status>('idle');
   const [cycle, setCycle] = useState(0);
-  const [edges, setEdges] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [lit, setLit] = useState(0);
   const [onScreen, setOnScreen] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -122,6 +121,7 @@ export function BioReading({ head, foot }: BioReadingProps) {
   const [reply, setReply] = useState<readonly string[]>([copy.idle]);
 
   const media = MEDIA[view];
+  const take = copy.views[view];
   const showVideo = onScreen && (requested || (wide && !reduced));
 
   /* El vídeo sólo existe con la pieza a la vista: fuera de pantalla ni descarga ni decodifica. */
@@ -168,8 +168,6 @@ export function BioReading({ head, foot }: BioReadingProps) {
     still.current = null;
     const canvas = canvasRef.current;
     canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
-    setEdges(0);
-    setProgress(0);
     setLit(0);
   }
 
@@ -197,36 +195,32 @@ export function BioReading({ head, foot }: BioReadingProps) {
     }
   }
 
-  /** Qué puntos de lectura ha cruzado ya la cabeza de la pasada, como máscara de bits. */
-  function crossed(front: number, direction: SweepDirection) {
+  /** Qué puntos de lectura ha cruzado ya la cabeza de la pasada (baja de arriba abajo), como máscara de bits. */
+  function crossed(front: number) {
     let mask = 0;
-    BIO_VIEWS[view].points.forEach(([x, y], at) => {
-      const along = direction === 'down' ? y : direction === 'up' ? 1 - y : direction === 'right' ? x : 1 - x;
-      if (front >= along) mask |= 1 << at;
+    BIO_VIEWS[view].points.forEach(([, y], at) => {
+      if (front >= y) mask |= 1 << at;
     });
     return mask;
   }
 
-  function trace(found: { map: Uint8Array; width: number; height: number }, next: Status) {
+  function trace(found: { map: Uint8Array; width: number; height: number }) {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
     const points = traceEdges(found.map, found.width, found.height, TRACE_EVERY);
     still.current = { points, radius: 0.55 };
     paintStill(context, canvas, still.current);
-    setEdges(points.length / 2);
-    setProgress(1);
     setLit((1 << BIO_VIEWS[view].points.length) - 1);
-    setStatus(next);
+    setStatus('done');
+    setReply(copy.doneReply);
     publishBody('read');
   }
 
-  function run(scan: Scan, direction: SweepDirection) {
+  function run(scan: Scan) {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
-    const vertical = direction === 'down' || direction === 'up';
-    const forward = direction === 'down' || direction === 'right';
     let last = 0;
     let told = 0;
 
@@ -260,18 +254,13 @@ export function BioReading({ head, foot }: BioReadingProps) {
 
       // La línea de cabeza: lo que el ojo sigue mientras las filas bajan.
       if (scan.front < 1) {
-        const span = vertical ? canvas.height : canvas.width;
-        const at = (forward ? scan.front : 1 - scan.front) * span;
         context.fillStyle = `rgba(${CYAN}, 0.55)`;
-        if (vertical) context.fillRect(0, at, canvas.width, Math.max(1, scale * 0.6));
-        else context.fillRect(at, 0, Math.max(1, scale * 0.6), canvas.height);
+        context.fillRect(0, scan.front * canvas.height, canvas.width, Math.max(1, scale * 0.6));
       }
 
       if (now - told > READOUT_MS || scan.done) {
         told = now;
-        setEdges(scan.frozen);
-        setProgress(scan.progress);
-        setLit(crossed(scan.front, direction));
+        setLit(crossed(scan.front));
       }
 
       if (scan.done) {
@@ -302,7 +291,7 @@ export function BioReading({ head, foot }: BioReadingProps) {
     turns.current += 1;
     // Con movimiento reducido no hay pasada: los bordes aparecen ya trazados.
     if (reduced) {
-      trace(found, 'done');
+      trace(found);
       return;
     }
     setStatus('scanning');
@@ -313,51 +302,10 @@ export function BioReading({ head, foot }: BioReadingProps) {
         width: found.width,
         height: found.height,
         edges: found.map,
-        sweep,
+        sweep: 'down',
         random: seeded(0xe7a07 + turns.current),
       }),
-      sweep,
     );
-  };
-
-  const onTrace = () => {
-    const found = readEdges();
-    if (!found) return;
-    play('confirm');
-    wipe();
-    setReply(copy.traceReply);
-    trace(found, 'traced');
-  };
-
-  const onClear = () => {
-    play('confirm');
-    wipe();
-    setStatus('idle');
-    setReply(copy.clearReply);
-    publishBody('idle');
-  };
-
-  /** Girar el barrido no borra lo leído: vale para la próxima pasada. */
-  const onTurn = () => {
-    play('confirm');
-    const next = SWEEPS[(SWEEPS.indexOf(sweep) + 1) % SWEEPS.length];
-    setSweep(next);
-    setReply(copy.turnReplies[next]);
-  };
-
-  /** Cada vista tiene su vídeo y sus bordes: al cambiar, lo leído en la otra ya no vale. */
-  const onView = (next: BodyView) => {
-    if (next === view) return;
-    play('open');
-    wipe();
-    setVideoReady(false);
-    // El vídeo de la otra vista pesa lo suyo: donde no se cargan solos, se vuelve a pedir.
-    setRequested(false);
-    setPaused(false);
-    setView(next);
-    setStatus('idle');
-    setReply(copy.viewReplies[next]);
-    publishBody('idle');
   };
 
   const onVideo = () => {
@@ -377,22 +325,17 @@ export function BioReading({ head, foot }: BioReadingProps) {
 
   const image = media.poster;
   const names = copy.points[view];
-  const busy = status === 'scanning';
   const videoLabel = !showVideo ? copy.actions.load : paused ? copy.actions.resume : copy.actions.pause;
 
   return (
     <div ref={hostRef} className="bio" data-status={status} data-view={view}>
-      {head && <div className="bio__head">{head}</div>}
-
       <figure className="bio__figure">
         <div className="bio__media" style={{ aspectRatio: String(BIO_VIEWS[view].aspect) }}>
           {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
             <span key={corner} aria-hidden="true" className={`bio__corner bio__corner--${corner}`} />
           ))}
 
-          {/* La clave lleva la vista: al cambiar de toma, póster y vídeo se montan de nuevo. */}
           <Image
-            key={`poster-${view}`}
             ref={imageRef}
             className="bio__image"
             src={image.src}
@@ -410,7 +353,6 @@ export function BioReading({ head, foot }: BioReadingProps) {
              * sin controles de sonido: la pista de audio del archivo no se usa.
              */
             <video
-              key={`video-${view}`}
               ref={videoRef}
               className="bio__video"
               data-ready={videoReady || undefined}
@@ -435,7 +377,7 @@ export function BioReading({ head, foot }: BioReadingProps) {
           <ul className="bio__points" aria-hidden="true">
             {BIO_VIEWS[view].points.map(([x, y], at) => (
               <li
-                key={`${view}-${at}`}
+                key={at}
                 className="bio__point mono"
                 data-on={(lit >> at) & 1 ? '' : undefined}
                 data-side={x > 0.5 ? 'left' : 'right'}
@@ -453,7 +395,7 @@ export function BioReading({ head, foot }: BioReadingProps) {
             <span>
               {copy.subject} <i>{'//'}</i> {copy.title}
             </span>
-            <span>{copy.views[view].hud}</span>
+            <span>{take.hud}</span>
           </p>
           <p className="bio__tag bio__tag--bottom mono" aria-hidden="true">
             <span>
@@ -464,43 +406,15 @@ export function BioReading({ head, foot }: BioReadingProps) {
             </span>
           </p>
         </div>
+
+        <figcaption className="bio__caption mono">
+          <span className="bio__kicker">{take.kicker}</span>
+          <span>{take.name}</span>
+        </figcaption>
       </figure>
 
       <div className="bio__console">
-        <p className="bio__kicker mono">{copy.kicker}</p>
-        <p className="bio__body">{copy.body}</p>
-
-        <div className="bio__views" role="group" aria-label={copy.views.label}>
-          {(['profile', 'front'] as const).map((id) => (
-            <button
-              key={id}
-              type="button"
-              className="core__chip bio__view mono"
-              aria-pressed={view === id}
-              onClick={() => onView(id)}
-              data-cursor-label={copy.views[id].cursor}
-            >
-              <span>{copy.views[id].name}</span>
-            </button>
-          ))}
-        </div>
-
-        <p className="dna__hud bio__hud mono">
-          <span className="dna__hud-title">
-            {copy.subject} {'//'} {copy.title}
-          </span>
-          <span className="dna__hud-core">
-            <i aria-hidden="true" />
-            {copy.hud.state}: {copy.states[status]} · {copy.hud.cycle}:{' '}
-            <b data-bin="">{bin(cycle, CYCLE_BITS)}</b>
-          </span>
-          <span>
-            {copy.hud.view}: {copy.views[view].hud} · {copy.hud.sweep}: {copy.sweeps[sweep]}
-          </span>
-          <span className="dna__hud-count">
-            {copy.hud.edges}: <b>{edges}</b> · {copy.hud.progress}: <b>{Math.round(progress * 100)} %</b>
-          </span>
-        </p>
+        {writes}
 
         <div className="dna__actions bio__actions" role="group" aria-label={copy.actionsLabel}>
           <button
@@ -511,38 +425,10 @@ export function BioReading({ head, foot }: BioReadingProps) {
           >
             {status === 'idle' ? copy.actions.start : copy.actions.repeat}
           </button>
-          <button
-            type="button"
-            className="dna__btn mono"
-            onClick={onTurn}
-            disabled={busy}
-            data-cursor-label={copy.cursors.turn}
-          >
-            {copy.actions.turn}
-          </button>
-          <button
-            type="button"
-            className="dna__btn mono"
-            onClick={onTrace}
-            disabled={busy}
-            data-cursor-label={copy.cursors.trace}
-          >
-            {copy.actions.trace}
-          </button>
           <button type="button" className="dna__btn mono" onClick={onVideo} data-cursor-label={copy.cursors.video}>
             {videoLabel}
             {!showVideo && <small> · {megabytes(media.video.bytes)}</small>}
           </button>
-          {status !== 'idle' && (
-            <button
-              type="button"
-              className="dna__btn dna__btn--ghost mono"
-              onClick={onClear}
-              data-cursor-label={copy.cursors.clear}
-            >
-              {copy.actions.clear}
-            </button>
-          )}
         </div>
 
         <p className="dna__reply" role="status">

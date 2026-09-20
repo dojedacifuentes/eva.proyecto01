@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Orbitron, Space_Grotesk } from 'next/font/google';
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import './interface.css';
-import './neuroscan.css';
+import './nucleo.css';
 import './dna.css';
-import './lab.css';
 import './ejes.css';
 import './cuerpo.css';
+import './relato.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { EvaSynapse } from '@/components/eva/EvaSynapse';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';
@@ -31,13 +31,11 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 });
 
-/** Sólo para el acrónimo del hero: tres letras, tipografía de display. */
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['600', '800'],
-  variable: '--font-orbitron',
-  display: 'swap',
-});
+/*
+ * Dos tipografías y ninguna más: Space Grotesk para leer y JetBrains Mono para
+ * lo que EVA teclea, los rótulos y los bits. El acrónimo de la portada se
+ * rasteriza a partir de la primera (antes tenía una tercera, Orbitron).
+ */
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -70,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es-CL"
-      className={`${grotesk.variable} ${jetbrains.variable} ${orbitron.variable}`}
+      className={`${grotesk.variable} ${jetbrains.variable}`}
     >
       <body>
         <a href="#contenido" className="skip-link sr-only-focusable mono">

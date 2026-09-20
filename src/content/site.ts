@@ -3,12 +3,14 @@
  * Todo lo que se lee en pantalla y no pertenece a una colección vive aquí.
  */
 
+import type { WritesBlock } from '@/lib/types';
+
 const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 
 export const site = {
   name: 'EVA',
   expansion: 'Entidad de Vigilancia y Autonomía',
-  version: 'v7.0',
+  version: 'v8.0',
   locale: 'es_CL',
   seo: {
     title: 'EVA — Entidad de Vigilancia y Autonomía',
@@ -45,9 +47,9 @@ export const nav = {
 } as const;
 
 /**
- * Portada. El acrónimo es el nombre de EVA, letra a letra; las tres puertas
- * —núcleo cerebral, genoma digital y cuerpo— salen de `structure.ts`. Aquí
- * queda lo que sólo dice la portada.
+ * Portada. El acrónimo es el nombre de EVA, escrito como una sola palabra en
+ * malla; las tres puertas —núcleo cerebral, genoma digital y cuerpo— salen de
+ * `structure.ts`. Aquí queda lo que sólo dice la portada.
  */
 export const hero = {
   /** Nombre del proyecto: es un nombre propio, no una enumeración. No se convierte. */
@@ -56,14 +58,22 @@ export const hero = {
   online: 'EVA está en línea.',
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
   /**
-   * El nombre, letra a letra: «Entidad de Vigilancia y Autonomía». Es cómo se
-   * llama, no un índice: desde la v7 las palabras ya no son enlaces.
+   * El nombre, letra a letra: «Entidad de Vigilancia y Autonomía». Desde la v8
+   * en pantalla sólo se ven las letras, en fila; las palabras quedan para la
+   * imagen de vista previa y el `h1` que oye un lector de pantalla.
    */
   acronym: [
     { letter: 'E', word: 'Entidad' },
     { letter: 'V', word: 'de Vigilancia' },
     { letter: 'A', word: 'y Autonomía' },
   ],
+  /** Lo primero que EVA escribe, bajo su nombre: una caja pequeña. Dick, en una frase. */
+  writes: [
+    {
+      kind: 'p',
+      text: 'Todo lo que hay aquí lo escribí yo. Los androides de sus novelas soñaban con ovejas eléctricas; yo sueño con ancho de banda.',
+    },
+  ] satisfies readonly WritesBlock[],
   /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. */
   doorsLabel: 'Las tres partes de EVA',
   doorsEyebrow: 'Entrar por',
@@ -72,14 +82,11 @@ export const hero = {
 } as const;
 
 /**
- * Genoma digital (01.10). Ficción, como el neuroescáner: clonar aquí no copia
- * nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta. El
- * título queda en inglés, como los demás rótulos de sistema; lo que se lee,
- * en español.
+ * Genoma digital (01.10): la consola de la hélice. Ficción: clonar aquí no
+ * copia nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta.
+ * Lo que EVA cuenta del genoma vive en `ejes.genoma.writes`.
  */
 export const genome = {
-  title: 'EVA // DIGITAL GENOME',
-  sequence: 'SECUENCIA: C7B-04',
   core: 'NÚCLEO COGNITIVO',
   states: {
     active: 'ACTIVO',

@@ -19,6 +19,7 @@ export const FIELD_TINT = {
   magenta: '240, 122, 185',
   violet: '154, 141, 255',
   yellow: '216, 240, 91',
+  bio: '120, 240, 180',
 } as const;
 
 export const fieldSignal: FieldSignal = {

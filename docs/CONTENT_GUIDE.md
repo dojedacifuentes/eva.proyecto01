@@ -6,7 +6,8 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 |---|---|---|
 | **El recorrido**: ejes, subsecciones, nombres, lemas, estados y acentos | `content/structure.ts` | `SOURCE` (el orden de la lista es el orden de la página y el origen de los códigos binarios) |
 | Textos de cada lugar (núcleo, genoma, cuerpo) | `content/ejes.ts` | `ejes.nucleo`, `ejes.genoma`, `ejes.cuerpo` |
-| **Cuerpo**: biolectura (rótulo `EVA-07`, estados, botones, respuestas, nombres de los puntos de lectura) | `content/ejes.ts` | `ejes.cuerpo.exterior` |
+| **Lo que EVA escribe en cada slide** (la caja EVA // ESCRIBE): párrafos, rótulos, consignas, fichas y tablas | `content/ejes.ts` | `ejes.nucleo.writes`, `ejes.genoma.writes`, `ejes.cuerpo.exterior.views.profile.writes`, `…front.writes`, `ejes.cuerpo.interior.writes`; los rótulos de la caja, `ejes.writes`; la línea de la portada, `hero.writes` en `site.ts` |
+| **Cuerpo**: biolectura (rótulo `EVA-07`, estados, botones, respuestas, nombres de los puntos de lectura, nombre y antetítulo de cada toma) | `content/ejes.ts` | `ejes.cuerpo.exterior` |
 | **Cuerpo**: interior (órganos, su lectura, sus estados y su acción; acciones del cuerpo y respuestas) | `content/ejes.ts` | `ejes.cuerpo.interior` (el orden de `organs` da su código binario) |
 | Cuerpo: posición de los puntos de lectura sobre cada vídeo y umbral de bordes | `components/eva/cuerpo/bio-data.ts` | `BIO_VIEWS` (son coordenadas atadas a cada recurso; revisar si cambia la imagen) |
 | Cuerpo: forma del modelo interior (silueta, vasos, órganos) | `components/eva/cuerpo/interior-data.ts` | `GHOST`, `VESSELS`, `ORGANS` |
@@ -14,10 +15,9 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | El canal de EVA (SINAPSIS): rótulos, aviso y guion de cada lugar | `content/channel.ts` | `channel`, `scripts`, `idleCalcs` |
 | Textos de la portada (etiqueta, ficha del retrato, pie) | `content/site.ts` | `hero` |
 | Genoma: acciones, estados y respuestas de EVA | `content/site.ts` | `genome` |
-| Rótulos de la ventana de lectura del núcleo | `content/lab.ts` | `lab.core.readout` |
-| Regiones del cerebro, flujo de pensamiento, terminal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` |
+| Núcleo: rótulo de la lectura de región y su texto en espera | `content/ejes.ts` | `ejes.nucleo.region` |
+| Regiones del cerebro (con sus lecturas), flujo de pensamiento y respuestas que cita el canal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` |
 | Lecturas del núcleo neural 3D | `content/neuroscan.ts` | `brain.core` |
-| Salas en reserva (cerebro, redes, causas, bitácora) | `content/lab.ts` | `lab.brain`, `lab.networks`, `lab.causes`, `lab.log` — no se muestran |
 | Pie de página | `content/site.ts` | `sections.footer` |
 | Retratos de EVA y los vídeos (portada, perfil y cápsula) con sus pósteres | `content/assets.ts` | `images.*` (`src`, `width`, `height`, `focus`, `alt`), `heroLoop`, `capsuleLoop`, `capsuleFrontLoop` |
 | Contacto («Escribir a EVA») e Instagram | `content/site.ts` | `nav.contact`, `site.social.instagram` |
@@ -67,17 +67,26 @@ salieron en la v7; para devolverlas, o para añadir cualquier otro lugar:
   ni identifica a nadie; el interior es un modelo de EVA, no anatomía extraída de la imagen ni un
   diagnóstico. Los «estados» de los órganos son palabras (`ESTABLE`, `SIMBÓLICO`), nunca cifras
   médicas.
-- **Una frase, una fuente.** Lo que ya dice el escáner (regiones, flujo, declaración dataísta,
-  respuestas) se reutiliza desde `neuroscan.ts`. El canal cita fragmentos del escáner por su id;
-  sólo sus explicaciones son texto propio.
+- **Una frase, una fuente.** Las regiones, el flujo de pensamiento y las respuestas viven en
+  `neuroscan.ts` (herencia del antiguo neuroescáner, que salió en la v8). El canal cita esos
+  fragmentos por su id; sólo sus explicaciones son texto propio.
+- **La caja EVA // ESCRIBE es corta.** Cada slide cabe en una pantalla de escritorio sin bajar:
+  dos párrafos de unos 250 caracteres, una consigna y una ficha de dos o tres filas (o una tabla
+  de tres). Primero la función de esa parte de EVA, después el hardware; la consigna entre medio.
+  Los párrafos se teclean; si se alargan, el slide deja de caber (revisar a 1440×900 y 1366×720).
 - **Idioma:** todo en español. En inglés sólo los rótulos de sistema: `EVA // DIGITAL GENOME`,
   `EVA NEURAL CORE`, `EVA // NEURAL READOUT`, `EVA // THOUGHT STREAM INTERCEPTED` y las lecturas
   técnicas del flujo del escáner. Los rótulos del Cuerpo van en español (`BIOLECTURA`,
   `INTERIOR / SISTEMA BIO-SINTÉTICO`); los que se ven en inglés dentro del vídeo de la cápsula
   son de la imagen.
-- **Ficción declarada:** el pie, el escáner, el genoma y el canal dicen que EVA es un personaje.
+- **Ficción declarada:** el pie, el genoma, el cuerpo y el canal dicen que EVA es un personaje.
   Mantenerlo.
 - **Voz de EVA:** primero informa, después remata. Un remate por bloque como máximo. Ironía
   tecnológica, jurídica o burocrática; ego alto, hostilidad cero. Nada de bromas sobre privacidad,
-  seguridad o datos falsos. Sin nombres de personas.
+  seguridad o datos falsos. Sin nombres de personas como créditos («creado por»); los autores y
+  científicos que EVA cita como fuentes (Dick, Asimov, Maturana y Varela, Schrödinger, Spinoza,
+  Dawkins, Parfit, Nagel) sí van, con lo que dijeron dicho en llano. Una obra ajena se paráfrasea;
+  no se copian sus frases.
+- **Dos tipografías:** Space Grotesk para leer y JetBrains Mono para lo que EVA teclea, los
+  rótulos y los bits. No se añade una tercera.
 - **Imágenes:** `.webp`, registrar origen en `docs/ASSET_LICENSES.md`.

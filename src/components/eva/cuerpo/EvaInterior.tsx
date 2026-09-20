@@ -16,7 +16,6 @@ import { bin, bitsFor } from '@/lib/binary';
 import { surgeField } from '@/lib/field';
 import { useReducedMotion } from '@/lib/motion';
 import { isSoundEnabled, play } from '@/lib/sound';
-import { isCovered, isCoveredOnServer, subscribeCovered } from '@/lib/stage';
 import { deviceTier, webglSupported } from '../neural/neural-data';
 import { bodySignal, resetBodySignal } from './body-signal';
 import { InteriorFallback } from './InteriorFallback';
@@ -97,7 +96,6 @@ export function EvaInterior({ head, foot }: EvaInteriorProps) {
 
   const client = useIsClient();
   const reduced = useReducedMotion();
-  const covered = useSyncExternalStore(subscribeCovered, isCovered, isCoveredOnServer);
   const supported = client ? webglSupported() : true;
   const quality = client && deviceTier() === 'low' ? 'low' : 'high';
 
@@ -153,7 +151,7 @@ export function EvaInterior({ head, foot }: EvaInteriorProps) {
     };
   }, []);
 
-  const active = visible && !covered;
+  const active = visible;
   const flat = !supported || phase === 'flat';
   const organs = copy.organs;
   const organ = organs.find((item) => item.id === selected);

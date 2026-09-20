@@ -272,11 +272,11 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
     glow.current += ((signals.near.current ?? 0) - glow.current) * 0.08;
     const lift = glow.current * 1.1 + energy * 1.8 + mutation * 1.2;
     if (strandMaterial.current) {
-      strandMaterial.current.emissiveIntensity = 1.02 + lift;
+      strandMaterial.current.emissiveIntensity = 0.82 + lift;
       strandMaterial.current.color.lerpColors(tints.base, tints.mutated, mutation);
       strandMaterial.current.emissive.lerpColors(tints.base, tints.mutated, mutation);
     }
-    if (nodeMaterial.current) nodeMaterial.current.emissiveIntensity = 1.3 + lift * 1.3;
+    if (nodeMaterial.current) nodeMaterial.current.emissiveIntensity = 1.05 + lift * 1.3;
   });
 
   return (
@@ -287,7 +287,7 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
             ref={strandMaterial}
             color={CYAN}
             emissive={CYAN}
-            emissiveIntensity={1.02}
+            emissiveIntensity={0.82}
             metalness={0.75}
             roughness={0.22}
           />
@@ -296,7 +296,7 @@ function Body({ geo, pairs, particles, reduced, signals }: BodyProps) {
           <meshStandardMaterial
             color={VIOLET}
             emissive={VIOLET}
-            emissiveIntensity={0.94}
+            emissiveIntensity={0.76}
             metalness={0.75}
             roughness={0.22}
           />
@@ -553,15 +553,16 @@ export default function DnaScene({ active, quality = 'high', ...scene }: DnaScen
       style={{ pointerEvents: 'none' }}
     >
       <ambientLight intensity={0.46} />
-      <pointLight position={[3, 3, 4]} intensity={25} color={CYAN} />
-      <pointLight position={[-3.5, -2, 2]} intensity={16} color={VIOLET} />
-      <pointLight position={[0, 0, -5]} intensity={11} color={WHITE} />
+      <pointLight position={[3, 3, 4]} intensity={18} color={CYAN} />
+      <pointLight position={[-3.5, -2, 2]} intensity={13} color={VIOLET} />
+      <pointLight position={[0, 0, -5]} intensity={8} color={WHITE} />
 
       <Stage {...scene} />
 
       {!low && (
         <EffectComposer enableNormalPass={false}>
-          <Bloom intensity={0.7} luminanceThreshold={0.24} luminanceSmoothing={0.4} mipmapBlur />
+          {/* Más contenido desde la v8: la hélice se integra en el fondo oscuro en vez de deslumbrar. */}
+          <Bloom intensity={0.42} luminanceThreshold={0.34} luminanceSmoothing={0.4} mipmapBlur />
         </EffectComposer>
       )}
       <ComposerSizeGuard />

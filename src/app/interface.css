@@ -83,10 +83,6 @@ html {
     radial-gradient(ellipse at 0% 60%, rgba(16, 37, 62, 0.44), transparent 60%),
     var(--eva-bg);
 }
-.field::before {
-  background-size: 64px 64px;
-  opacity: 0.3;
-}
 /* El campo vuelve a verse: era lo que la versión compacta había apagado. */
 .field canvas {
   opacity: 0.72;
@@ -326,54 +322,18 @@ html {
 }
 
 /*
- * El acrónimo: las letras son una red de nodos pintada en un lienzo (las
- * rasteriza EvaAcronymMesh a partir de Orbitron) y las palabras van al lado,
- * una por fila. Las dos columnas comparten alto, así que las filas casan.
+ * El acrónimo: las tres letras son una red de nodos pintada en un lienzo (las
+ * rasteriza EvaAcronymMesh a partir de Space Grotesk), en fila, como una sola
+ * palabra. Su tamaño lo pone ejes.css (`.acronym--word`).
  */
 .acronym {
-  display: grid;
-  grid-template-columns: clamp(5.5rem, 12vw, 10rem) minmax(0, 1fr);
-  align-items: stretch;
-  column-gap: clamp(0.25rem, 0.7vw, 0.6rem);
+  position: relative;
   margin-top: 0.9rem;
-  min-height: clamp(14rem, 48vh, 28rem);
-  border-left: 1px solid var(--eva-line-strong);
-  padding-left: clamp(0.6rem, 1.4vw, 1.1rem);
 }
 .acronym__canvas {
   display: block;
   width: 100%;
   height: 100%;
-}
-.acronym__words {
-  display: grid;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  min-width: 0;
-  /* Red de seguridad: si algún día no cupiera, se recorta aquí en vez de
-     invadir la columna del genoma. */
-  overflow: hidden;
-}
-.acronym__row {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.5rem, 1.4vw, 1.1rem);
-  padding: 0;
-  min-width: 0;
-}
-.acronym__word {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: clamp(0.45rem, 1.1vw, 0.85rem);
-  font-size: clamp(0.8rem, 1.4vw, 1.05rem);
-  white-space: nowrap;
-}
-.acronym__word::before {
-  flex-basis: clamp(0.5rem, 1.2vw, 1.1rem);
-}
-.acronym__index {
-  margin-left: auto;
-  font-size: 0.58rem;
 }
 /* EVA, a la derecha y al lado del acrónimo. Marco estrecho: ocupa menos y lee
    como una ficha técnica, no como una fotografía grande. */
@@ -535,12 +495,6 @@ html {
     padding: 1.15rem;
     gap: 1.25rem;
   }
-  .acronym__letter {
-    font-size: 2.9rem;
-  }
-  .acronym__word {
-    font-size: 1rem;
-  }
   /* El retrato flota arriba a la derecha. */
   .hero__portrait {
     position: static;
@@ -564,19 +518,6 @@ html {
   .hero .portrait__frame {
     aspect-ratio: 3 / 4;
   }
-  /* La pista no cabe junto a un retrato de 84 px: queda la flecha. */
-  .profile__hint-label {
-    display: none;
-  }
-  /* Sin hover que la revele, la pista se muestra entera. */
-  .profile__hint {
-    padding: 0.2rem 0.3rem;
-    opacity: 1;
-  }
-  /* Los índices 01–03 chocarían con el retrato: en móvil sobran. */
-  .acronym__index {
-    display: none;
-  }
   .hero .portrait__caption {
     display: none;
   }
@@ -592,8 +533,5 @@ html {
   }
   .hero__grid {
     padding-block: 1rem;
-  }
-  .acronym__letter {
-    font-size: clamp(2.6rem, 8vh, 4.3rem);
   }
 }

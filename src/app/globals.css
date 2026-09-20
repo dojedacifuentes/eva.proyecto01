@@ -101,17 +101,7 @@ html.eva-cursor * {
     var(--eva-bg);
 }
 
-.field::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--eva-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--eva-line) 1px, transparent 1px);
-  background-size: 4.5rem 4.5rem;
-  opacity: 0.45;
-  mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 10%, transparent 75%);
-}
+/* Sin retícula: el fondo es plano —degradados y partículas— desde la v8. */
 
 .field canvas {
   position: absolute;
@@ -542,47 +532,9 @@ main {
 .hero__label {
   color: var(--eva-cyan);
 }
+/* El acrónimo (la palabra en malla) se estila en interface.css y ejes.css. */
 .acronym {
   margin-top: 1.5rem;
-  display: grid;
-  border-left: 1px solid var(--eva-line-strong);
-}
-.acronym__row {
-  display: grid;
-  grid-template-columns: clamp(3.9rem, 12.6vw, 9.3rem) 1fr;
-  align-items: center;
-  column-gap: clamp(0.75rem, 2.5vw, 2rem);
-  padding-left: clamp(0.75rem, 2vw, 1.5rem);
-}
-.acronym__letter {
-  font-size: clamp(5.25rem, 17vw, 12.5rem);
-  font-weight: 700;
-  line-height: 0.86;
-  letter-spacing: -0.05em;
-  background: linear-gradient(180deg, var(--eva-text) 35%, color-mix(in srgb, var(--eva-cyan) 80%, var(--eva-violet)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.acronym__word {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.6rem, 1.5vw, 1.25rem);
-  min-width: 0;
-  font-size: clamp(1.35rem, 3.6vw, 2.75rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-}
-.acronym__word::before {
-  content: '';
-  flex: 0 0 clamp(1rem, 4vw, 3.5rem);
-  height: 1px;
-  background: linear-gradient(90deg, var(--eva-cyan), transparent);
-}
-.acronym__index {
-  margin-left: auto;
-  color: var(--eva-muted);
 }
 .hero__context {
   display: grid;

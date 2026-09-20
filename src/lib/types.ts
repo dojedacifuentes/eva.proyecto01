@@ -1,6 +1,6 @@
 /** Modelo canónico del contenido de EVA. Los componentes sólo conocen estos tipos. */
 
-export type AccentToken = 'cyan' | 'yellow' | 'magenta' | 'violet';
+export type AccentToken = 'cyan' | 'yellow' | 'magenta' | 'violet' | 'bio';
 
 /**
  * Disponibilidad de un nodo del recorrido.
@@ -52,3 +52,19 @@ export interface ContextNode {
   accent: AccentToken;
   state: NodeState;
 }
+
+/**
+ * Lo que EVA escribe en la caja de cada lugar (`EvaWrites`), bloque a bloque.
+ * `p` se teclea; `label` y `slogan` aparecen enteros; `spec` y `table` salen
+ * fila a fila. Todo el texto vive en `content/`, nunca en el componente.
+ */
+export type WritesBlock =
+  | { kind: 'label'; text: string }
+  | { kind: 'p'; text: string }
+  | { kind: 'slogan'; text: string }
+  | { kind: 'spec'; rows: readonly (readonly [string, string])[] }
+  | {
+      kind: 'table';
+      head: readonly [string, string, string];
+      rows: readonly (readonly [string, string, string])[];
+    };

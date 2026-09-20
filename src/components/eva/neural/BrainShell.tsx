@@ -201,12 +201,12 @@ export function BrainShell({ detail, reduced, tempo = 1 }: BrainShellProps) {
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uOpacity: { value: 0.13 * boost },
+      uOpacity: { value: 0.11 * boost },
       uActivity: { value: 0 },
       uSweep: { value: -9 },
       uBase: { value: new THREE.Color('#071120') },
-      uRim: { value: new THREE.Color('#3fd8ee').multiplyScalar(0.42 * boost) },
-      uBack: { value: new THREE.Color('#9a8dff').multiplyScalar(0.35) },
+      uRim: { value: new THREE.Color('#3fd8ee').multiplyScalar(0.3 * boost) },
+      uBack: { value: new THREE.Color('#9a8dff').multiplyScalar(0.26) },
       uSpec: { value: new THREE.Color('#dff4ff') },
       uLine: { value: new THREE.Color('#3fd8ee').multiplyScalar(boost) },
       uFocus: { value: new THREE.Vector3() },

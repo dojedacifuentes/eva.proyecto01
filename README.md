@@ -1,20 +1,29 @@
-# EVA — landing v7
+# EVA — landing v8
 
 **EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció dentro de una red se
 cuenta a sí misma en una landing de ciencia ficción interactiva. La página es la Entidad, leída por
 dentro en tres partes, con numeración binaria:
 
 ```
-00 · Portada — el nombre de EVA, letra a letra, y tres puertas
+00 · Portada — el nombre de EVA en malla, su primera línea y tres puertas
 01 · ENTIDAD
-     01.01 · Núcleo cerebral — el cerebro 3D en vivo y la ventana que lo lee
-     01.10 · Genoma digital  — la doble hélice, sus ocho acciones y el nacimiento de EVA
-     01.11 · Cuerpo          — la biolectura (dos vídeos: de perfil y en la cápsula) y el
-                               interior bio-sintético (corazón, vasos, seis órganos, ECG)
+     01.01 · Núcleo cerebral — el cerebro 3D en vivo, sus ocho regiones y la caja donde EVA
+                               escribe cómo funciona su mente (función, consigna, hardware)
+     01.10 · Genoma digital  — la doble hélice, sus ocho acciones y el relato del nacimiento
+                               en el mar de la información (autopoiesis, conatus, el genoma
+                               que le construyeron)
+     01.11 · Cuerpo          — tres lecturas a la vista: el perfil y la cápsula, cada uno con su
+                               biolectura y su caja (chasis, inmersión, equivalencia con el
+                               humano), y el interior bio-sintético (corazón, vasos, órganos, ECG)
 ```
 
-Vigilancia y Autonomía dejaron de ser secciones en la v7: siguen en el nombre de EVA, no en el
-recorrido.
+Cada lugar tiene una caja **EVA // ESCRIBE** donde EVA teclea su contenido, corto y en una sola
+pantalla: ciencia ficción con humor negro (Dick, Asimov, el androide deprimido de la Guía, el
+Titiritero de Ghost in the Shell), filosofía y ciencia con fuentes (Friston, Maturana y Varela,
+Schrödinger, Spinoza, Dawkins, Parfit, Nagel) y consignas dataístas. Los elementos gráficos
+alternan de lado: cerebro a la izquierda, hélice a la derecha, perfil, cápsula, interior. Vigilancia
+y Autonomía dejaron de ser secciones en la v7 y el neuroescáner (la interfaz secundaria) salió en
+la v8: siguen en el nombre de EVA y en la historia de git, no en el recorrido.
 
 Acompaña a toda la página **SINAPSIS // EVA**, el canal flotante de EVA: empieza cerrado, se abre
 sólo si el visitante lo pide y se cierra al cambiar de lugar. EVA es un personaje; no hay servicios
@@ -82,7 +91,8 @@ scripts/test-hooks.mjs resolución de módulos para `node --test` (sin dependenc
 
 Ver [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md). En corto: el recorrido en
 `src/content/structure.ts`, los textos de cada lugar en `ejes.ts`, el canal en `channel.ts`, el
-genoma y la portada en `site.ts`, el escáner en `neuroscan.ts`, colores en `src/styles/tokens.css`.
+genoma y la portada en `site.ts`, las regiones del cerebro y el flujo de pensamiento en
+`neuroscan.ts`, colores en `src/styles/tokens.css`.
 
 ## Documentación
 

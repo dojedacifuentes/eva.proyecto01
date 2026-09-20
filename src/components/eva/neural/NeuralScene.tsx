@@ -43,8 +43,9 @@ function haloTexture() {
       size / 2,
       size / 2,
     );
-    gradient.addColorStop(0, 'rgba(63, 216, 238, 0.5)');
-    gradient.addColorStop(0.42, 'rgba(154, 141, 255, 0.16)');
+    // Más apagado desde la v8: el cerebro se funde con el fondo en vez de flotar sobre un halo.
+    gradient.addColorStop(0, 'rgba(63, 216, 238, 0.34)');
+    gradient.addColorStop(0.42, 'rgba(154, 141, 255, 0.1)');
     gradient.addColorStop(1, 'rgba(154, 141, 255, 0)');
     context.fillStyle = gradient;
     context.fillRect(0, 0, size, size);
@@ -97,7 +98,7 @@ function Chamber({ reduced, scale, aspect }: ChamberProps) {
         <spriteMaterial
           map={halo}
           transparent
-          opacity={0.32}
+          opacity={0.18}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
           toneMapped={false}
@@ -369,8 +370,8 @@ export default function NeuralScene({
       }}
     >
       <ambientLight intensity={0.35} />
-      <pointLight position={[3.5, 3, 4]} intensity={22} color={CYAN} />
-      <pointLight position={[-4, -1.5, -3.5]} intensity={28} color={VIOLET} />
+      <pointLight position={[3.5, 3, 4]} intensity={16} color={CYAN} />
+      <pointLight position={[-4, -1.5, -3.5]} intensity={20} color={VIOLET} />
       <directionalLight position={[-2, 4, 1]} intensity={0.5} color={WHITE} />
 
       <Stage
@@ -393,7 +394,7 @@ export default function NeuralScene({
         <EffectComposer multisampling={detail.multisampling} enableNormalPass={false}>
           <Bloom
             intensity={detail.bloom}
-            luminanceThreshold={0.5}
+            luminanceThreshold={0.58}
             luminanceSmoothing={0.35}
             mipmapBlur
             radius={0.72}

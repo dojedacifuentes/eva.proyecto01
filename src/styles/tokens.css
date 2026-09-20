@@ -78,5 +78,9 @@
 }
 [data-accent='violet'] {
   --accent: var(--eva-violet);
-  --accent-2: var(--eva-blue);
+  --accent-2: var(--eva-magenta);
+}
+[data-accent='bio'] {
+  --accent: var(--eva-bio);
+  --accent-2: var(--eva-magenta);
 }

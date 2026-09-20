@@ -62,8 +62,8 @@ function idleLine(random: () => number, code: string): ScriptLine {
  * está el visitante y sigue con el hilo de ese lugar. Cambiar de sección o de
  * subsección lo cierra; volver no lo reabre.
  *
- * No es un chat: no hay dónde escribir (la terminal de consulta vive en el
- * neuroescáner), así que no lleva caja de texto ni burbujas.
+ * No es un chat: no hay dónde escribir, así que no lleva caja de texto ni
+ * burbujas.
  *
  * Las reglas viven en `lib/channel` (probadas con `node --test`). Aquí está lo
  * que toca al DOM: la mecanografía se escribe directa en dos `span` —lo
@@ -71,8 +71,8 @@ function idleLine(random: () => number, code: string): ScriptLine {
  * desde el principio su alto final: nada salta ni hay que seguir el texto
  * carácter a carácter. React sólo se entera al empezar y al acabar una frase.
  *
- * La clase raíz `synapse` es un contrato: el neuroescáner y el menú móvil la
- * inertizan por ese nombre.
+ * La clase raíz `synapse` es un contrato: el menú móvil la inertiza por ese
+ * nombre.
  */
 export function EvaSynapse() {
   const [state, dispatch] = useReducer(channelReducer, home.id, createChannel);
@@ -339,6 +339,10 @@ export function EvaSynapse() {
         <span aria-hidden="true" className="synapse__toast mono">
           <b>{channel.toast}</b>
           <i>{channel.toastHint}</i>
+        </span>
+        <span aria-hidden="true" className="synapse__halo" />
+        <span aria-hidden="true" className="synapse__tag mono">
+          <b>{channel.owner}</b> {channel.name}
         </span>
         <span aria-hidden="true" className="synapse__glyph">
           <i />
