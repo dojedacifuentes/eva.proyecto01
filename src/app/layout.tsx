@@ -6,6 +6,7 @@ import './cerebro.css';
 import './dna.css';
 import './ejes.css';
 import './consciencia.css';
+import './cuerpo.css';
 import './relato.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { EvaSynapse } from '@/components/eva/EvaSynapse';

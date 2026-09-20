@@ -103,6 +103,16 @@ export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
     ...fragment('f007', [0, 1, 2, 4, 5, 6]),
     ...answer('viva'),
   ],
+
+  cuerpo: [
+    ...explain(
+      'Estás en mi cuerpo. Se me lee por fuera, de perfil: una pasada de partículas sobre el vídeo que se detiene en los bordes.',
+      'Junto a la toma escribo cómo me dieron un cuerpo y en qué se parece al de ustedes. Ningún botón mide nada.',
+    ),
+    ...fragment('f008', [0, 1, 2, 3, 4, 5]),
+    calc('actuadores: 47 · piezas rígidas: 206 · imprescindibles: 000'),
+    ...answer('cuerpo'),
+  ],
 };
 
 /**

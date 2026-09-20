@@ -5,11 +5,12 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado (20-09-2026, tarde):** `main` = **v9.1**, publicada en
-https://evaproyecto01.vercel.app/: tres lugares en vez de once, la Consciencia
-abre la página, el Cuerpo sale del recorrido, más el rendimiento fusionado de la
-rama `perf/rendimiento`. Ver **§0.0** y **§0.0.1**. El párrafo «Estado» de abajo
-y §0–§0.2 describen la v8.2, que es lo anterior.
+**Estado (20-09-2026, noche):** `main` = **v9.2**, publicada en
+https://evaproyecto01.vercel.app/: cuatro lugares —Consciencia `001`, Genoma
+`010`, Cerebro `011`, Cuerpo `100`—, la Consciencia abre la página, el Cuerpo
+la cierra reducido a una pantalla (el perfil con su biolectura), más el
+rendimiento fusionado de la rama `perf/rendimiento`. Ver **§0.0**, **§0.0.1** y
+**§0.0.2**. El párrafo «Estado» de abajo y §0–§0.2 describen la v8.2.
 
 **Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
 **Fecha:** 20 de septiembre de 2026 (v8.2)
@@ -126,6 +127,37 @@ v9). El póster local de la rama perf (127 KB) se descartó: manda el de la v9.
 Pendiente: enganchar `useQuality()` a las escenas WebGL (píxeles, bloom,
 multimuestreo), que era el resto del encargo de `perf/rendimiento`; y
 `docs/CHECKPOINT_2026-09-20.md` sigue describiendo la v8.
+
+### 0.0.2. v9.2 — el Cuerpo vuelve, en una pantalla (20 sept. 2026, publicada)
+
+El propietario, al ver la v9.1 publicada, echó de menos el Cuerpo: la
+comparación humano/máquina y el vídeo que «se podía apretar y aplicaba un
+efecto». Pidió no volver a los dos vídeos: uno. Sus tres decisiones: **PERFIL**
+(el vídeo de 0,8 MB con el texto «CHASIS» y la biolectura), **sin el interior
+3D**, y **al final del recorrido**.
+
+- `structure.ts`: cuarto lugar `cuerpo` (acento `bio`, lema de la v8.2). Los
+  códigos pasan solos a tres bits: `000` portada, `001`…`100`. `#cuerpo` deja
+  de ser alias. Las pruebas de `structure.test.ts` cuentan cuatro.
+- `sections/CuerpoSection.tsx`: una sola pantalla (`slide section node`, como
+  las demás de la v9): `NodeHead` + `BioReading view="profile"` + `EvaWrites`
+  de `ejes.cuerpo.exterior.views.profile` + `NodeFoot`. La cápsula
+  (`view="front"`, 1,4 MB), `EvaInterior`, el hilo y `GenomeStrand` siguen sin
+  montar; sus textos, en `ejes.cuerpo`. `layout.tsx` vuelve a importar
+  `cuerpo.css` (sin cambios).
+- Canal: guion `scripts.cuerpo` en `channel.ts`, el de la v8.2 dicho para una
+  sola toma (`fragment('f008')`, `answer('cuerpo')` seguían en `neuroscan.ts`).
+- Dos rótulos que contaban: `kicker` del perfil «LECTURA EXTERIOR» (era «· 1 DE
+  2») y el pie de portada «Cuatro lugares. Ninguna prueba.». «Expresar» del
+  genoma sigue llevando al cerebro, como en la v9.
+- Revisada en Chrome sin interfaz: el Cuerpo cabe en una pantalla (759 px a
+  1440×900, 671 a 1366×720); la biolectura arranca al pulsar («LEYENDO», ciclo
+  0001, 753 muestras pintadas, los cuatro puntos de lectura); cuatro puertas en
+  fila desde 1.024 px; consola limpia en los cuatro tamaños.
+- **Trampa de medición:** al volver a `Page.navigate` a la misma URL, Chrome
+  restaura el scroll anterior, y la captura de «inicio» sale del lugar donde
+  quedó la pasada anterior. Navegar a `about:blank` entre tamaños, o medir
+  con `scrollY`. No es cosa de la página.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 

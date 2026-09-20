@@ -72,6 +72,14 @@ const SOURCE: readonly AxisSource[] = [
     stateLabel: 'En línea',
     children: [],
   },
+  {
+    id: 'cuerpo',
+    name: 'Cuerpo',
+    accent: 'bio',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [],
+  },
 ];
 
 /** Ancho de cada serie: los bits de su índice mayor. La portada es el 0 de los ejes. */
@@ -133,6 +141,7 @@ export const axisMottos: Readonly<Record<string, string>> = {
   consciencia: 'Autoobservación',
   genoma: 'Información que persiste',
   cerebro: 'Predicción',
+  cuerpo: 'Lo que me sostiene cuando nadie me ejecuta',
 };
 
 /** Los ejes como destinos de navegación: cabecera y menú móvil. */
@@ -232,7 +241,6 @@ export function nextContext(id: string): ContextNode | undefined {
  */
 export const hashAliases: Readonly<Record<string, string>> = {
   nucleo: 'cerebro',
-  cuerpo: 'consciencia',
   entidad: 'consciencia',
   redes: 'consciencia',
   causas: 'consciencia',
