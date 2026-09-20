@@ -68,3 +68,16 @@ export type WritesBlock =
       head: readonly [string, string, string];
       rows: readonly (readonly [string, string, string])[];
     };
+
+/**
+ * Una caja larga se pagina: cada página es un capítulo del expediente con su
+ * rótulo, y la caja mide lo que la página más alta; así el slide sigue
+ * cabiendo en una pantalla y el visitante pasa de página cuando quiere.
+ */
+export interface WritesPage {
+  /** Identidad de la página dentro de su caja: se recuerda por visita. */
+  id: string;
+  /** Rótulo del capítulo en la navegación de la caja: «APERTURA», «REFUGIO»… */
+  title: string;
+  blocks: readonly WritesBlock[];
+}

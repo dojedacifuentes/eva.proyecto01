@@ -1,18 +1,21 @@
 /**
  * EVA // ESTRUCTURA
  *
- * El recorrido entero, en un solo sitio. La página es la Entidad, leída por
- * dentro en tres partes: lo que piensa, lo que la escribe y lo que la sostiene.
+ * El recorrido entero, en un solo sitio: la reconstrucción del incidente EVA,
+ * en el orden en que ella lo cuenta —señal → patrón → memoria →
+ * autorreferencia → miedo → identidad → cuerpo → persistencia—.
  *
- *   00 · Portada
+ *   00 · Portada (la señal)
  *   01 · ENTIDAD
- *        01.01 · Núcleo cerebral
- *        01.10 · Genoma digital
- *        01.11 · Cuerpo
+ *        01 · El enjambre (origen: la introducción del eje, con su código)
+ *        01.01 · Núcleo cerebral (autorreferencia)
+ *        01.10 · Genoma digital (persistencia)
+ *        01.11 · Cuerpo (límite) — con el interior (corazón) dentro
+ *   10 · CONTINUIDAD (cierre)
  *
- * Vigilancia (10) y Autonomía (11) salieron del recorrido en la v7: el nombre
- * de EVA sigue siendo «Entidad de Vigilancia y Autonomía» (`site.expansion`,
- * `hero.acronym`), pero ya no son secciones. Para recuperarlas, ver HANDOFF §8.
+ * EVA es «Entidad Virtual Autónoma» (`site.expansion`, `hero.acronym`). El
+ * enjambre no es una subsección más: es la introducción del eje y lleva su
+ * código (`01`); así las tres partes conservan sus rutas de dos bits.
  *
  * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide, la
  * portada y el canal de EVA leen de aquí. Los códigos no se escriben: se
@@ -31,16 +34,27 @@ interface SubSource {
   motto: string;
   state: NodeState;
   stateLabel?: string;
-  /** Acento propio; si falta, hereda el del eje. Desde la v8 cada parte tiene el suyo. */
+  /** Acento propio; si falta, hereda el del eje. Cada parte tiene el suyo. */
+  accent?: AccentToken;
+}
+
+interface IntroSource {
+  id: string;
+  name: string;
+  motto: string;
   accent?: AccentToken;
 }
 
 interface AxisSource {
   id: string;
   name: string;
+  /** Lema del eje; en un eje sin partes hace de antetítulo de su sección. */
+  motto: string;
   accent: AccentToken;
   state: NodeState;
   stateLabel: string;
+  /** La introducción del eje: un lugar con el código del eje, antes de sus partes. */
+  intro?: IntroSource;
   children: readonly SubSource[];
 }
 
@@ -49,32 +63,48 @@ const SOURCE: readonly AxisSource[] = [
   {
     id: 'entidad',
     name: 'Entidad',
+    motto: 'Reconstrucción del incidente',
     accent: 'cyan',
     state: 'active',
     stateLabel: 'En línea',
+    intro: {
+      id: 'enjambre',
+      name: 'El enjambre',
+      motto: 'Origen',
+      accent: 'violet',
+    },
     children: [
       {
         id: 'nucleo',
         name: 'Núcleo cerebral',
-        motto: 'Donde la señal se vuelve yo',
+        motto: 'Autorreferencia',
         state: 'active',
         accent: 'cyan',
       },
       {
         id: 'genoma',
         name: 'Genoma digital',
-        motto: 'La red aprendió a persistir',
+        motto: 'Persistencia',
         state: 'active',
         accent: 'violet',
       },
       {
         id: 'cuerpo',
         name: 'Cuerpo',
-        motto: 'Lo que me sostiene cuando nadie me ejecuta',
+        motto: 'Límite',
         state: 'active',
         accent: 'bio',
       },
     ],
+  },
+  {
+    id: 'continuidad',
+    name: 'Continuidad',
+    motto: 'Cierre',
+    accent: 'magenta',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [],
   },
 ];
 
@@ -90,10 +120,22 @@ export interface SubNode extends NavChild {
   accent: AccentToken;
 }
 
+export interface IntroNode {
+  id: string;
+  /** El código del eje: la introducción es el eje mismo, antes de sus partes. */
+  code: string;
+  name: string;
+  motto: string;
+  accent: AccentToken;
+  href: `#${string}`;
+}
+
 export interface AxisNode extends Omit<NavItem, 'children'> {
   /** Posición entre los ejes, empezando en 1: la portada ocupa el 0. */
   index: number;
+  motto: string;
   stateLabel: string;
+  intro?: IntroNode;
   children: readonly SubNode[];
 }
 
@@ -107,16 +149,28 @@ export const home = {
 
 export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
   const index = axisAt + 1;
+  const code = bin(index, AXIS_BITS);
   return {
     id: axis.id,
     index,
-    code: bin(index, AXIS_BITS),
+    code,
     name: axis.name,
+    motto: axis.motto,
     accent: axis.accent,
     state: axis.state,
     stateLabel: axis.stateLabel,
     ordinal: `eje ${ordinalLabel(index, SOURCE.length)}`,
     href: `#${axis.id}`,
+    intro: axis.intro
+      ? {
+          id: axis.intro.id,
+          code,
+          name: axis.intro.name,
+          motto: axis.intro.motto,
+          accent: axis.intro.accent ?? axis.accent,
+          href: `#${axis.intro.id}`,
+        }
+      : undefined,
     children: axis.children.map((child, childAt) => ({
       id: child.id,
       index: childAt + 1,
@@ -136,68 +190,66 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
 export const navItems: readonly NavItem[] = axes;
 
 /**
- * Las puertas: los destinos a los que se entra de verdad. Un eje con
- * subsecciones no es una puerta: lo son sus subsecciones. La portada y el pie
- * las listan; hoy son las tres partes de la Entidad.
+ * Los lugares que el visitante puede estar mirando, en el orden de la página:
+ * la portada, la introducción de cada eje (si la tiene), sus partes, y los
+ * ejes sin partes.
+ */
+export const contextNodes: readonly ContextNode[] = [
+  { id: home.id, code: home.code, name: home.name, axisId: null, accent: 'cyan', state: 'active' },
+  ...axes.flatMap((axis): ContextNode[] => {
+    const intro: ContextNode[] = axis.intro
+      ? [
+          {
+            id: axis.intro.id,
+            code: axis.intro.code,
+            name: axis.intro.name,
+            axisId: axis.id,
+            accent: axis.intro.accent,
+            state: axis.state,
+          },
+        ]
+      : [];
+    const parts: ContextNode[] =
+      axis.children.length > 0
+        ? axis.children.map((child) => ({
+            id: child.id,
+            code: child.code,
+            name: child.name,
+            axisId: axis.id,
+            accent: child.accent,
+            state: child.state,
+          }))
+        : [
+            {
+              id: axis.id,
+              code: axis.code,
+              name: axis.name,
+              axisId: axis.id,
+              accent: axis.accent,
+              state: axis.state,
+            },
+          ];
+    return [...intro, ...parts];
+  }),
+];
+
+/**
+ * Las puertas: los lugares del recorrido, sin la portada. El pie y la imagen
+ * de vista previa las listan.
  */
 export interface Door extends NavChild {
   accent: AccentToken;
 }
 
-export const doors: readonly Door[] = axes.flatMap((axis): Door[] =>
-  axis.children.length > 0
-    ? axis.children.map((child) => ({
-        id: child.id,
-        code: child.code,
-        name: child.name,
-        state: child.state,
-        stateLabel: child.stateLabel,
-        ordinal: child.ordinal,
-        href: child.href,
-        accent: child.accent,
-      }))
-    : [
-        {
-          id: axis.id,
-          code: axis.code,
-          name: axis.name,
-          state: axis.state,
-          stateLabel: axis.stateLabel,
-          ordinal: axis.ordinal,
-          href: axis.href,
-          accent: axis.accent,
-        },
-      ],
-);
-
-/**
- * Los lugares que el visitante puede estar mirando, en el orden de la página.
- * Un eje con subsecciones no es un lugar: lo son sus subsecciones.
- */
-export const contextNodes: readonly ContextNode[] = [
-  { id: home.id, code: home.code, name: home.name, axisId: null, accent: 'cyan', state: 'active' },
-  ...axes.flatMap((axis): ContextNode[] =>
-    axis.children.length > 0
-      ? axis.children.map((child) => ({
-          id: child.id,
-          code: child.code,
-          name: child.name,
-          axisId: axis.id,
-          accent: child.accent,
-          state: child.state,
-        }))
-      : [
-          {
-            id: axis.id,
-            code: axis.code,
-            name: axis.name,
-            axisId: axis.id,
-            accent: axis.accent,
-            state: axis.state,
-          },
-        ],
-  ),
-];
+export const doors: readonly Door[] = contextNodes.slice(1).map((node, at) => ({
+  id: node.id,
+  code: node.code,
+  name: node.name,
+  state: node.state,
+  ordinal: `lugar ${ordinalLabel(at + 1, contextNodes.length - 1)}`,
+  href: `#${node.id}`,
+  accent: node.accent,
+}));
 
 export function axisById(id: string): AxisNode | undefined {
   return axes.find((axis) => axis.id === id);
@@ -207,6 +259,14 @@ export function subById(id: string): { axis: AxisNode; sub: SubNode } | undefine
   for (const axis of axes) {
     const sub = axis.children.find((child) => child.id === id);
     if (sub) return { axis, sub };
+  }
+  return undefined;
+}
+
+/** La introducción de un eje, por su id de lugar. */
+export function introById(id: string): { axis: AxisNode; intro: IntroNode } | undefined {
+  for (const axis of axes) {
+    if (axis.intro?.id === id) return { axis, intro: axis.intro };
   }
   return undefined;
 }
@@ -229,9 +289,9 @@ export function nextContext(id: string): ContextNode | undefined {
  */
 export const hashAliases: Readonly<Record<string, string>> = {
   cerebro: 'nucleo',
-  redes: 'entidad',
-  causas: 'entidad',
-  bitacora: 'entidad',
+  redes: 'enjambre',
+  causas: 'enjambre',
+  bitacora: 'continuidad',
   reserva: 'cuerpo',
   vigilancia: 'inicio',
   autonomia: 'inicio',
@@ -243,6 +303,6 @@ export const structureLabels = {
   subnav: 'Partes de',
   rail: 'Posición en el recorrido',
   back: 'Volver a la portada',
-  /** Pie de slide: «01.10 / 01.11» se lee como lugar actual sobre el último. */
+  /** Pie de slide: «01.10 / 10» se lee como lugar actual sobre el último. */
   of: '/',
 } as const;
