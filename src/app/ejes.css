@@ -104,7 +104,7 @@
   padding-left: 0.35rem;
   border-left: 1px solid var(--eva-line-strong);
 }
-html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
+html[data-axis='cerebro'] .nav__axis[data-axis='cerebro'] .nav__sub {
   display: flex;
 }
 .nav__sub a {
@@ -459,18 +459,22 @@ html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
   padding: 0.5rem 0 0;
   border-top: 0;
 }
+/*
+ * Desde la v9 la región dice su verbo —«0001 DECIDE»— y no sólo su código.
+ * Ocho códigos binarios en fila no eran un mapa del cerebro, eran una cinta de
+ * cifras; con el verbo se lee de un vistazo qué se está comparando con la red.
+ * Los botones, más bajos a cambio: 30 px, como los del genoma.
+ */
 .core[data-variant='room'] .core__chip {
   min-width: 44px;
-  min-height: 40px;
+  min-height: 30px;
   justify-content: center;
-  padding: 0.2rem 0.5rem;
-}
-.core[data-variant='room'] .core__chip:not(.core__chip--reset) span {
-  display: none;
+  gap: 0.35rem;
+  padding: 0.15rem 0.45rem;
 }
 @media (pointer: coarse) {
   .core[data-variant='room'] .core__chip {
-    min-height: 44px;
+    min-height: 36px;
   }
 }
 

@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { genome, site } from '@/content/site';
-import { subById } from '@/content/structure';
+import { axisById } from '@/content/structure';
 import { bin } from '@/lib/binary';
 import { clearGenome, publishGenome, type GenomeState } from '@/lib/genome-state';
 import { sequenceId, toFasta, toNotes } from '@/lib/genome';
@@ -34,14 +34,18 @@ const STATE_MS = 6000;
 /** Ancho del contador de copias: el original más cuatro clones caben en tres bits. */
 const CLONE_BITS = 3;
 
-/** Adónde lleva «Expresar»: el cuerpo, la tercera parte de la Entidad. */
-const body = subById('cuerpo')?.sub;
+/**
+ * Adónde lleva «Expresar»: el cerebro (11), el lugar siguiente. Hasta la v8
+ * llevaba al Cuerpo; ese lugar salió del recorrido en la v9 y la acción se
+ * conserva entera, sólo cambia su destino.
+ */
+const expressed = axisById('cerebro');
 
 /**
  * Genoma digital de EVA: doble hélice procedural con ocho acciones —clonar,
  * utilizar, mutar, escanear, desplegar, sonificar, descargar y expresar— más la
  * purga de copias, que vive junto a su contador. Expresar es el puente con el
- * cuerpo (01.11): la hélice se enciende y la respuesta lleva hasta allí.
+ * cerebro (11): la hélice se enciende y la respuesta lleva hasta allí.
  *
  * Es ficción: no copia ni registra nada (la descarga es un archivo de texto
  * generado en el navegador). Sólo cambia lo que se ve y lo que EVA contesta.
@@ -256,7 +260,7 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
     setClones(0);
   };
 
-  /** Expresar: la hélice se enciende y la recorre un barrido; la respuesta lleva hasta el cuerpo (01.11). */
+  /** Expresar: la hélice se enciende y la recorre un barrido; la respuesta lleva hasta el cerebro (11). */
   const onExpress = () => {
     play('open');
     announce('expressing', genome.expressReplies[expressedTurns.current % genome.expressReplies.length]);
@@ -360,10 +364,10 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
               {genome.actions.purge}
             </button>
           )}
-          {state === 'expressing' && body && (
-            <a href={body.href} className="dna__reply-link mono" data-sound="open">
+          {state === 'expressing' && expressed && (
+            <a href={expressed.href} className="dna__reply-link mono" data-sound="open">
               <b aria-hidden="true" data-bin="">
-                {body.code}
+                {expressed.code}
               </b>{' '}
               {genome.expressLink} <span aria-hidden="true">↓</span>
             </a>

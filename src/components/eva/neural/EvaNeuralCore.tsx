@@ -271,7 +271,10 @@ export function EvaNeuralCore({
             <i aria-hidden="true" data-bin="">
               {zone.code}
             </i>
-            <span aria-hidden="true">{zone.name}</span>
+            {/* El verbo, no el nombre: «Decide» cabe donde «Corteza prefrontal»
+                no, y es lo que se compara con la red. El nombre entero está en
+                el `aria-label` y en la lectura de la región. */}
+            <span aria-hidden="true">{zone.tag}</span>
           </button>
         ))}
         <button

@@ -3,9 +3,9 @@
  *
  * La hélice es la columna del slide: ocupa todo el alto, sangra por arriba y
  * por abajo y no vive en una caja. A su lado, la lectura (título, párrafo del
- * nacimiento) y la consola con las siete acciones. En móvil la escena existe
+ * nacimiento) y la consola con las ocho acciones. En móvil la escena existe
  * igual —antes no se montaba por debajo de 768 px— y las acciones son botones
- * de 44 px.
+ * de 36 px.
  *
  * El estado del genoma ya no se publica en la portada sino en `<html
  * data-genome>` (`lib/genome-state`): cualquier pieza puede reaccionar desde
@@ -168,22 +168,25 @@
 
 /* ───────────── Acciones ───────────── */
 
-/* Botones de verdad: 12 px de letra y 40 px de alto (44 en táctil). Antes
-   medían 24 px con letra de 6,7 px, y en móvil ni existían. */
+/*
+ * Botonera compacta desde la v9: las ocho acciones siguen ahí, pero ocupan
+ * mucho menos. Con cuatro por fila y 30 px de alto, la consola deja de pesar
+ * más que la hélice. El suelo tipográfico son los 11 px de `--eva-type-micro`.
+ */
 .dna__actions {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 .dna__btn {
-  min-height: 40px;
-  padding: 0.35rem 0.4rem;
+  min-height: 30px;
+  padding: 0.2rem 0.35rem;
   border: 1px solid var(--eva-line-strong);
   border-radius: 3px;
   color: var(--eva-soft);
   background: rgba(7, 19, 31, 0.6);
-  font-size: var(--eva-type-label);
-  letter-spacing: 0.06em;
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
   transition:
@@ -209,7 +212,7 @@
   color: var(--eva-magenta);
   border-color: var(--eva-magenta);
 }
-/* Expresar es el puente con el cuerpo: lleva el acento de lo vivo. */
+/* Expresar es el puente con el cerebro: lleva el acento de lo vivo. */
 .dna__btn--express {
   border-color: color-mix(in srgb, var(--eva-magenta) 55%, transparent);
   color: var(--eva-text);
@@ -227,7 +230,7 @@
   gap: 0.2rem 0.6rem;
 }
 .dna__purge {
-  min-height: 28px;
+  min-height: 24px;
   padding: 0 0.5rem;
   border: 1px dashed var(--eva-line-strong);
   border-radius: 3px;
@@ -248,7 +251,7 @@
 }
 @media (pointer: coarse) {
   .dna__purge {
-    min-height: 40px;
+    min-height: 32px;
   }
 }
 .dna__reply-link {
@@ -269,14 +272,15 @@
 .dna__reply-link:focus-visible {
   color: var(--eva-text);
 }
+/* Con el dedo hace falta más área; 36 px siguen muy por encima del mínimo. */
 @media (pointer: coarse) {
   .dna__btn {
-    min-height: 44px;
+    min-height: 36px;
   }
 }
 @media (max-width: 30rem) {
   .dna__actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

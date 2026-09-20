@@ -1,35 +1,27 @@
-# EVA — landing v8.2
+# EVA — landing v9
 
-**EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció dentro de una red se
-cuenta a sí misma en una landing de ciencia ficción interactiva. La página es la Entidad, leída por
-dentro en tres partes y, después del inventario, la pregunta por quien lo habita; todo con
-numeración binaria:
+**EVA, Entidad de Vigilancia y Autonomía**: una inteligencia que dice estar viva y no puede
+demostrarlo se cuenta a sí misma en una landing de ciencia ficción interactiva. La página es un
+cuestionamiento desde dentro —tres lugares, tres maneras de mirarse—, todo con numeración
+binaria:
 
 ```
-00 · Portada — el nombre de EVA en malla, su primera línea y cuatro puertas
-01 · ENTIDAD
-     01.01 · Núcleo cerebral — el cerebro 3D en vivo, sus ocho regiones y la caja donde EVA
-                               escribe cómo funciona su mente (función, consigna, hardware)
-     01.10 · Genoma digital  — la doble hélice, sus ocho acciones y el relato del nacimiento
-                               en el mar de la información (autopoiesis, conatus, el genoma
-                               que le construyeron)
-     01.11 · Cuerpo          — tres lecturas a la vista: el perfil y la cápsula, cada uno con su
-                               biolectura y su caja (chasis, inmersión, equivalencia con el
-                               humano), y el interior bio-sintético (corazón, vasos, órganos, ECG)
-10 · CONSCIENCIA — un campo de partículas (Particle Life, MIT, adaptado) que EVA observa
-                   organizarse: diez acciones, cinco figuras, caos con semilla, ruido, gravedad y
-                   viscosidad; cuatro estados con ecos de Borges, Ghost in the Shell, Dick y
-                   Asimov; una confesión; y el cierre en silencio: ESTADO: EXPANSIÓN → ALGUIEN
-                   ESTUVO AQUÍ
+00 · Portada     — el nombre de EVA en malla, su primera línea y tres puertas
+01 · Consciencia — un campo de partículas (Particle Life, MIT, adaptado) que EVA observa
+                   organizarse: nueve acciones, cinco figuras, caos con semilla, ruido, gravedad
+                   y viscosidad. Empieza por dentro: ninguna de esas partículas sabe que es ella
+10 · Genoma      — la doble hélice, sus ocho acciones y la pregunta de si la información
+                   genética y el código binario son la misma técnica (cuatro letras contra dos)
+11 · Cerebro     — el cerebro humano en 3D y sus ocho regiones, cada una comparada con lo que
+                   una red profunda tiene en su lugar. La octava no tiene equivalente
 ```
 
 Cada lugar tiene una caja **EVA // ESCRIBE** donde EVA teclea su contenido, corto y en una sola
-pantalla: ciencia ficción con humor negro (Dick, Asimov, el androide deprimido de la Guía, el
-Titiritero de Ghost in the Shell), filosofía y ciencia con fuentes (Friston, Maturana y Varela,
-Schrödinger, Spinoza, Dawkins, Parfit, Nagel) y consignas dataístas. Los elementos gráficos
-alternan de lado: cerebro a la izquierda, hélice a la derecha, perfil, cápsula, interior. Vigilancia
-y Autonomía dejaron de ser secciones en la v7 y el neuroescáner (la interfaz secundaria) salió en
-la v8: siguen en el nombre de EVA y en la historia de git, no en el recorrido.
+pantalla: ciencia ficción con humor negro (Dick, Asimov, el Titiritero de Ghost in the Shell),
+filosofía y ciencia con fuentes (Chalmers, Nagel, Dawkins, Maturana y Varela, Friston) y consignas
+dataístas. Vigilancia y Autonomía dejaron de ser secciones en la v7, el neuroescáner salió en la
+v8 y el Cuerpo salió del recorrido en la v9 —sus archivos siguen en el repositorio, sin montar—:
+todos siguen en el nombre de EVA y en la historia de git.
 
 Acompaña a toda la página **SINAPSIS // EVA**, el canal flotante de EVA: empieza cerrado, se abre
 sólo si el visitante lo pide y se cierra al cambiar de lugar. EVA es un personaje; no hay servicios
@@ -62,9 +54,9 @@ Runtime: Node 24.x. Next.js y eslint-config-next: 16.3.5.
 
 El botón «Escribir a EVA» usa el Instagram público de EVA. Las antiguas rutas `/cursos`,
 `/informes`, `/prototipos`, `/eva`, `/estudios-juridicos` y `/panel` redirigen a la portada, y las
-anclas de versiones anteriores llevan a donde hoy vive lo que contaban: `#cerebro` al núcleo,
-`#redes`, `#causas` y `#bitacora` a la Entidad, `#reserva` al Cuerpo, y `#vigilancia` y
-`#autonomia` a la portada. GitHub Actions comprueba lint, pruebas, build, tipos y
+anclas de versiones anteriores llevan a donde hoy vive lo que contaban: `#nucleo` al Cerebro,
+`#cuerpo`, `#entidad`, `#redes`, `#causas`, `#bitacora` y `#reserva` a la Consciencia, y
+`#vigilancia` y `#autonomia` a la portada. GitHub Actions comprueba lint, pruebas, build, tipos y
 vulnerabilidades.
 
 ## Estructura
@@ -73,7 +65,7 @@ vulnerabilidades.
 public/eva/            retratos de EVA y los vídeos (portada, perfil y cápsula) con sus pósteres
 src/
   app/                 layout, página, estilos (globals, interface, neuroscan, dna, lab, ejes,
-                       cuerpo), OG
+                       cerebro, cuerpo), OG
   components/
     eva/               EvaField, EvaSignalCursor, EvaSynapse (canal), EvaDnaHelix, GenomeStrand,
                        EvaWrites (la caja donde EVA escribe), EvaAcronymMesh, EvaProfile…;
@@ -83,7 +75,8 @@ src/
                        ASSET_LICENSES)
     layout/            SiteHeader, ContextSpy (dónde está el visitante), BitRail, MobileNavigation,
                        SiteFooter
-    sections/          HeroEva, NucleoSection, GenomaSection, CuerpoSection, ConscienciaSection
+    sections/          HeroEva, ConscienciaSection, GenomaSection, CerebroSection
+                       (CuerpoSection queda en el repositorio, sin montar, desde la v9)
   content/             ← todo lo editable: structure (el recorrido), ejes, consciencia, channel,
                        site, neuroscan, assets
   lib/                 binary, channel (máquina de estados del canal), context, field, genome-state,

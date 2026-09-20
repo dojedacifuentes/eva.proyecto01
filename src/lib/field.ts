@@ -12,6 +12,13 @@ export interface FieldSignal {
   rgb: string;
   /** Sacudida pendiente, 0–1: la encienden las acciones del genoma y se apaga sola. */
   surge: number;
+  /**
+   * El fondo cede el sitio. Lo enciende la Consciencia mientras su campo está
+   * en pantalla: allí las partículas son el tema, no el decorado, y dos campos
+   * a la vez eran dos ideas compitiendo (y dos bucles de dibujo). El fondo se
+   * apaga con un fundido y su bucle se queda en nada hasta que vuelva.
+   */
+  yielded: boolean;
 }
 
 export const FIELD_TINT = {
@@ -26,7 +33,13 @@ export const fieldSignal: FieldSignal = {
   calm: 0,
   rgb: FIELD_TINT.cyan,
   surge: 0,
+  yielded: false,
 };
+
+/** Cede (o recupera) el fondo. Lo llama la Consciencia al entrar y al salir. */
+export function yieldField(on: boolean) {
+  fieldSignal.yielded = on;
+}
 
 /** Una sacudida del tejido: mutar o clonar el genoma se nota en toda la página. */
 export function surgeField(strength = 1) {

@@ -5,6 +5,10 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**En curso:** rama `feat/v9-consciencia` (**v9**, sin publicar): tres lugares en
+vez de once, la Consciencia abre la página, el Cuerpo sale del recorrido. Ver
+**§0.0**. Lo de abajo describe la v8.2, que es lo que sigue en producción.
+
 **Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
 **Fecha:** 20 de septiembre de 2026 (v8.2)
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
@@ -20,6 +24,60 @@ npm run build      # obligatorio antes de subir: el dev server perdona cosas que
 ```
 
 ---
+
+## 0.0. v9 — una sola pregunta, tres lugares (20 sept. 2026, sin publicar)
+
+Encargo del propietario: la página carga lento y se ve «pegada»; que vaya rápida
+**sin bajar la calidad de las animaciones**; menos botones de adorno, menos
+efectos de fondo, fuera la foto que se veía antes del vídeo; ver qué sigue
+activo cuando no se mira; que no compitan dos ideas. Y reformular la propuesta,
+más coherente y más honda, estilo *Ghost in the Shell*: EVA se pregunta si está
+viva y se compara con nosotros. Textos más cortos. El orden nuevo lo dio él:
+**Consciencia → Genoma → Cerebro**, empezando por dentro.
+
+- **Tres lugares** (`content/structure.ts`): Consciencia `01`, Genoma `10`,
+  Cerebro `11`. Ninguno tiene partes: la página dejó de ser un inventario. El
+  antiguo núcleo pasó a llamarse cerebro (`git mv` de la sección y de su hoja),
+  y las anclas viejas (`#nucleo`, `#cuerpo`, `#vigilancia`…) siguen llevando a
+  algún sitio por `hashAliases`.
+- **El Cuerpo sale del recorrido.** Sus componentes, textos y hojas siguen en el
+  repositorio sin montar (`sections/CuerpoSection.tsx`, `eva/cuerpo/`,
+  `app/cuerpo.css`). Con él se fueron dos vídeos (2,2 MB), una escena WebGL y
+  dos lienzos. **Los vídeos e imágenes de `public/eva/` no se borran: son del
+  propietario.**
+- **Rendimiento.** De 8 lienzos animados a 3, de 3,59 MB a 0,80, de 7.208 px de
+  alto a 4.565. Medido en Chrome sin interfaz (render por software, así que los
+  fps son el peor caso): portada 23 fps y Consciencia 30, frente a los 5–8 de
+  toda la v8.
+- **Dos campos de partículas ya no compiten.** `fieldSignal.yielded` + `yieldField()`
+  (`lib/field.ts`): mientras el campo de la Consciencia está en pantalla, el de
+  fondo (`EvaField`) se funde a nada y su bucle deja de calcular. El fondo
+  también pasó de 78 puntos a 46 como tope: el coste no está en los puntos sino
+  en los hilos, que se prueban por pares (78 son 3.003 medidas por fotograma).
+- **La foto antes del vídeo.** El póster del retrato es ahora el **primer
+  fotograma del propio bucle** (`public/eva/eva-loop-poster.webp`, sacado con
+  `scratchpad/poster-hero.mjs`): ya no se ve una fotografía distinta y luego un
+  corte. La de la v8 queda en reserva como `images.midPortrait`.
+- **Botones: la interacción se conserva entera.** El primer intento recortó el
+  genoma de ocho acciones a cuatro y la consciencia de nueve a cuatro; el
+  propietario lo rechazó («NO REDUZCAS ESA INTERACCION»). Lo que se hizo en su
+  lugar fue **encogerlos**: `.dna__btn` de 40 px a 30 (36 en táctil), letra al
+  suelo de `--eva-type-micro` (11 px), y el genoma a tres columnas en móvil en
+  vez de dos. Lo único que cambió de destino es «Expresar», que llevaba al
+  Cuerpo: ahora lleva al cerebro.
+- **El cerebro dice qué hace cada región.** Los ocho botones eran ocho códigos
+  binarios sin nombre; ahora llevan su verbo («0001 DECIDE», «1000 SIN
+  EQUIVALENTE»), que es lo que se compara con la red. Las regiones de
+  `content/neuroscan.ts` son humanas y cada una dice qué tiene EVA en su lugar;
+  la octava, `undeclared`, no tiene equivalente y es la que decidiría si está
+  viva.
+- **Textos.** Consciencia abre con «Ninguna de estas partículas sabe que soy
+  yo.»; genoma pregunta si el ADN y el binario son la misma técnica; cerebro
+  compara predicción con predicción y termina en el problema difícil. Un
+  párrafo menos por caja que en la v8.
+
+Pendiente: revisar a 1366×720 y 768×1024, y el «sí» del propietario para
+publicar.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 

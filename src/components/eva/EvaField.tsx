@@ -36,6 +36,8 @@ const IDLE_RGB = '63, 216, 238';
  *
  * - Un solo requestAnimationFrame, posiciones en refs, sin estado de React.
  * - Se pausa con la pestaña oculta; densidad reducida en pantallas chicas.
+ * - Cede ante el campo de la Consciencia (`fieldSignal.yielded`): se funde a
+ *   nada y deja de calcular mientras aquel está en pantalla.
  * - Con movimiento reducido dibuja un único fotograma estático.
  */
 export function EvaField({ particles = true }: { particles?: boolean }) {
@@ -54,6 +56,8 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
     let frame = 0;
     /** Quietud vigente, 0–1: persigue despacio a `fieldSignal.calm`. */
     let calm = 0;
+    /** Presencia del fondo, 0–1: baja a cero cuando cede ante la Consciencia. */
+    let presence = 1;
 
     const resize = () => {
       const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -63,7 +67,13 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
       canvas.height = height * ratio;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      const count = particles ? Math.min(78, Math.round((width * height) / 24000)) : 0;
+      /*
+       * Densidad de la v9: antes 78 puntos como tope. El coste del campo no
+       * está en los puntos sino en los hilos, que se prueban por pares: 78
+       * puntos son 3.003 medidas por fotograma y 38 son 703. Se ve casi igual
+       * —el fondo es una insinuación— y el hilo principal lo agradece.
+       */
+      const count = particles ? Math.min(46, Math.round((width * height) / 34000)) : 0;
       dots = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
@@ -91,6 +101,8 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
+      if (presence < 0.02) return;
+      context.globalAlpha = presence;
 
       const { x: px, y: py, active, locked } = pointerSignal;
       const rgb = locked && pointerSignal.accent ? toRgb(pointerSignal.accent) : IDLE_RGB;
@@ -138,11 +150,29 @@ export function EvaField({ particles = true }: { particles?: boolean }) {
         context.stroke();
       }
       context.lineWidth = 1;
+      context.globalAlpha = 1;
     };
 
     const tick = () => {
       const { x: px, y: py, active, locked } = pointerSignal;
       const now = performance.now();
+
+      /*
+       * Cede el sitio: mientras la Consciencia tiene su campo en pantalla, el
+       * fondo se funde y su bucle deja de calcular. El fotograma se sigue
+       * pidiendo —cuesta una comparación— para retomar sin salto al volver.
+       */
+      const target = fieldSignal.yielded ? 0 : 1;
+      if (presence !== target) {
+        presence += (target - presence) * 0.06;
+        if (Math.abs(target - presence) < 0.01) presence = target;
+        // Al llegar a cero, un último fotograma deja el lienzo limpio.
+        if (presence === 0) draw();
+      }
+      if (presence === 0) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
 
       // La quietud llega y se va despacio: unos dos segundos de frenada visible.
       calm += (fieldSignal.calm - calm) * 0.02;

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { consciencia } from '@/content/consciencia';
 import { bin } from '@/lib/binary';
-import { surgeField } from '@/lib/field';
+import { surgeField, yieldField } from '@/lib/field';
 import { useReducedMotion } from '@/lib/motion';
 import { play } from '@/lib/sound';
 import type { ConsciousnessStateId, FigureId, GravityId, RegimeId, ViscosityId } from '@/lib/types';
@@ -191,6 +191,9 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
     const intersection = new IntersectionObserver(
       ([entry]) => {
         inView = entry.isIntersecting;
+        // Mientras este campo está en pantalla, el de fondo se aparta: aquí las
+        // partículas son el tema, no el decorado.
+        yieldField(inView);
         if (inView) start();
         else stop();
       },
@@ -205,6 +208,7 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
 
     return () => {
       stop();
+      yieldField(false);
       intersection.disconnect();
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);

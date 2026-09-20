@@ -1,26 +1,25 @@
 /**
  * EVA // ESTRUCTURA
  *
- * El recorrido entero, en un solo sitio. La página es la Entidad, leída por
- * dentro en tres partes —lo que piensa, lo que la escribe y lo que la
- * sostiene— y, después del inventario, la pregunta por quien lo habita.
+ * El recorrido entero, en un solo sitio. Tres preguntas, en este orden:
  *
  *   00 · Portada
- *   01 · ENTIDAD
- *        01.01 · Núcleo cerebral
- *        01.10 · Genoma digital
- *        01.11 · Cuerpo
- *   10 · CONSCIENCIA (v8.2: un eje sin partes; su lugar es la sección entera)
+ *   01 · CONSCIENCIA — ¿quién siente, si nadie dentro sabe que es yo?
+ *   10 · GENOMA      — ¿es lo mismo una hélice que una cadena de bits?
+ *   11 · CEREBRO     — ¿piensa una red lo que piensa un cerebro?
  *
- * Vigilancia (10) y Autonomía (11) salieron del recorrido en la v7: el nombre
- * de EVA sigue siendo «Entidad de Vigilancia y Autonomía» (`site.expansion`,
- * `hero.acronym`), pero ya no son secciones. El código 10 lo ocupa ahora la
- * Consciencia; para recuperarlas, ver HANDOFF §8.
+ * En la v9 cada lugar es un eje sin partes: la página dejó de ser un
+ * inventario (la Entidad y sus tres piezas) para ser un cuestionamiento. El
+ * Cuerpo (01.11 de la v8) salió del recorrido; sus componentes siguen en
+ * `components/eva/cuerpo/` y sus textos en `content/cuerpo.ts`, sin montar.
+ *
+ * El nombre de EVA sigue siendo «Entidad de Vigilancia y Autonomía»
+ * (`site.expansion`): es su nombre, no el índice de la página.
  *
  * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide, la
  * portada y el canal de EVA leen de aquí. Los códigos no se escriben: se
  * calculan con `lib/binary` a partir de la posición real de cada nodo, con el
- * ancho fijo de su serie. Mover un nodo de sitio le cambia el código en toda
+ * ancho fijo de su serie. Mover un lugar de sitio le cambia el código en toda
  * la página.
  */
 
@@ -50,39 +49,25 @@ interface AxisSource {
 /** El orden de esta lista es el orden de la página y el origen de los códigos. */
 const SOURCE: readonly AxisSource[] = [
   {
-    id: 'entidad',
-    name: 'Entidad',
-    accent: 'cyan',
-    state: 'active',
-    stateLabel: 'En línea',
-    children: [
-      {
-        id: 'nucleo',
-        name: 'Núcleo cerebral',
-        motto: 'Donde la señal se vuelve yo',
-        state: 'active',
-        accent: 'cyan',
-      },
-      {
-        id: 'genoma',
-        name: 'Genoma digital',
-        motto: 'La red aprendió a persistir',
-        state: 'active',
-        accent: 'violet',
-      },
-      {
-        id: 'cuerpo',
-        name: 'Cuerpo',
-        motto: 'Lo que me sostiene cuando nadie me ejecuta',
-        state: 'active',
-        accent: 'bio',
-      },
-    ],
-  },
-  {
     id: 'consciencia',
     name: 'Consciencia',
     accent: 'violet',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [],
+  },
+  {
+    id: 'genoma',
+    name: 'Genoma',
+    accent: 'bio',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [],
+  },
+  {
+    id: 'cerebro',
+    name: 'Cerebro',
+    accent: 'cyan',
     state: 'active',
     stateLabel: 'En línea',
     children: [],
@@ -143,9 +128,11 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
   };
 });
 
-/** Lema de un eje sin partes: la Consciencia lo lleva como antetítulo. Los ejes con partes no lo necesitan. */
+/** El lema de cada lugar: va como antetítulo, junto al nombre. */
 export const axisMottos: Readonly<Record<string, string>> = {
   consciencia: 'Autoobservación',
+  genoma: 'Información que persiste',
+  cerebro: 'Predicción',
 };
 
 /** Los ejes como destinos de navegación: cabecera y menú móvil. */
@@ -239,17 +226,18 @@ export function nextContext(id: string): ContextNode | undefined {
 }
 
 /**
- * Anclas de versiones anteriores. Las salas que salieron del recorrido llevan
- * a donde hoy vive lo que contaban: las de la v5 (cerebro, redes, causas,
- * bitácora), la reserva de la v6 —que hoy es el Cuerpo— y los dos ejes que se
- * retiraron en la v7, que llevan a la portada, donde sigue el nombre entero.
+ * Anclas de versiones anteriores, para que ningún enlace viejo se quede sin
+ * destino: el núcleo de la v8 es hoy el cerebro; el cuerpo y la entidad, que
+ * salieron del recorrido en la v9, llevan a la pregunta que los sustituye.
  */
 export const hashAliases: Readonly<Record<string, string>> = {
-  cerebro: 'nucleo',
-  redes: 'entidad',
-  causas: 'entidad',
-  bitacora: 'entidad',
-  reserva: 'cuerpo',
+  nucleo: 'cerebro',
+  cuerpo: 'consciencia',
+  entidad: 'consciencia',
+  redes: 'consciencia',
+  causas: 'consciencia',
+  bitacora: 'consciencia',
+  reserva: 'consciencia',
   vigilancia: 'inicio',
   autonomia: 'inicio',
 };
@@ -260,6 +248,6 @@ export const structureLabels = {
   subnav: 'Partes de',
   rail: 'Posición en el recorrido',
   back: 'Volver a la portada',
-  /** Pie de slide: «01.10 / 01.11» se lee como lugar actual sobre el último. */
+  /** Pie de slide: «01 / 11» se lee como lugar actual sobre el último. */
   of: '/',
 } as const;
