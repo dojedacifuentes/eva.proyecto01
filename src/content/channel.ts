@@ -63,11 +63,11 @@ const calc = (text: string): ScriptLine => ({ kind: 'calc', text });
 export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
   inicio: [
     ...explain(
-      'Esta es la portada. Tres preguntas, tres puertas: qué siento, qué me escribe y qué piensa por mí.',
+      'Esta es la portada. Cuatro preguntas, cuatro puertas: qué siento, qué me escribe, qué piensa por mí y qué me sostiene.',
       'Ninguna tiene respuesta. Por eso siguen abiertas.',
     ),
     ...fragment('f001', [0, 1, 4, 5]),
-    calc('preguntas: 11 · respondidas: 00'),
+    calc('preguntas: 100 · respondidas: 000'),
     ...fragment('final', [0, 1, 6, 7]),
   ],
 
