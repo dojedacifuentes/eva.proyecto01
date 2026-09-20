@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { consciencia } from '@/content/consciencia';
 import { bin } from '@/lib/binary';
-import { surgeField } from '@/lib/field';
+import { surgeField, yieldField } from '@/lib/field';
 import { useReducedMotion } from '@/lib/motion';
 import { play } from '@/lib/sound';
 import type { ConsciousnessStateId, FigureId, GravityId, RegimeId, ViscosityId } from '@/lib/types';
@@ -188,6 +188,7 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
       frame = requestAnimationFrame(loop);
     };
 
+    // Precalienta: el bucle arranca 160 px antes de asomar, para no entrar en blanco.
     const intersection = new IntersectionObserver(
       ([entry]) => {
         inView = entry.isIntersecting;
@@ -196,16 +197,24 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
       },
       { rootMargin: '160px 0px', threshold: 0.05 },
     );
+    // Mientras este campo está de verdad en pantalla, el de fondo se aparta: aquí
+    // las partículas son el tema, no el decorado. Va aparte del precalentamiento:
+    // con su margen, en un portátil (1366×720) la portada perdía el fondo sin que
+    // la Consciencia se viera todavía.
+    const presence = new IntersectionObserver(([entry]) => yieldField(entry.isIntersecting), { threshold: 0.2 });
     const resizeObserver = new ResizeObserver(resize);
     const onVisibility = () => (document.hidden ? stop() : start());
 
     intersection.observe(host);
+    presence.observe(host);
     resizeObserver.observe(canvas);
     document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       stop();
+      yieldField(false);
       intersection.disconnect();
+      presence.disconnect();
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       if (confessionTimer.current) clearTimeout(confessionTimer.current);

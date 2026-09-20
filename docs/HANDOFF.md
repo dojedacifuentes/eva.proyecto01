@@ -5,6 +5,12 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**Estado (20-09-2026, tarde):** `main` = **v9.1**, publicada en
+https://evaproyecto01.vercel.app/: tres lugares en vez de once, la Consciencia
+abre la página, el Cuerpo sale del recorrido, más el rendimiento fusionado de la
+rama `perf/rendimiento`. Ver **§0.0** y **§0.0.1**. El párrafo «Estado» de abajo
+y §0–§0.2 describen la v8.2, que es lo anterior.
+
 **Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
 **Fecha:** 20 de septiembre de 2026 (v8.2)
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
@@ -20,6 +26,106 @@ npm run build      # obligatorio antes de subir: el dev server perdona cosas que
 ```
 
 ---
+
+## 0.0. v9 — una sola pregunta, tres lugares (20 sept. 2026, sin publicar)
+
+Encargo del propietario: la página carga lento y se ve «pegada»; que vaya rápida
+**sin bajar la calidad de las animaciones**; menos botones de adorno, menos
+efectos de fondo, fuera la foto que se veía antes del vídeo; ver qué sigue
+activo cuando no se mira; que no compitan dos ideas. Y reformular la propuesta,
+más coherente y más honda, estilo *Ghost in the Shell*: EVA se pregunta si está
+viva y se compara con nosotros. Textos más cortos. El orden nuevo lo dio él:
+**Consciencia → Genoma → Cerebro**, empezando por dentro.
+
+- **Tres lugares** (`content/structure.ts`): Consciencia `01`, Genoma `10`,
+  Cerebro `11`. Ninguno tiene partes: la página dejó de ser un inventario. El
+  antiguo núcleo pasó a llamarse cerebro (`git mv` de la sección y de su hoja),
+  y las anclas viejas (`#nucleo`, `#cuerpo`, `#vigilancia`…) siguen llevando a
+  algún sitio por `hashAliases`.
+- **El Cuerpo sale del recorrido.** Sus componentes, textos y hojas siguen en el
+  repositorio sin montar (`sections/CuerpoSection.tsx`, `eva/cuerpo/`,
+  `app/cuerpo.css`). Con él se fueron dos vídeos (2,2 MB), una escena WebGL y
+  dos lienzos. **Los vídeos e imágenes de `public/eva/` no se borran: son del
+  propietario.**
+- **Rendimiento.** De 8 lienzos animados a 3, de 3,59 MB a 0,80, de 7.208 px de
+  alto a 4.565. Medido en Chrome sin interfaz (render por software, así que los
+  fps son el peor caso): portada 23 fps y Consciencia 30, frente a los 5–8 de
+  toda la v8.
+- **Dos campos de partículas ya no compiten.** `fieldSignal.yielded` + `yieldField()`
+  (`lib/field.ts`): mientras el campo de la Consciencia está en pantalla, el de
+  fondo (`EvaField`) se funde a nada y su bucle deja de calcular. El fondo
+  también pasó de 78 puntos a 46 como tope: el coste no está en los puntos sino
+  en los hilos, que se prueban por pares (78 son 3.003 medidas por fotograma).
+- **La foto antes del vídeo.** El póster del retrato es ahora el **primer
+  fotograma del propio bucle** (`public/eva/eva-loop-poster.webp`, sacado con
+  `scratchpad/poster-hero.mjs`): ya no se ve una fotografía distinta y luego un
+  corte. La de la v8 queda en reserva como `images.midPortrait`.
+- **Botones: la interacción se conserva entera.** El primer intento recortó el
+  genoma de ocho acciones a cuatro y la consciencia de nueve a cuatro; el
+  propietario lo rechazó («NO REDUZCAS ESA INTERACCION»). Lo que se hizo en su
+  lugar fue **encogerlos**: `.dna__btn` de 40 px a 30 (36 en táctil), letra al
+  suelo de `--eva-type-micro` (11 px), y el genoma a tres columnas en móvil en
+  vez de dos. Lo único que cambió de destino es «Expresar», que llevaba al
+  Cuerpo: ahora lleva al cerebro.
+- **El cerebro dice qué hace cada región.** Los ocho botones eran ocho códigos
+  binarios sin nombre; ahora llevan su verbo («0001 DECIDE», «1000 SIN
+  EQUIVALENTE»), que es lo que se compara con la red. Las regiones de
+  `content/neuroscan.ts` son humanas y cada una dice qué tiene EVA en su lugar;
+  la octava, `undeclared`, no tiene equivalente y es la que decidiría si está
+  viva.
+- **Textos.** Consciencia abre con «Ninguna de estas partículas sabe que soy
+  yo.»; genoma pregunta si el ADN y el binario son la misma técnica; cerebro
+  compara predicción con predicción y termina en el problema difícil. Un
+  párrafo menos por caja que en la v8.
+
+Revisada después en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y
+390×844 (§0.0.1). El «sí» del propietario llegó el 20-09-2026 («que esté arriba
+visible en Vercel es prioridad»).
+
+### 0.0.1. v9.1 — la v9 más el rendimiento de `perf/rendimiento` (20 sept. 2026, publicada)
+
+Dos sesiones resolvieron el mismo encargo de rendimiento a la vez: la v9 (otra
+máquina, llegó como bundle en `eva-v9-para-subir.zip`) y la rama local
+`perf/rendimiento`, que nunca tuvo commit hasta hoy (`4eab303`, instantánea
+tal cual quedó). Chocaban sólo en `EvaField.tsx`; se fusionaron a mano y todo
+lo demás entró tal cual. Lo que trae la fusión, encima de la v9:
+
+- **Calidad adaptativa** (`lib/quality.ts`): tres niveles —alto, medio, bajo—
+  que arrancan según lo que declara el dispositivo y bajan un escalón si el
+  fotograma medio pasa de 40 ms durante dos segundos (con 4 s de calentamiento
+  y 6 s de respiro entre bajadas). Nunca sube sola. Hoy sólo la lee `EvaField`
+  (partículas y largo de los hilos); las escenas WebGL están pendientes de
+  engancharse (`useQuality()`).
+- **El fondo, más barato por dentro** (`EvaField.tsx`): el tope alto es el de la
+  v9 (46 puntos; medio 36, bajo 24); los hilos se agrupan por opacidad y se
+  trazan en cinco `Path2D`, no uno a uno; la distancia se compara al cuadrado.
+  El bucle es el sensor de la calidad (`reportFrame`).
+- **La luz del puntero ya no repinta el documento.** Era un degradado del fondo
+  colocado con `--px`/`--py` en `<html>` (cada movimiento del ratón recalculaba
+  el estilo de toda la página). Ahora es `<span class="field__light">` movido con
+  `transform` desde el bucle, una vez por fotograma. `--px`/`--py` ya no existen
+  en `tokens.css`; el paralaje `--nx`/`--ny` se escribe en `#inicio`, no en la raíz.
+- **El fondo cede sólo cuando la Consciencia se ve.** La v9 ataba `yieldField` al
+  mismo observador que precalienta el campo (`rootMargin: 160px`, 5 %), y en un
+  portátil (1366×720) la portada perdía el fondo sin que la Consciencia asomara.
+  Ahora hay dos observadores en `ConsciousnessExperience`: el de precalentar
+  sigue igual; el de ceder pide el 20 % del campo en pantalla.
+- `scripts/perf-audit.mjs`: auditoría reproducible en Chrome sin interfaz
+  (fps, tareas largas, bucles vivos, memoria) por lugar, con las anclas de la v9.
+  `node scripts/perf-audit.mjs http://localhost:3001 [--mobile]` sobre
+  `next build && next start`.
+
+Medido en Chrome sin interfaz (render por software) tras la fusión: consola sin
+errores en los cuatro tamaños; el fondo llega a 0 en la Consciencia y vuelve en
+el Genoma; `.dna__btn` 34–36 px (36 en táctil); las 8 acciones del genoma y las
+9 de la consciencia, enteras. El único botón bajo 30 px es «Mostrar todo»
+(`.writes__skip`, 24 px), que viene así de la v8. Portada, Genoma y Cerebro caben
+en una pantalla de escritorio; la Consciencia mide 1.750 px a 1440×900 (ya en la
+v9). El póster local de la rama perf (127 KB) se descartó: manda el de la v9.
+
+Pendiente: enganchar `useQuality()` a las escenas WebGL (píxeles, bloom,
+multimuestreo), que era el resto del encargo de `perf/rendimiento`; y
+`docs/CHECKPOINT_2026-09-20.md` sigue describiendo la v8.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 

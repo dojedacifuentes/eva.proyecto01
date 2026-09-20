@@ -59,9 +59,6 @@
   --eva-slow: 800ms;
   --eva-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
 
-  /* Puntero (los actualiza EvaField) */
-  --px: 50%;
-  --py: 30%;
 }
 
 [data-accent='cyan'] {

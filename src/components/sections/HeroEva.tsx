@@ -9,8 +9,8 @@ const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
  * Portada (00): el nombre de EVA como una sola palabra —tres letras en fila,
- * dibujadas como una red de nodos—, una línea que ella teclea debajo y las tres puertas
- * por las que se entra en ella: núcleo cerebral, genoma digital y cuerpo. Al
+ * dibujadas como una red de nodos—, lo que ella teclea debajo y las tres
+ * puertas por las que se entra en ella: consciencia, genoma y cerebro. Al
  * lado, su retrato.
  *
  * Desde la v8 el acrónimo no se desglosa en pantalla: las palabras «Entidad»,

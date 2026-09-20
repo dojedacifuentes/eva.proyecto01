@@ -64,6 +64,7 @@ export const capsuleFrontLoop: EvaLoop = {
 
 export const images: Record<
   | 'heroPortrait'
+  | 'midPortrait'
   | 'closeUpPortrait'
   | 'humanPortrait'
   | 'aboutPortrait'
@@ -72,10 +73,23 @@ export const images: Record<
   | 'capsulePortrait',
   EvaImage
 > = {
-  /** Retrato principal: medio cuerpo, media estructura expuesta. */
+  /**
+   * Retrato de la portada: **el primer fotograma de su propio bucle**
+   * (`heroLoop`). Hasta la v8 era otra fotografía, y al arrancar el vídeo se
+   * veía el cambio de una imagen a otra; ahora el vídeo sigue exactamente donde
+   * estaba el póster. La fotografía anterior queda en reserva más abajo.
+   */
   heroPortrait: {
+    src: '/eva/eva-loop-poster.webp',
+    alt: 'Primer plano de EVA: la mitad izquierda es un rostro humano de melena negra y flequillo recto; la derecha deja a la vista el cráneo mecánico, con placas metálicas, circuitos, un ojo de lente y haces de cables de colores.',
+    width: 720,
+    height: 1280,
+    focus: '50% 30%',
+  },
+  /** El retrato de medio cuerpo de la v8, en reserva. */
+  midPortrait: {
     src: '/eva/eva-cyborg-02.webp',
-    alt: 'Retrato de EVA de medio cuerpo y brazos cruzados: la mitad izquierda es una mujer de melena negra y flequillo recto; la derecha deja a la vista la estructura mecánica bajo la piel, con placas, cables de colores y fibras, en una sala de luz azul con paneles de datos.',
+    alt: 'Retrato de EVA de medio cuerpo y brazos cruzados: la mitad izquierda es una mujer de melena negra y flequillo recto; la derecha deja a la vista la estructura mecánica bajo la piel.',
     width: 765,
     height: 1024,
     focus: '46% 18%',

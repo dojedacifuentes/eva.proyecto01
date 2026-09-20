@@ -86,7 +86,7 @@ export function NeuralRoom({ head, writes }: NeuralRoomProps) {
           {zone ? (
             <>
               <p className="core-room__reading-head mono">
-                <b data-bin="">{zone.code}</b> {ejes.nucleo.region.label} <i aria-hidden="true">{'//'}</i>{' '}
+                <b data-bin="">{zone.code}</b> {ejes.cerebro.region.label} <i aria-hidden="true">{'//'}</i>{' '}
                 {zone.name.toUpperCase()}
               </p>
               {zone.lines.map((line) => (
@@ -96,7 +96,7 @@ export function NeuralRoom({ head, writes }: NeuralRoomProps) {
               ))}
             </>
           ) : (
-            <p className="core-room__reading-idle mono">{ejes.nucleo.region.idle}</p>
+            <p className="core-room__reading-idle mono">{ejes.cerebro.region.idle}</p>
           )}
         </div>
       </div>

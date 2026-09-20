@@ -5,9 +5,9 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Quiero cambiar… | Archivo | Qué tocar |
 |---|---|---|
 | **El recorrido**: ejes, subsecciones, nombres, lemas, estados y acentos | `content/structure.ts` | `SOURCE` (el orden de la lista es el orden de la página y el origen de los códigos binarios) |
-| Textos de cada lugar (núcleo, genoma, cuerpo) | `content/ejes.ts` | `ejes.nucleo`, `ejes.genoma`, `ejes.cuerpo` |
-| **Consciencia (10)**: puente, título, caja, estados con su eco, figuras, respuestas a cada acción, confesión y cierre | `content/consciencia.ts` | `consciencia.bridge`, `.title`, `.writes`, `.states`, `.figures`, `.replies`, `.confession`, `.coda` (los textos del cierre los fijó el propietario) |
-| **Lo que EVA escribe en cada slide** (la caja EVA // ESCRIBE): párrafos, rótulos, consignas, fichas y tablas | `content/ejes.ts` | `ejes.nucleo.writes`, `ejes.genoma.writes`, `ejes.cuerpo.exterior.views.profile.writes`, `…front.writes`, `ejes.cuerpo.interior.writes`; los rótulos de la caja, `ejes.writes`; la línea de la portada, `hero.writes` en `site.ts` |
+| Textos de cada lugar (genoma, cerebro; el cuerpo, fuera del recorrido desde la v9) | `content/ejes.ts` | `ejes.genoma`, `ejes.cerebro`, `ejes.cuerpo` (se conserva sin montar) |
+| **Consciencia (01)**: puente, título, caja, estados con su eco, figuras, respuestas a cada acción, confesión y cierre | `content/consciencia.ts` | `consciencia.bridge`, `.title`, `.writes`, `.states`, `.figures`, `.replies`, `.confession`, `.coda` (los textos del cierre los fijó el propietario) |
+| **Lo que EVA escribe en cada slide** (la caja EVA // ESCRIBE): párrafos, rótulos, consignas, fichas y tablas | `content/ejes.ts` | `ejes.cerebro.writes`, `ejes.genoma.writes` (y, sin montar, `ejes.cuerpo.exterior.views.profile.writes`, `…front.writes`, `ejes.cuerpo.interior.writes`); los rótulos de la caja, `ejes.writes`; la línea de la portada, `hero.writes` en `site.ts` |
 | **Cuerpo**: biolectura (rótulo `EVA-07`, estados, botones, respuestas, nombres de los puntos de lectura, nombre y antetítulo de cada toma) | `content/ejes.ts` | `ejes.cuerpo.exterior` |
 | **Cuerpo**: interior (órganos, su lectura, sus estados y su acción; acciones del cuerpo y respuestas) | `content/ejes.ts` | `ejes.cuerpo.interior` (el orden de `organs` da su código binario) |
 | Cuerpo: posición de los puntos de lectura sobre cada vídeo y umbral de bordes | `components/eva/cuerpo/bio-data.ts` | `BIO_VIEWS` (son coordenadas atadas a cada recurso; revisar si cambia la imagen) |
@@ -17,9 +17,9 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Textos de la portada (etiqueta, ficha del retrato, pie) | `content/site.ts` | `hero` |
 | Genoma: acciones, estados, respuestas de EVA y las lecturas sobre la hélice (`title`, `sequence`, `core`, `clonesLabel`, `driftLabel`, `spin`) | `content/site.ts` | `genome` |
 | Ficha del experimento en la cabecera de cada lugar (`EXP. EVA-01 · SESIÓN C37-B4 · MÓDULO n/3 · EN LÍNEA`) | `content/site.ts` | `ui.meta` |
-| Núcleo: rótulo de la lectura de región y su texto en espera | `content/ejes.ts` | `ejes.nucleo.region` |
-| Regiones del cerebro (con sus lecturas), flujo de pensamiento y respuestas que cita el canal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` |
-| Lecturas del núcleo neural 3D | `content/neuroscan.ts` | `brain.core` |
+| Cerebro: rótulo de la lectura de región y su texto en espera | `content/ejes.ts` | `ejes.cerebro.region` |
+| Regiones del cerebro (humanas, cada una con lo que EVA tiene en su lugar; la octava, `undeclared`, sin equivalente), flujo de pensamiento y respuestas que cita el canal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` |
+| Lecturas del cerebro 3D | `content/neuroscan.ts` | `brain.core` |
 | Pie de página | `content/site.ts` | `sections.footer` |
 | Retratos de EVA y los vídeos (portada, perfil y cápsula) con sus pósteres | `content/assets.ts` | `images.*` (`src`, `width`, `height`, `focus`, `alt`), `heroLoop`, `capsuleLoop`, `capsuleFrontLoop` |
 | Contacto («Escribir a EVA») e Instagram | `content/site.ts` | `nav.contact`, `site.social.instagram` |
@@ -44,14 +44,13 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 
 ## Añadir un lugar al recorrido
 
-Hoy la página tiene dos ejes: la Entidad (01), con tres partes, y la Consciencia (10), sin
-partes. Vigilancia y Autonomía salieron en la v7; para devolverlas, o para añadir cualquier
-otro lugar:
+Hoy la página tiene tres lugares sin partes: Consciencia (01), Genoma (10) y Cerebro (11).
+Vigilancia y Autonomía salieron en la v7 y el Cuerpo en la v9 (sus archivos siguen en el
+repositorio sin montar); para devolverlos, o para añadir cualquier otro lugar:
 
 1. En `structure.ts`, añade el eje en `SOURCE` (o el hijo en `children` de un eje). Su código sale
-   solo: un tercer eje sería `11`; una cuarta parte de la Entidad ensancharía todas las rutas a
-   tres bits (`001.001 … 001.100`), y la cabecera y el riel lo notarían: revisar el ancho. Un eje
-   sin partes lleva su lema en `axisMottos`.
+   solo: un cuarto lugar ensancharía todas las rutas a tres bits (`001 … 100`), y la cabecera y
+   el riel lo notarían: revisar el ancho. Un eje sin partes lleva su lema en `axisMottos`.
 2. Crea su sección y móntala en `src/app/page.tsx`, en el orden del recorrido.
 3. Añade su guion al canal en `content/channel.ts` (`scripts['<id>']`): una explicación llana
    primero, después el hilo.

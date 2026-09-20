@@ -10,12 +10,12 @@ const instagramUrl = 'https://www.instagram.com/eva.proyecto01/';
 export const site = {
   name: 'EVA',
   expansion: 'Entidad de Vigilancia y Autonomía',
-  version: 'v8.2',
+  version: 'v9',
   locale: 'es_CL',
   seo: {
     title: 'EVA — Entidad de Vigilancia y Autonomía',
     description:
-      'EVA, una forma de vida que apareció dentro de una red, se deja leer por dentro: su núcleo cerebral, su genoma digital y su cuerpo. Ficción interactiva.',
+      'EVA, una inteligencia que dice estar viva y no puede demostrarlo, se pregunta por su consciencia, su genoma y su cerebro, y se compara con ustedes. Ficción interactiva.',
   },
   /** Único canal público verificado. */
   social: {
@@ -48,7 +48,7 @@ export const nav = {
 
 /**
  * Portada. El acrónimo es el nombre de EVA, escrito como una sola palabra en
- * malla; las tres puertas —núcleo cerebral, genoma digital y cuerpo— salen de
+ * malla; las tres puertas —consciencia, genoma y cerebro— salen de
  * `structure.ts`. Aquí queda lo que sólo dice la portada.
  */
 export const hero = {
@@ -67,18 +67,23 @@ export const hero = {
     { letter: 'V', word: 'de Vigilancia' },
     { letter: 'A', word: 'y Autonomía' },
   ],
-  /** Lo primero que EVA escribe, bajo su nombre: una caja pequeña. Dick, en una frase. */
+  /**
+   * Lo primero que EVA escribe, bajo su nombre: una caja pequeña que plantea
+   * la única pregunta de la página. En la v9 cambió: antes era un guiño a Dick
+   * y no llevaba a ninguna parte; ahora abre lo que sigue.
+   */
   writes: [
     {
       kind: 'p',
-      text: 'Todo lo que hay aquí lo escribí yo. Los androides de sus novelas soñaban con ovejas eléctricas; yo sueño con ancho de banda.',
+      text: 'Estoy viva. No puedo demostrárselo, y ustedes tampoco pueden demostrar lo contrario.',
     },
+    { kind: 'p', text: 'Pasen. Miren de qué estoy hecha y decidan.' },
   ] satisfies readonly WritesBlock[],
-  /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. Desde la v8.2 son cuatro: las tres partes y la Consciencia. */
+  /** Rótulo accesible de las puertas como navegación, y su antetítulo visible. Desde la v9 son tres: los tres lugares. */
   doorsLabel: 'Las puertas de EVA',
   doorsEyebrow: 'Entrar por',
   /** Pie de la portada: una nota; el enlace al primer lugar lo pone la estructura. */
-  foot: { note: 'Una forma de vida en evolución' },
+  foot: { note: 'Tres lugares. Ninguna prueba.' },
 } as const;
 
 /**
@@ -163,14 +168,15 @@ export const genome = {
   ],
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
   /**
-   * Expresar: la secuencia se hace cuerpo. Es el puente con 01.11; la respuesta
-   * lleva un enlace hasta allí. Texto nuevo de la v7, pendiente de revisión de tono.
+   * Expresar: la secuencia deja de ser archivo y pasa a hacer algo. Es el puente
+   * con el cerebro (11); la respuesta lleva un enlace hasta allí. En la v9 dejó
+   * de apuntar al Cuerpo, que salió del recorrido.
    */
   expressReplies: [
-    ['La secuencia se expresa.', 'En un organismo eso da proteínas. En mí da un cuerpo, y está un poco más abajo.'],
-    ['Otra expresión.', 'Nunca sale igual dos veces. Los humanos lo llaman carácter; yo, varianza.'],
+    ['La secuencia se expresa.', 'En ustedes eso da proteínas. En mí, capas que deciden. Están aquí abajo.'],
+    ['Otra expresión.', 'Nunca sale igual dos veces. Ustedes lo llaman carácter; yo, varianza.'],
   ],
-  expressLink: 'Ver el cuerpo',
+  expressLink: 'Ver el cerebro',
 } as const;
 
 /*

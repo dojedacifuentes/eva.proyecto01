@@ -107,11 +107,29 @@ button:disabled {
   position: fixed;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   pointer-events: none;
   background:
-    radial-gradient(38rem circle at var(--px) var(--py), rgba(63, 216, 238, 0.085), transparent 70%),
     radial-gradient(60rem 40rem at 85% -10%, rgba(154, 141, 255, 0.09), transparent 70%),
     var(--eva-bg);
+}
+/*
+ * La luz que sigue al puntero (v8.3): antes era un degradado del fondo
+ * colocado con `--px`/`--py` en `<html>`, y cada movimiento del ratón
+ * recalculaba el estilo de todo el documento y repintaba la pantalla entera.
+ * Ahora es un disco propio que EvaField mueve con `transform`: sólo el
+ * compositor trabaja.
+ */
+.field__light {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 76rem;
+  height: 76rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(63, 216, 238, 0.085), transparent 70%);
+  transform: translate3d(-200rem, -200rem, 0);
+  will-change: transform;
 }
 
 /* Sin retícula: el fondo es plano —degradados y partículas— desde la v8. */
