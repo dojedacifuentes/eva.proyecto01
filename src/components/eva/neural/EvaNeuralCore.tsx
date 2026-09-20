@@ -182,6 +182,7 @@ export function EvaNeuralCore({
       data-fit={fit?.toFixed(3)}
     >
       <div className="core__stage">
+        <span aria-hidden="true" className="stage-marks" />
         {client && mounted && !flat && (
           <div
             ref={canvasRef}

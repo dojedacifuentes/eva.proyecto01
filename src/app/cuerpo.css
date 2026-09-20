@@ -220,40 +220,6 @@ html[data-node='cuerpo'] .field::after {
   border-color: color-mix(in srgb, var(--eva-bio) 72%, transparent);
   box-shadow: 0 0 60px rgba(120, 240, 180, 0.09);
 }
-.bio__corner {
-  position: absolute;
-  z-index: 3;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--eva-bio);
-  pointer-events: none;
-}
-.bio__corner--tl {
-  top: 5px;
-  left: 5px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.bio__corner--tr {
-  top: 5px;
-  right: 5px;
-  border-left: 0;
-  border-bottom: 0;
-}
-.bio__corner--bl {
-  bottom: 5px;
-  left: 5px;
-  border-right: 0;
-  border-top: 0;
-}
-.bio__corner--br {
-  right: 5px;
-  bottom: 5px;
-  border-left: 0;
-  border-top: 0;
-}
-
-/* Rótulos diegéticos sobre la imagen: arriba quién y qué, abajo cómo va. */
 .bio__tag {
   position: absolute;
   z-index: 3;
@@ -605,29 +571,6 @@ html[data-body='scanning'] .thread__line::after {
     height: clamp(26rem, 76vh, 46rem);
   }
 }
-.interior__stage::before,
-.interior__stage::after {
-  content: '';
-  position: absolute;
-  z-index: 2;
-  width: 16px;
-  height: 16px;
-  border: 1px solid color-mix(in srgb, var(--eva-magenta) 70%, transparent);
-  pointer-events: none;
-}
-.interior__stage::before {
-  top: 0;
-  right: 0;
-  border-left: 0;
-  border-bottom: 0;
-}
-.interior__stage::after {
-  left: 0;
-  bottom: 0;
-  border-right: 0;
-  border-top: 0;
-}
-/* pan-y deja pasar el desplazamiento vertical: arrastrar en horizontal gira, en vertical desplaza. */
 .interior__canvas {
   position: absolute;
   inset: 0;

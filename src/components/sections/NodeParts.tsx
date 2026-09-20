@@ -1,3 +1,4 @@
+import { ui } from '@/content/site';
 import { contextById, contextNodes, home, nextContext, structureLabels } from '@/content/structure';
 
 interface NodeHeadProps {
@@ -19,12 +20,21 @@ interface NodeHeadProps {
  */
 export function NodeHead({ id, eyebrow, title, lede, state, quiet = false }: NodeHeadProps) {
   const node = contextById(id);
+  const at = contextNodes.findIndex((item) => item.id === id);
 
   return (
     <div className="node__head reveal">
       <span aria-hidden="true" className="node__code mono" data-bin="">
         {node?.code}
       </span>
+      {/* La ficha del experimento: identidad, sesión y posición del módulo. Adorno de instrumento. */}
+      <p aria-hidden="true" className="node__meta mono">
+        <span>{ui.meta.experiment}</span>
+        <span>{ui.meta.session}</span>
+        <span>
+          {ui.meta.module} {at}/{contextNodes.length - 1} · {ui.meta.state}
+        </span>
+      </p>
       <div className="node__titles">
         <p className="eyebrow mono">
           {eyebrow}

@@ -19,14 +19,14 @@ export interface EvaImage {
 export const heroLoop = {
   src: '/eva/eva-loop.mp4',
   type: 'video/mp4',
-  /** Aviso para quien mantenga esto: sin comprimir todavía. */
-  bytes: 3_888_331,
+  /** Recomprimido en la v8.1: H.264 CRF 30, 720×1280, sin audio. */
+  bytes: 559_854,
 } as const;
 
 /**
  * Las dos tomas del Cuerpo (01.11), las dos en vídeo: el propietario pidió
- * conservarlas así. Traen pista de audio, que no se usa: se sirven `muted` y
- * sin control de sonido. El póster de cada una es su primer fotograma, para
+ * conservarlas así. Desde la v8.1 van recomprimidos (H.264, CRF 30, 720×1280) y
+ * sin pista de audio; se sirven `muted`. El póster de cada una es su primer fotograma, para
  * que no salte nada al arrancar; la biolectura se dibuja sobre ese mismo marco,
  * así que **el póster tiene que ser del vídeo**, no una imagen parecida.
  *
@@ -48,8 +48,8 @@ export const capsuleLoop: EvaLoop = {
   type: 'video/mp4',
   width: 720,
   height: 1280,
-  /** Sin recomprimir. */
-  bytes: 5_765_937,
+  /** Recomprimido en la v8.1: H.264 CRF 30, sin audio. */
+  bytes: 795_724,
 };
 
 /** La cápsula, de frente y en movimiento: mismas medidas, más peso. */
@@ -58,8 +58,8 @@ export const capsuleFrontLoop: EvaLoop = {
   type: 'video/mp4',
   width: 720,
   height: 1280,
-  /** Sin recomprimir. */
-  bytes: 9_334_571,
+  /** Recomprimido en la v8.1: H.264 CRF 30, sin audio. */
+  bytes: 1_430_888,
 };
 
 export const images: Record<

@@ -281,6 +281,24 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
         onPointerUp={onDragEnd}
         onPointerCancel={onDragEnd}
       >
+        <span className="stage-marks" />
+        {/* Lecturas del instrumento, sobre el escenario: identidad y estado arriba, contadores abajo. */}
+        <p className="dna__overlay dna__overlay--top mono">
+          <span className="dna__hud-title">
+            {genome.title} <i>{'//'}</i> {genome.sequence}
+          </span>
+          <span className="dna__hud-core">
+            <i />
+            {genome.core}: {genome.states[state]}
+          </span>
+        </p>
+        <p className="dna__overlay dna__overlay--bottom mono">
+          <span className="dna__hud-count">
+            {genome.clonesLabel}: <b data-bin="">{bin(clones + 1, CLONE_BITS)}</b> · {genome.driftLabel}:{' '}
+            {drift} %
+          </span>
+          <span>{genome.spin}</span>
+        </p>
         {density && close && (
           <DnaScene
             pairs={density.pairs}
@@ -300,31 +318,6 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
       </div>
 
       <div className="dna__console">
-        {/* Una sola línea de estado: lo demás lo cuenta EVA en su caja. */}
-        <p className="dna__hud mono">
-          <span className="dna__hud-core">
-            <i aria-hidden="true" />
-            {genome.core}: {genome.states[state]}
-          </span>
-          <span className="dna__hud-count">
-            <span>
-              {genome.clonesLabel}: <b data-bin="">{bin(clones + 1, CLONE_BITS)}</b> · {genome.driftLabel}:{' '}
-              {drift} %
-            </span>
-            {/* Junto al contador que vacía: así la botonera no gana una fila al aparecer. */}
-            {clones > 0 && (
-              <button
-                type="button"
-                className="dna__purge mono"
-                onClick={onPurge}
-                data-cursor-label="PURGAR"
-              >
-                {genome.actions.purge}
-              </button>
-            )}
-          </span>
-        </p>
-
         <div className="dna__actions" role="group" aria-label={genome.actionsLabel}>
           <button type="button" className="dna__btn mono" onClick={onClone} data-cursor-label="CLONAR">
             {genome.actions.clone}
@@ -361,6 +354,12 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
           {reply.map((line) => (
             <span key={line}>{line}</span>
           ))}
+          {/* La purga vive junto a la respuesta: así la botonera no gana una fila al aparecer. */}
+          {clones > 0 && (
+            <button type="button" className="dna__purge mono" onClick={onPurge} data-cursor-label="PURGAR">
+              {genome.actions.purge}
+            </button>
+          )}
           {state === 'expressing' && body && (
             <a href={body.href} className="dna__reply-link mono" data-sound="open">
               <b aria-hidden="true" data-bin="">

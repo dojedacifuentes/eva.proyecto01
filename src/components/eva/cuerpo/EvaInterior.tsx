@@ -326,6 +326,7 @@ export function EvaInterior({ head, foot }: EvaInteriorProps) {
       {head && <div className="interior__head">{head}</div>}
 
       <div className="interior__stage">
+        <span aria-hidden="true" className="stage-marks" />
         <div
           ref={stageRef}
           className="interior__canvas"

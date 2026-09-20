@@ -87,6 +87,9 @@ export const hero = {
  * Lo que EVA cuenta del genoma vive en `ejes.genoma.writes`.
  */
 export const genome = {
+  /** Lecturas del instrumento sobre la hélice. Rótulos de sistema, en la voz de la interfaz. */
+  title: 'EVA // GENOMA',
+  sequence: 'C7B-04 · 600 BASES',
   core: 'NÚCLEO COGNITIVO',
   states: {
     active: 'ACTIVO',
@@ -196,6 +199,13 @@ export const notFound = {
 
 export const ui = {
   external: 'se abre en una pestaña nueva',
+  /** Ficha de instrumento en la cabecera de cada lugar: experimento, sesión, módulo y estado. */
+  meta: {
+    experiment: 'EXP. EVA-01',
+    session: 'SESIÓN C37-B4',
+    module: 'MÓDULO',
+    state: 'EN LÍNEA',
+  },
   sound: {
     on: 'SONIDO: SÍ',
     off: 'SONIDO: NO',

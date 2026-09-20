@@ -14,7 +14,8 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | El nombre de la portada, letra a letra, y el rótulo de las puertas | `content/site.ts` | `hero.acronym`, `hero.doorsLabel`, `hero.doorsEyebrow` |
 | El canal de EVA (SINAPSIS): rótulos, aviso y guion de cada lugar | `content/channel.ts` | `channel`, `scripts`, `idleCalcs` |
 | Textos de la portada (etiqueta, ficha del retrato, pie) | `content/site.ts` | `hero` |
-| Genoma: acciones, estados y respuestas de EVA | `content/site.ts` | `genome` |
+| Genoma: acciones, estados, respuestas de EVA y las lecturas sobre la hélice (`title`, `sequence`, `core`, `clonesLabel`, `driftLabel`, `spin`) | `content/site.ts` | `genome` |
+| Ficha del experimento en la cabecera de cada lugar (`EXP. EVA-01 · SESIÓN C37-B4 · MÓDULO n/3 · EN LÍNEA`) | `content/site.ts` | `ui.meta` |
 | Núcleo: rótulo de la lectura de región y su texto en espera | `content/ejes.ts` | `ejes.nucleo.region` |
 | Regiones del cerebro (con sus lecturas), flujo de pensamiento y respuestas que cita el canal | `content/neuroscan.ts` | `brain.zones`, `stream`, `answers` |
 | Lecturas del núcleo neural 3D | `content/neuroscan.ts` | `brain.core` |

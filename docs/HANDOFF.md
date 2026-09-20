@@ -74,6 +74,34 @@ lado (izquierda, derecha, izquierda…). Publicado con su «sí».
   `Emulation.setDeviceMetricsOverride` + `getBoundingClientRect` (trampa 26) a 1440×900 y
   1366×720: ningún slide de escritorio necesita desplazamiento. En móvil se apilan.
 
+### 0.1 · v8.1: vídeos recomprimidos y en marcha, móvil y marcas de instrumento
+
+Segundo encargo de la misma noche: en móvil las interacciones quedaban lejos del
+gráfico; los vídeos tenían que arrancar solos y pesar menos; la portada debía
+enseñar en móvil el mismo retrato que en escritorio; todo con movimiento; y el
+conjunto, con aspecto de instrumento científico coherente.
+
+- **Vídeos:** los tres (`eva-loop`, `eva-capsula-loop`, `eva-capsula-frontal`)
+  recomprimidos con ffmpeg (H.264, CRF 30, preset veryslow, 720×1280, sin audio,
+  `faststart`): 3,9 → 0,56 MB, 5,8 → 0,80 MB y 9,3 → 1,43 MB. Los originales
+  están en el historial de git (`5e76591`). Con ese peso arrancan solos en todas
+  las pantallas (`EvaPortraitLoop` sin umbral de ancho, `BioReading` sin `wide`);
+  sólo con movimiento reducido se quedan en el póster. ffmpeg no está en la
+  máquina: se usó `ffmpeg-static` instalado en el scratchpad, no en el proyecto.
+- **Móvil:** la portada apila nombre, retrato entero con su bucle, caja y
+  puertas (`.hero__head { display: contents }` + `order`); en el genoma las
+  acciones van bajo la hélice y la caja después; en el cuerpo los botones van
+  justo bajo el vídeo (`.bio__controls` con `order: -1`) y el vídeo se acota a
+  18 rem.
+- **Marcas de instrumento** (`.stage-marks`, un solo elemento): las mismas cuatro
+  esquinas, una regla de trazos en el borde inferior y una línea de barrido
+  lenta en el cerebro, la hélice, los vídeos y el interior. La hélice lleva sus
+  lecturas encima como los demás (`.dna__overlay`: identidad y estado arriba,
+  clones y deriva abajo, cada una con su fondo oscuro) y la consola queda en
+  acciones + respuesta (la purga va junto a la respuesta). Cada cabecera de
+  lugar abre con la ficha del experimento (`.node__meta`: `EXP. EVA-01 · SESIÓN
+  C37-B4 · MÓDULO n/3 · EN LÍNEA`, textos en `ui.meta`), sólo en escritorio.
+
 ## 0 bis. Encargo resuelto en v7: el Cuerpo, y una sola Entidad (19 sept. 2026)
 
 El encargo íntegro y cómo se resolvió están en `docs/CUERPO_ENCARGO.md` (§10).
@@ -403,10 +431,8 @@ apareció dos veces en sitios distintos.
    - rótulo `EVA-07` (encargo) o `EVA-01` (imagen): va `EVA-07`, en
      `ejes.cuerpo.exterior.subject`;
    - título y lema del Cuerpo e interior: provisionales, marcados en el código;
-   - los vídeos pesan 5,8 MB (perfil) y 9,3 MB (cápsula), sin recomprimir y con
-     audio que no se usa: en escritorio se descarga el de la vista que se mira;
-     en móvil y con movimiento reducido, sólo si se pide («Cargar el vídeo ·
-     9,3 MB»). Recomprimirlos los dejaría en torno a 1–2 MB cada uno;
+   - ~~los vídeos pesan 5,8 y 9,3 MB~~ resuelto en la v8.1: recomprimidos y en
+     marcha en todas las pantallas;
    - la imagen fija de la cápsula (`eva-capsula.webp`, 1024×1536) quedó **en
      reserva**: la vista frontal usa el vídeo y su propio primer fotograma,
      porque el póster tiene que tener la proporción del vídeo;
@@ -424,7 +450,7 @@ apareció dos veces en sitios distintos.
 3. **Revisión de tono** de los textos nuevos: párrafo del nacimiento
    (`ejes.genoma.birth`), explicaciones del canal (`channel.scripts`) y líneas
    de estado.
-4. **El vídeo pesa 3,71 MB**, sin recomprimir y con audio que no se usa.
+4. ~~El vídeo pesa 3,71 MB~~ Recomprimidos los tres en la v8.1 (0,56 / 0,80 / 1,43 MB, sin audio).
 5. **Permiso de publicación de retratos y vídeo** (`ASSET_LICENSES.md`).
 6. El contacto es el Instagram público. No inventar otro canal.
 7. `prefers-reduced-motion`, Safari iOS y lector de pantalla: implementados,

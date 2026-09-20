@@ -3,16 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { heroLoop } from "@/content/assets";
 
-/** Por debajo de esto no se carga el vídeo: la imagen basta y pesa mucho menos. */
-const MIN_WIDTH = 1024;
-
 /**
  * Bucle de vídeo de EVA sobre su retrato.
  *
- * Se descarga tarde y sólo cuando toca: pantalla ancha, sin movimiento reducido
- * y con el marco a la vista. Hasta entonces —y siempre en móvil— lo que se ve
- * es la imagen, que hace de póster. Mudo, en bucle y sin controles: es un
- * retrato que respira, no un reproductor.
+ * Se descarga tarde y sólo cuando toca: sin movimiento reducido y con el marco
+ * a la vista. Hasta entonces lo que se ve es la imagen, que hace de póster.
+ * Desde la v8.1 también en móvil: el archivo pesa 0,56 MB, recomprimido. Mudo,
+ * en bucle y sin controles: es un retrato que respira, no un reproductor.
  */
 export function EvaPortraitLoop() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -20,7 +17,7 @@ export function EvaPortraitLoop() {
   const [allowed, setAllowed] = useState(false);
   const [ready, setReady] = useState(false);
 
-  /* ¿Toca cargarlo? Ancho, preferencia de movimiento y estar en pantalla. */
+  /* ¿Toca cargarlo? Preferencia de movimiento y estar en pantalla. */
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
@@ -29,7 +26,7 @@ export function EvaPortraitLoop() {
     let onScreen = false;
 
     const decide = () => {
-      setAllowed(onScreen && !motion.matches && window.innerWidth >= MIN_WIDTH);
+      setAllowed(onScreen && !motion.matches);
     };
 
     const observer = new IntersectionObserver(
@@ -40,12 +37,10 @@ export function EvaPortraitLoop() {
       { rootMargin: "200px" },
     );
     observer.observe(host);
-    window.addEventListener("resize", decide);
     motion.addEventListener("change", decide);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", decide);
       motion.removeEventListener("change", decide);
     };
   }, []);

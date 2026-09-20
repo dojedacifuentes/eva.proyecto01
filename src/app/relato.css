@@ -592,12 +592,232 @@
   background: linear-gradient(90deg, rgba(63, 216, 238, 0.08), transparent 60%);
 }
 
+/* ───────────── Marcas de instrumento: el mismo encuadre para todo lo que se ve ───────────── */
+
+/*
+ * Cada escenario (cerebro, hélice, vídeos, interior) lleva las mismas marcas:
+ * cuatro esquinas de retícula, una regla de trazos en el borde inferior y una
+ * línea de barrido muy tenue que baja despacio. Un solo elemento, sin caja:
+ * es la marca de quien intenta encuadrar a EVA, no un marco.
+ */
+.stage-marks {
+  --mark: color-mix(in srgb, var(--accent) 72%, transparent);
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark)),
+    linear-gradient(var(--mark), var(--mark));
+  background-repeat: no-repeat;
+  background-size:
+    16px 1px, 1px 16px,
+    16px 1px, 1px 16px,
+    16px 1px, 1px 16px,
+    16px 1px, 1px 16px;
+  background-position:
+    0 0, 0 0,
+    100% 0, 100% 0,
+    0 100%, 0 100%,
+    100% 100%, 100% 100%;
+}
+/* La regla: trazos cada 8 px, más largos cada 40, sólo en el tercio central del borde inferior. */
+.stage-marks::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 0;
+  height: 6px;
+  background:
+    repeating-linear-gradient(90deg, var(--mark) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 38%, transparent) 0 1px, transparent 1px 8px);
+  background-size: 100% 6px, 100% 3px;
+  background-position: 0 100%, 0 100%;
+  background-repeat: repeat-x;
+  mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+}
+/* El barrido: una línea que cruza el escenario de arriba abajo cada nueve segundos. */
+.stage-marks::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 55%, transparent), transparent);
+  opacity: 0;
+  animation: stage-sweep 9s linear infinite;
+}
+@keyframes stage-sweep {
+  0% {
+    top: 2%;
+    opacity: 0;
+  }
+  8%,
+  86% {
+    opacity: 0.7;
+  }
+  100% {
+    top: 98%;
+    opacity: 0;
+  }
+}
+/* Donde la pista del escenario va a la izquierda (cerebro, interior), la regla se corre a la derecha. */
+.core__stage .stage-marks::before,
+.interior__stage .stage-marks::before {
+  left: 46%;
+  right: 6%;
+}
+/* Las marcas del vídeo llevan el verde de la cápsula y no barren: el vídeo ya tiene su pasada. */
+.bio__media .stage-marks {
+  --mark: color-mix(in srgb, var(--eva-bio) 70%, transparent);
+  inset: 6px;
+}
+.bio__media .stage-marks::after {
+  display: none;
+}
+/* El interior lleva el magenta de lo que circula. */
+.interior__stage .stage-marks {
+  --mark: color-mix(in srgb, var(--eva-magenta) 65%, transparent);
+}
+
+/* ── La hélice, con sus lecturas encima, como los demás instrumentos ── */
+
+.dna__overlay {
+  position: absolute;
+  left: 0.4rem;
+  right: 0.4rem;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.3rem 0.8rem;
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+/* Cada lectura lleva su propio fondo oscuro: se lee aunque la hélice pase por detrás. */
+.dna__overlay > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 2px;
+  background: rgba(3, 9, 16, 0.74);
+  white-space: nowrap;
+}
+.dna__overlay--top {
+  top: 0.5rem;
+}
+.dna__overlay--bottom {
+  bottom: 0.7rem;
+}
+.dna__overlay .dna__hud-title {
+  color: var(--accent);
+}
+.dna__overlay .dna__hud-title i {
+  color: var(--eva-line-strong);
+  font-style: normal;
+}
+.dna__overlay .dna__hud-count b {
+  color: var(--eva-text);
+  font-weight: 600;
+}
+@media (min-width: 64rem) {
+  /* La hélice sangra por arriba y por abajo: sus lecturas y marcas van dentro de lo visible. */
+  .dna__overlay--top {
+    top: 3rem;
+  }
+  .dna__overlay--bottom {
+    bottom: 3.2rem;
+  }
+  .dna__stage .stage-marks {
+    inset: 2.5rem 0;
+  }
+}
+.dna__reply .dna__purge {
+  justify-self: start;
+}
+
+/* ── La ficha del experimento, en la cabecera de cada lugar ── */
+
+/* Una línea de instrumento sobre el título: experimento, sesión, módulo y estado. */
+.node__meta {
+  order: -1;
+  grid-column: 1 / -1;
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.1rem;
+  margin: 0 0 -0.2rem;
+  color: var(--eva-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+}
+.node__meta span:first-child {
+  color: var(--accent);
+}
+.node__meta span + span::before {
+  content: '·';
+  margin-right: 1.1rem;
+  color: var(--eva-line-strong);
+}
+@media (min-width: 64rem) {
+  .node__meta {
+    display: flex;
+  }
+}
+
 /* ───────────── Móvil ───────────── */
 
 @media (max-width: 47.99rem) {
-  /* El retrato flota arriba a la derecha: las letras le dejan ese hueco. */
+  /*
+   * La portada, apilada: el nombre, el retrato entero con su bucle (como en
+   * escritorio), la caja y las puertas. La cabecera del retrato deja de
+   * flotar en la esquina.
+   */
+  .hero__head {
+    display: contents;
+  }
+  .hero__label {
+    order: 1;
+  }
   .acronym--word {
-    margin-right: 5.6rem;
+    order: 2;
+    margin-right: 0;
+  }
+  .hero__portrait {
+    order: 3;
+    width: min(100%, 17rem);
+    margin-inline: auto;
+  }
+  .hero .profile {
+    position: static;
+    width: auto;
+  }
+  /* Las esquinas del retrato se atan al retrato, no a la tarjeta. */
+  .hero .portrait {
+    position: relative;
+  }
+  .hero .portrait__caption {
+    display: flex;
+  }
+  /* El vídeo del cuerpo, más contenido: los botones quedan a un pulgar de distancia. */
+  .bio__media {
+    width: min(100%, 18rem);
+  }
+  .hero__line {
+    order: 4;
+  }
+  .doors {
+    order: 5;
   }
   /* El rótulo de la cinta no cabe sin pisarla: en móvil la cinta habla sola. */
   .strand__label {
@@ -605,6 +825,20 @@
   }
   .writes__place {
     display: none;
+  }
+  /* Los controles, pegados al elemento gráfico: bajo el vídeo van los botones, y después la caja. */
+  .bio__controls {
+    order: -1;
+  }
+}
+/* En el genoma, las acciones van bajo la hélice y la caja después (por debajo de escritorio). */
+@media (max-width: 63.99rem) {
+  .dna {
+    grid-template-areas:
+      'head'
+      'stage'
+      'console'
+      'copy';
   }
 }
 

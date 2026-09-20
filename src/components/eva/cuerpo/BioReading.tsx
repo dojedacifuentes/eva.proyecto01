@@ -6,7 +6,6 @@ import { capsuleFrontLoop, capsuleLoop, images, type EvaImage, type EvaLoop } fr
 import { ejes, type BodyView } from '@/content/ejes';
 import { bin, bitsFor } from '@/lib/binary';
 import { clearBody, publishBody } from '@/lib/body-state';
-import { useMediaQuery } from '@/lib/media';
 import { useReducedMotion } from '@/lib/motion';
 import { seeded } from '@/lib/random';
 import { play } from '@/lib/sound';
@@ -95,9 +94,9 @@ function paintStill(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement
  *
  * Desde la v8 las dos tomas van una debajo de otra, cada una con su
  * biolectura y su caja de EVA: nada se abre con clic. El vídeo arranca solo
- * al entrar en pantalla en escritorio; en pantallas estrechas y con
+ * al entrar en pantalla, también en móvil (v8.1: recomprimidos); sólo con
  * movimiento reducido se queda en su primer fotograma, que hace de póster, y
- * sólo se descarga si el visitante lo pide.
+ * se descarga si el visitante lo pide.
  */
 export function BioReading({ view, writes, foot }: BioReadingProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -109,7 +108,6 @@ export function BioReading({ view, writes, foot }: BioReadingProps) {
   const turns = useRef(0);
 
   const reduced = useReducedMotion();
-  const wide = useMediaQuery('(min-width: 64rem)');
 
   const [status, setStatus] = useState<Status>('idle');
   const [cycle, setCycle] = useState(0);
@@ -122,7 +120,9 @@ export function BioReading({ view, writes, foot }: BioReadingProps) {
 
   const media = MEDIA[view];
   const take = copy.views[view];
-  const showVideo = onScreen && (requested || (wide && !reduced));
+  /* Desde la v8.1 el vídeo arranca solo en todas las pantallas (pesa 0,8–1,4 MB); con
+     movimiento reducido se queda en el póster y sólo se descarga si se pide. */
+  const showVideo = onScreen && (requested || !reduced);
 
   /* El vídeo sólo existe con la pieza a la vista: fuera de pantalla ni descarga ni decodifica. */
   useEffect(() => {
@@ -265,7 +265,8 @@ export function BioReading({ view, writes, foot }: BioReadingProps) {
 
       if (scan.done) {
         const points: number[] = [];
-        for (let at = 0; at < scan.count; at++) if (scan.flags[at] & FROZEN) points.push(scan.x[at], scan.y[at]);
+        for (let at = 0; at < scan.count; at++)
+          if (scan.flags[at] & FROZEN) points.push(scan.x[at], scan.y[at]);
         still.current = { points: Float32Array.from(points), radius: 0.72 };
         paintStill(context, canvas, still.current);
         setLit((1 << BIO_VIEWS[view].points.length) - 1);
@@ -331,9 +332,7 @@ export function BioReading({ view, writes, foot }: BioReadingProps) {
     <div ref={hostRef} className="bio" data-status={status} data-view={view}>
       <figure className="bio__figure">
         <div className="bio__media" style={{ aspectRatio: String(BIO_VIEWS[view].aspect) }}>
-          {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
-            <span key={corner} aria-hidden="true" className={`bio__corner bio__corner--${corner}`} />
-          ))}
+          <span aria-hidden="true" className="stage-marks" />
 
           <Image
             ref={imageRef}
@@ -416,26 +415,34 @@ export function BioReading({ view, writes, foot }: BioReadingProps) {
       <div className="bio__console">
         {writes}
 
-        <div className="dna__actions bio__actions" role="group" aria-label={copy.actionsLabel}>
-          <button
-            type="button"
-            className="dna__btn bio__start mono"
-            onClick={onStart}
-            data-cursor-label={copy.cursors.start}
-          >
-            {status === 'idle' ? copy.actions.start : copy.actions.repeat}
-          </button>
-          <button type="button" className="dna__btn mono" onClick={onVideo} data-cursor-label={copy.cursors.video}>
-            {videoLabel}
-            {!showVideo && <small> · {megabytes(media.video.bytes)}</small>}
-          </button>
-        </div>
+        {/* Los controles van juntos: en móvil se colocan justo bajo el vídeo, antes de la caja. */}
+        <div className="bio__controls">
+          <div className="dna__actions bio__actions" role="group" aria-label={copy.actionsLabel}>
+            <button
+              type="button"
+              className="dna__btn bio__start mono"
+              onClick={onStart}
+              data-cursor-label={copy.cursors.start}
+            >
+              {status === 'idle' ? copy.actions.start : copy.actions.repeat}
+            </button>
+            <button
+              type="button"
+              className="dna__btn mono"
+              onClick={onVideo}
+              data-cursor-label={copy.cursors.video}
+            >
+              {videoLabel}
+              {!showVideo && <small> · {megabytes(media.video.bytes)}</small>}
+            </button>
+          </div>
 
-        <p className="dna__reply" role="status">
-          {reply.map((line) => (
-            <span key={line}>{line}</span>
-          ))}
-        </p>
+          <p className="dna__reply" role="status">
+            {reply.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </p>
+        </div>
         {foot}
       </div>
     </div>
