@@ -48,10 +48,23 @@ p {
   text-wrap: pretty;
 }
 
-/* Cursor propio: sólo con puntero fino y cuando el componente está activo. */
-html.eva-cursor,
-html.eva-cursor * {
-  cursor: none !important;
+/*
+ * Cursor de señal (v8.2): el cursor del sistema se queda a la vista. Hasta la
+ * v8.1 se ocultaba (`cursor: none`) y lo sustituía un punto que seguía al
+ * puntero un fotograma por detrás: en equipos lentos se notaba como retraso.
+ * Ahora el punto es el del sistema y el anillo con su rótulo lo acompaña con
+ * inercia, como señal, no como cursor. `html.eva-cursor` sigue marcando que
+ * el anillo está activo.
+ */
+/* Con el cursor del sistema a la vista, lo que se pulsa lo dice: mano sobre enlaces y botones. */
+a,
+button,
+summary,
+[data-cursor] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
 }
 
 .mono {
@@ -122,19 +135,11 @@ html.eva-cursor * {
 .cursor.is-visible {
   opacity: 1;
 }
-.cursor__dot,
 .cursor__ring {
   position: fixed;
   top: 0;
   left: 0;
   will-change: transform;
-}
-.cursor__dot {
-  width: 5px;
-  height: 5px;
-  margin: -2.5px 0 0 -2.5px;
-  border-radius: 50%;
-  background: var(--eva-text);
 }
 .cursor__ring {
   width: 34px;

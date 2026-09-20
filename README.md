@@ -1,11 +1,12 @@
-# EVA — landing v8
+# EVA — landing v8.2
 
 **EVA, Entidad de Vigilancia y Autonomía**: una forma de vida que apareció dentro de una red se
 cuenta a sí misma en una landing de ciencia ficción interactiva. La página es la Entidad, leída por
-dentro en tres partes, con numeración binaria:
+dentro en tres partes y, después del inventario, la pregunta por quien lo habita; todo con
+numeración binaria:
 
 ```
-00 · Portada — el nombre de EVA en malla, su primera línea y tres puertas
+00 · Portada — el nombre de EVA en malla, su primera línea y cuatro puertas
 01 · ENTIDAD
      01.01 · Núcleo cerebral — el cerebro 3D en vivo, sus ocho regiones y la caja donde EVA
                                escribe cómo funciona su mente (función, consigna, hardware)
@@ -15,6 +16,11 @@ dentro en tres partes, con numeración binaria:
      01.11 · Cuerpo          — tres lecturas a la vista: el perfil y la cápsula, cada uno con su
                                biolectura y su caja (chasis, inmersión, equivalencia con el
                                humano), y el interior bio-sintético (corazón, vasos, órganos, ECG)
+10 · CONSCIENCIA — un campo de partículas (Particle Life, MIT, adaptado) que EVA observa
+                   organizarse: diez acciones, cinco figuras, caos con semilla, ruido, gravedad y
+                   viscosidad; cuatro estados con ecos de Borges, Ghost in the Shell, Dick y
+                   Asimov; una confesión; y el cierre en silencio: ESTADO: EXPANSIÓN → ALGUIEN
+                   ESTUVO AQUÍ
 ```
 
 Cada lugar tiene una caja **EVA // ESCRIBE** donde EVA teclea su contenido, corto y en una sola
@@ -70,15 +76,16 @@ src/
                        cuerpo), OG
   components/
     eva/               EvaField, EvaSignalCursor, EvaSynapse (canal), EvaDnaHelix, GenomeStrand,
-                       TypedParagraph, EvaAcronymMesh, EvaNeuroscan, EvaProfile…;
-                       dna/ (hélice 3D), neural/ (núcleo neural 3D) y cuerpo/ (biolectura e
-                       interior 3D; técnicas adaptadas de dos repos MIT, ver ASSET_LICENSES)
+                       EvaWrites (la caja donde EVA escribe), EvaAcronymMesh, EvaProfile…;
+                       dna/ (hélice 3D), neural/ (núcleo neural 3D), cuerpo/ (biolectura e
+                       interior 3D) y consciencia/ (campo de partículas: motor puro y probado,
+                       figuras, ruido, lienzo 2D; técnicas adaptadas de tres repos MIT, ver
+                       ASSET_LICENSES)
     layout/            SiteHeader, ContextSpy (dónde está el visitante), BitRail, MobileNavigation,
                        SiteFooter
-    sections/          HeroEva, NucleoSection, GenomaSection, CuerpoSection; reserva/ (salas
-                       antiguas, no se montan)
-  content/             ← todo lo editable: structure (el recorrido), ejes, channel, site, neuroscan,
-                       lab, assets
+    sections/          HeroEva, NucleoSection, GenomaSection, CuerpoSection, ConscienciaSection
+  content/             ← todo lo editable: structure (el recorrido), ejes, consciencia, channel,
+                       site, neuroscan, assets
   lib/                 binary, channel (máquina de estados del canal), context, field, genome-state,
                        body-state, stage, sound, genome, media, motion, random, types
   styles/tokens.css    colores, radios, tiempos, suelo tipográfico
@@ -96,7 +103,8 @@ genoma y la portada en `site.ts`, las regiones del cerebro y el flujo de pensami
 
 ## Documentación
 
-- [`HANDOFF.md`](docs/HANDOFF.md) — estado actual y siguiente paso
+- [`CHECKPOINT_2026-09-20.md`](docs/CHECKPOINT_2026-09-20.md) — punto de control: qué hay, qué queda y por dónde seguir
+- [`HANDOFF.md`](docs/HANDOFF.md) — estado actual, trampas conocidas y siguiente paso
 - [`CUERPO_ENCARGO.md`](docs/CUERPO_ENCARGO.md) — el encargo de 01.11 y cómo se resolvió
 - [`AUDITORIA_INICIAL_LANDING_EVA.md`](docs/AUDITORIA_INICIAL_LANDING_EVA.md)
 - [`AUDITORIA_FINAL_LANDING_EVA.md`](docs/AUDITORIA_FINAL_LANDING_EVA.md)

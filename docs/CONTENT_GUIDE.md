@@ -6,6 +6,7 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 |---|---|---|
 | **El recorrido**: ejes, subsecciones, nombres, lemas, estados y acentos | `content/structure.ts` | `SOURCE` (el orden de la lista es el orden de la página y el origen de los códigos binarios) |
 | Textos de cada lugar (núcleo, genoma, cuerpo) | `content/ejes.ts` | `ejes.nucleo`, `ejes.genoma`, `ejes.cuerpo` |
+| **Consciencia (10)**: puente, título, caja, estados con su eco, figuras, respuestas a cada acción, confesión y cierre | `content/consciencia.ts` | `consciencia.bridge`, `.title`, `.writes`, `.states`, `.figures`, `.replies`, `.confession`, `.coda` (los textos del cierre los fijó el propietario) |
 | **Lo que EVA escribe en cada slide** (la caja EVA // ESCRIBE): párrafos, rótulos, consignas, fichas y tablas | `content/ejes.ts` | `ejes.nucleo.writes`, `ejes.genoma.writes`, `ejes.cuerpo.exterior.views.profile.writes`, `…front.writes`, `ejes.cuerpo.interior.writes`; los rótulos de la caja, `ejes.writes`; la línea de la portada, `hero.writes` en `site.ts` |
 | **Cuerpo**: biolectura (rótulo `EVA-07`, estados, botones, respuestas, nombres de los puntos de lectura, nombre y antetítulo de cada toma) | `content/ejes.ts` | `ejes.cuerpo.exterior` |
 | **Cuerpo**: interior (órganos, su lectura, sus estados y su acción; acciones del cuerpo y respuestas) | `content/ejes.ts` | `ejes.cuerpo.interior` (el orden de `organs` da su código binario) |
@@ -43,18 +44,21 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 
 ## Añadir un lugar al recorrido
 
-Hoy la página tiene un solo eje, la Entidad, con tres partes. Vigilancia (10) y Autonomía (11)
-salieron en la v7; para devolverlas, o para añadir cualquier otro lugar:
+Hoy la página tiene dos ejes: la Entidad (01), con tres partes, y la Consciencia (10), sin
+partes. Vigilancia y Autonomía salieron en la v7; para devolverlas, o para añadir cualquier
+otro lugar:
 
 1. En `structure.ts`, añade el eje en `SOURCE` (o el hijo en `children` de un eje). Su código sale
-   solo: un segundo eje sería `10`; una cuarta parte de la Entidad ensancharía todas las rutas a
-   tres bits (`001.001 … 001.100`), y la cabecera y el riel lo notarían: revisar el ancho.
+   solo: un tercer eje sería `11`; una cuarta parte de la Entidad ensancharía todas las rutas a
+   tres bits (`001.001 … 001.100`), y la cabecera y el riel lo notarían: revisar el ancho. Un eje
+   sin partes lleva su lema en `axisMottos`.
 2. Crea su sección y móntala en `src/app/page.tsx`, en el orden del recorrido.
 3. Añade su guion al canal en `content/channel.ts` (`scripts['<id>']`): una explicación llana
    primero, después el hilo.
-4. Si vuelve a haber más de un eje, la cabecera vuelve sola a mostrar las subsecciones sólo del eje
-   en que se está (`ejes.css`, `.nav__axis:only-child`), y conviene revisar la portada: sus puertas
-   (`doors`) son las partes de cada eje.
+4. La cabecera muestra siempre las partes del primer eje (`ejes.css`, `.nav__axis:first-child`) y
+   las de cualquier otro sólo cuando se está dentro; la portada y el pie listan las puertas
+   (`doors`): las partes de cada eje, o el eje entero si no tiene. Con cuatro caben en fila a
+   partir de 1.024 px; con más, revisar la portada.
 5. Quita su id de `hashAliases` si estaba redirigido.
 
 ## Reglas

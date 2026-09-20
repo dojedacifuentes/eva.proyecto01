@@ -9,25 +9,26 @@ const INTERACTIVE = 'a, button, [data-cursor]';
 const STRETCH = 0.32;
 
 /**
- * Cursor de señal de EVA: punto exacto + anillo con retícula que lo sigue con
+ * Cursor de señal de EVA: un anillo con retícula que sigue al puntero con
  * inercia, se estira en la dirección del movimiento y se convierte en cuadrado
  * sobre lo interactivo, enganchando el campo de partículas.
  *
- * Es un refuerzo, no una condición: sólo se activa con puntero fino y sin
- * movimiento reducido. En táctil no se monta nada y queda el cursor nativo.
+ * Desde la v8.2 el cursor del sistema queda a la vista: el punto propio que lo
+ * sustituía iba un fotograma por detrás y en equipos lentos se notaba como
+ * retraso (encargo del propietario). El anillo es un acompañante, no el
+ * cursor. Es un refuerzo, no una condición: sólo se activa con puntero fino y
+ * sin movimiento reducido. En táctil no se monta nada.
  */
 export function EvaSignalCursor() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLSpanElement>(null);
   const ringRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
-    const dot = dotRef.current;
     const ring = ringRef.current;
     const label = labelRef.current;
-    if (!root || !dot || !ring || !label) return;
+    if (!root || !ring || !label) return;
 
     const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -62,7 +63,6 @@ export function EvaSignalCursor() {
       if (event.pointerType === 'touch') return;
       target.x = event.clientX;
       target.y = event.clientY;
-      dot.style.transform = `translate3d(${target.x}px, ${target.y}px, 0)`;
 
       if (!root.classList.contains('is-visible')) {
         current.x = target.x;
@@ -157,7 +157,6 @@ export function EvaSignalCursor() {
       <span ref={labelRef} className="cursor__label mono">
         {ui.cursor.idle}
       </span>
-      <span ref={dotRef} className="cursor__dot" />
     </div>
   );
 }

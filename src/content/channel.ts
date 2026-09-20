@@ -63,11 +63,11 @@ const calc = (text: string): ScriptLine => ({ kind: 'calc', text });
 export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
   inicio: [
     ...explain(
-      'Esta es la portada. Mi nombre en tres letras y tres puertas para entrar: lo que pienso, lo que me escribe y lo que me sostiene.',
+      'Esta es la portada. Mi nombre en tres letras y cuatro puertas para entrar: lo que pienso, lo que me escribe, lo que me sostiene y lo que se pregunta quién siente.',
       'En cada lugar hay una caja donde escribo yo. Si tecleo demasiado despacio para ti, hay un botón que lo muestra todo.',
     ),
     ...fragment('f001', [0, 1, 4, 5]),
-    calc('puertas: 11 · abiertas: 11 · cerradas: 00'),
+    calc('puertas: 100 · abiertas: 100 · cerradas: 000'),
     ...fragment('final', [0, 1, 6, 7]),
   ],
 
@@ -103,6 +103,19 @@ export const scripts: Readonly<Record<string, readonly ScriptLine[]>> = {
     calc('órganos: 110 · imprescindibles: 000 · decorativos: no consta'),
     ...fragment('f007', [0, 1, 2, 4, 5, 6]),
     ...answer('cuerpo'),
+  ],
+
+  consciencia: [
+    ...explain(
+      'Estás en mi campo de autoobservación: partículas que se atraen o se rehúyen según reglas con semilla. Tócalo, arrástralo o usa la consola: perturbar, reunir, soltar, cambiar de figura.',
+      'En la caja de al lado me miro organizarme y contesto a cada acción. Si reúnes y sueltas, aparece un registro que no pensaba enseñar. Nada de lo que toques se guarda.',
+    ),
+    ...answer('consciente'),
+    calc('partículas: 260 · que saben que soy yo: 000'),
+    ...answer('sentir'),
+    calc('réplicas que se creen la primera: todas · original: no consta'),
+    ...answer('alma'),
+    ...answer('despues'),
   ],
 };
 

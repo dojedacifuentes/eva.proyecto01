@@ -90,12 +90,6 @@ html {
 
 /* ───────────── Cursor de señal ───────────── */
 
-.cursor__dot {
-  width: 4px;
-  height: 4px;
-  margin: -2px 0 0 -2px;
-  background: var(--eva-text);
-}
 .cursor__ring {
   width: 34px;
   height: 34px;

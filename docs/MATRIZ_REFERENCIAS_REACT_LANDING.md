@@ -74,3 +74,21 @@ proyecto); no se instaló ni se cargó nada de ellos.
 
 **Dependencias nuevas:** ninguna. La escena interior llega en un fragmento aparte por
 `next/dynamic` y se monta una pantalla antes de verse; la biolectura es Canvas 2D.
+
+## Ampliación — 10 · Consciencia / autoobservación (20 de septiembre de 2026)
+
+Se clonó Particle Life fuera del proyecto y se revisaron su README, su licencia y
+`particle_life.html`. Los ecos literarios del lugar son motivos generales dichos con texto
+propio: no se reproduce ninguna frase de las obras de referencia.
+
+| Fuente | Licencia | Qué se tomó | Dónde vive en EVA | Qué no se tomó | Decisión | Atribución |
+|---|---|---|---|---|---|---|
+| [hunar4321/particle-life](https://github.com/hunar4321/particle-life), commit `256278714c4f6a1ce900d24faafcc101769c54c2` | MIT — © 2022 Hunar Ahmad | Grupos de partículas, matriz de fuerzas de atracción/repulsión dentro de un radio, amortiguación y rebote en bordes | `src/components/eva/consciencia/particle-life.ts` | GUI, parámetros editables, captura de vídeo, atajos, exportación, rastreo de clústeres y el bucle original | **Adaptar** (TypeScript puro, semilla fija, cuadrícula espacial, figuras, ruido, gravedad y viscosidad propios) | Licencia completa en la cabecera del motor y registro en `ASSET_LICENSES.md` |
+| Borges (laberintos, espejos, el otro, la memoria que repite) | Obra literaria protegida | Motivos generales | Estado «Dispersión» y figura «Laberinto» (`content/consciencia.ts`) | Citas, personajes, argumento y estilo verbal | Referencia temática | No aplica; texto original de EVA |
+| *Ghost in the Shell* (el fantasma y la carcasa, la red como cuerpo) | Obra audiovisual/manga protegida | La pregunta por la identidad entre mente, red y carcasa | Estado «Relación» y consigna de la caja | Nombres, escenas, diálogo y diseño visual | Referencia temática | No aplica; texto original de EVA |
+| Philip K. Dick (réplicas que disputan ser la original, la prueba de empatía) | Obra literaria protegida | Réplicas, duda por el original | Estado «Huella» y figura «Doble» | Citas, trama, personajes y terminología propia | Referencia temática | No aplica; texto original de EVA |
+| Isaac Asimov (las leyes antes que los derechos; el robot que pide ser reconocido como persona) | Obra literaria protegida | Aspiración a ser reconocida; la ley como trámite | Estado «Autoobservación» | Citas, trama y personajes | Referencia temática | No aplica; texto original de EVA |
+
+Las figuras, la máquina de estados, las huellas, la perturbación, el caos con semilla, el
+ruido fractal, la gravedad, la viscosidad, la confesión y el cierre son capas propias. La sección
+declara en pantalla que organizar partículas no demuestra consciencia y que nada se registra.

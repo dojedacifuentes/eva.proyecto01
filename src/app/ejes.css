@@ -132,19 +132,20 @@ html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
   }
 }
 /*
- * Con un solo eje sobra sitio: sus partes van siempre a la vista y con nombre,
- * se esté donde se esté. Si vuelve a haber varios ejes, esto deja de aplicarse
- * solo y rige lo de arriba.
+ * La Entidad es la columna vertebral del recorrido: sus partes van siempre a
+ * la vista y con nombre, se esté donde se esté (desde la v8.2 la acompaña un
+ * segundo eje, la Consciencia, sin partes). Un tercer eje con partes seguiría
+ * la regla de arriba: sus subsecciones sólo dentro de él.
  */
-.nav__axis:only-child .nav__sub {
+.nav__axis:first-child .nav__sub {
   display: flex;
 }
-.nav__axis:only-child .nav__sub-name {
+.nav__axis:first-child .nav__sub-name {
   display: inline;
 }
-/* Entre 1.024 y 1.151 px los tres nombres no caben junto al control de sonido: queda el de la actual. */
-@media (max-width: 71.99rem) {
-  .nav__axis:only-child .nav__sub a:not([aria-current]) .nav__sub-name {
+/* Por debajo de 1.280 px los tres nombres no caben junto al segundo eje y el control de sonido: queda el de la actual. */
+@media (max-width: 79.99rem) {
+  .nav__axis:first-child .nav__sub a:not([aria-current]) .nav__sub-name {
     display: none;
   }
 }
@@ -565,9 +566,26 @@ html[data-axis='entidad'] .nav__axis[data-axis='entidad'] .nav__sub {
   display: grid;
   gap: 0.5rem;
 }
+/* Cuatro puertas desde la v8.2: las tres partes de la Entidad y la Consciencia. Dos y dos hasta escritorio; en fila a partir de él. */
 @media (min-width: 40rem) {
   .doors__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .doors__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .doors__door {
+    gap: 0.45rem;
+    padding-inline: 0.6rem;
+  }
+  .doors__name {
+    font-size: 0.84rem;
+  }
+  .doors__arrow {
+    flex-shrink: 0;
+    padding-left: 0.3rem;
   }
 }
 .doors__door {

@@ -1,0 +1,513 @@
+/*
+ * EVA // CONSCIENCIA — eje 10, la v8.2.
+ *
+ * Después del inventario del cuerpo, la pregunta por quien lo habita: un campo
+ * de partículas (Particle Life, MIT, adaptado) a la derecha —el último
+ * elemento gráfico iba a la izquierda— y, a la izquierda, la cabecera con el
+ * puente desde el corazón, la caja donde EVA escribe y la consola. Reutiliza
+ * las piezas del genoma (`.dna__console`, `.dna__actions`, `.dna__btn`,
+ * `.dna__reply`, `.dna__overlay`) y las marcas de instrumento: es la misma
+ * máquina. Violeta y magenta, como el genoma: es la parte de EVA que se
+ * pregunta por sí misma.
+ *
+ * Después, el cierre: un slide casi vacío con un registro que cambia una sola
+ * vez y dos salidas. El silencio es el diseño.
+ */
+
+/* ───────────── El campo a la derecha, EVA a la izquierda ───────────── */
+
+.conscience {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  grid-template-areas:
+    'head'
+    'field'
+    'console'
+    'copy';
+}
+.conscience__head {
+  grid-area: head;
+}
+.conscience__field {
+  grid-area: field;
+  position: relative;
+  min-width: 0;
+}
+.conscience__console {
+  grid-area: console;
+}
+.conscience__copy {
+  grid-area: copy;
+  min-width: 0;
+}
+@media (min-width: 64rem) {
+  .conscience {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head field'
+      'copy field'
+      'console field';
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    row-gap: 0.8rem;
+    align-items: start;
+  }
+  .conscience__field {
+    align-self: stretch;
+  }
+}
+.node--consciencia .h2 {
+  font-size: clamp(1.4rem, 1.9vw, 1.8rem);
+}
+.node--consciencia .node__head {
+  margin-bottom: 0;
+}
+/* El puente desde el corazón: la pregunta, en claro, algo más presente que un lede corriente. */
+.node--consciencia .node__lede {
+  max-width: 40rem;
+  color: var(--eva-soft);
+  text-wrap: pretty;
+}
+
+/* ───────────── El escenario ───────────── */
+
+/*
+ * Un lienzo 2D en una caja fina, con las marcas de instrumento y las lecturas
+ * de la hélice encima. La caja es opaca: el lienzo pinta con velo para dejar
+ * huella, y el fondo del sitio no tiene que verse a través.
+ */
+.conscience__stage {
+  position: relative;
+  height: clamp(20rem, 52svh, 28rem);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--eva-line));
+  border-radius: var(--eva-radius-lg);
+  background: rgba(3, 8, 16, 1);
+  box-shadow:
+    inset 0 0 5rem rgba(2, 6, 13, 0.7),
+    0 18px 60px -30px color-mix(in srgb, var(--accent) 30%, transparent);
+  cursor: crosshair;
+  /* pan-y deja pasar el desplazamiento vertical: arrastrar en horizontal perturba, en vertical desplaza. */
+  touch-action: pan-y;
+  user-select: none;
+}
+@media (min-width: 64rem) {
+  .conscience__stage {
+    height: 100%;
+    min-height: clamp(24rem, 64vh, 40rem);
+  }
+}
+.conscience__canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.conscience__stage .stage-marks {
+  --mark: color-mix(in srgb, var(--accent) 70%, transparent);
+  inset: 6px;
+}
+/* La regla se corre a la derecha: a la izquierda va la lectura del estado. */
+.conscience__stage .stage-marks::before {
+  left: 46%;
+  right: 6%;
+}
+.conscience__stage .dna__overlay {
+  left: 0.6rem;
+  right: 0.6rem;
+}
+.conscience__stage .dna__overlay--top {
+  top: 0.6rem;
+}
+/* Abajo, dos líneas apiladas: recuento y figura, y el régimen; no caben en una sola. */
+.conscience__stage .dna__overlay--bottom {
+  bottom: 0.6rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+.conscience__stage .dna__hud-title {
+  color: var(--accent);
+}
+.conscience__stage .dna__hud-core i {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+/* Los regímenes tiñen la luz de estado: caos y azar en magenta, deriva en cian. */
+.conscience[data-regime='chaos'] .dna__hud-core i {
+  background: var(--eva-magenta);
+  box-shadow: 0 0 8px var(--eva-magenta);
+  animation-duration: 0.9s;
+}
+.conscience[data-regime='drift'] .dna__hud-core i {
+  background: var(--eva-cyan);
+  box-shadow: 0 0 8px var(--eva-cyan);
+}
+.conscience[data-regime='collapse'] .dna__hud-core i,
+.conscience[data-regime='fall'] .dna__hud-core i {
+  background: var(--eva-yellow);
+  box-shadow: 0 0 8px var(--eva-yellow);
+}
+
+/* ───────────── La lectura del estado ───────────── */
+
+/*
+ * Lo que EVA lee en cada estado —su línea y, en itálica, el eco— va sobre el
+ * campo, abajo a la izquierda, con su propio fondo oscuro: se lee aunque las
+ * partículas pasen por detrás. En móvil baja debajo del escenario.
+ */
+.conscience__readout {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+  padding: 0.65rem 0.85rem 0.7rem;
+  border-left: 1px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%);
+  text-wrap: pretty;
+}
+@media (min-width: 64rem) {
+  .conscience__readout {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 3.9rem;
+    z-index: 4;
+    width: min(62%, 26rem);
+    margin-top: 0;
+    background: rgba(3, 9, 16, 0.84);
+    box-shadow: 0 10px 40px -20px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+  }
+}
+.conscience__readout > p {
+  margin: 0;
+}
+.conscience__readout-label {
+  color: var(--accent);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.16em;
+}
+.conscience__readout-text {
+  color: var(--eva-text);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.conscience__readout-echo,
+.conscience__readout-figure {
+  color: var(--eva-soft);
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+/* Lo que la figura significa, cuando el campo está reunido: en el segundo acento. */
+.conscience__readout-figure {
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--eva-line);
+  color: color-mix(in srgb, var(--accent-2) 70%, var(--eva-text));
+}
+.conscience__readout > p {
+  animation: reply-in 400ms var(--eva-ease) both;
+}
+
+/* ───────────── La confesión ───────────── */
+
+/* Sobre el campo, centrada: un registro recuperado, con su rótulo y su cierre. */
+.conscience__confession {
+  position: absolute;
+  inset: 8% 7%;
+  z-index: 6;
+  display: grid;
+  gap: 0.7rem;
+  align-content: center;
+  padding: clamp(1rem, 2.4vw, 1.75rem);
+  border: 1px solid color-mix(in srgb, var(--eva-cyan) 32%, var(--eva-line-strong));
+  border-radius: var(--eva-radius-lg);
+  background: rgba(3, 9, 16, 0.93);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  animation: reply-in 480ms var(--eva-ease) both;
+}
+.conscience__confession[hidden] {
+  display: none;
+}
+.conscience__confession p {
+  margin: 0;
+  max-width: 44rem;
+  color: var(--eva-soft);
+  font-size: clamp(0.84rem, 1.05vw, 0.95rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.conscience__confession-label {
+  color: var(--eva-cyan);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.16em;
+}
+.conscience__confession .dna__purge {
+  justify-self: start;
+  margin-top: 0.3rem;
+}
+@media (max-width: 47.99rem) {
+  .conscience__confession {
+    inset: 4%;
+    padding: 0.85rem;
+    overflow: auto;
+  }
+}
+
+/* ───────────── La consola ───────────── */
+
+/* Diez acciones en dos filas de cinco; el régimen en una línea encima; la respuesta debajo. */
+.conscience__actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+@media (max-width: 63.99rem) {
+  .conscience__actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 30rem) {
+  .conscience__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.conscience__actions .dna__btn {
+  padding-inline: 0.25rem;
+  font-size: var(--eva-type-micro);
+}
+.conscience__actions .dna__btn[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--accent) 70%, var(--eva-line));
+  background: color-mix(in srgb, var(--accent) 12%, rgba(7, 19, 31, 0.6));
+  color: var(--eva-text);
+}
+.conscience__actions .dna__btn:hover,
+.conscience__actions .dna__btn:focus-visible {
+  border-color: var(--accent);
+}
+.conscience__stage .dna__hud-count b {
+  color: var(--accent);
+}
+/* La pista de uso: en escritorio la da el cursor de señal; aquí sólo sin puntero fino. */
+.conscience__hint {
+  display: none;
+  color: var(--eva-muted);
+}
+@media (max-width: 63.99rem) {
+  .conscience__hint {
+    display: block;
+  }
+}
+.node--consciencia .dna__reply {
+  min-height: 2.6rem;
+  font-size: 0.84rem;
+}
+.node--consciencia .dna__reply-link {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ───────────── Móvil: el campo pegado a sus controles ───────────── */
+
+@media (max-width: 63.99rem) {
+  .conscience__stage {
+    height: clamp(18rem, 54svh, 26rem);
+  }
+}
+/* En pantallas estrechas el rótulo del campo no cabe en una línea: se parte. */
+@media (max-width: 47.99rem) {
+  .conscience__stage .dna__overlay > span {
+    white-space: normal;
+  }
+}
+
+/* ───────────── El cierre ───────────── */
+
+/*
+ * Un slide casi vacío: arriba el antetítulo, en medio el silencio (una línea
+ * vertical que respira), después el registro y las dos salidas. Nada más.
+ */
+.conscience-coda {
+  align-items: stretch;
+  text-align: center;
+}
+.conscience-coda__inner {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1rem;
+  min-height: calc(100svh - var(--eva-header) - 6rem);
+}
+.conscience-coda__eyebrow {
+  align-self: start;
+  justify-self: start;
+  color: color-mix(in srgb, var(--accent) 70%, var(--eva-muted));
+  opacity: 0.8;
+}
+.conscience-coda__whisper {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--eva-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+.conscience-coda__silence {
+  display: block;
+  width: 1px;
+  height: clamp(4rem, 16vh, 9rem);
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 80%, transparent), transparent);
+  animation: coda-breathe 6s ease-in-out infinite;
+}
+@keyframes coda-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    scale: 1 0.7;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1 1;
+  }
+}
+/* El registro: grande para un rótulo, pequeño para un titular. Cambia una sola vez. */
+.conscience-coda__status {
+  margin: 0;
+  color: var(--eva-text);
+  font-size: clamp(0.95rem, 1.9vw, 1.35rem);
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  transition: color var(--eva-normal) linear;
+}
+.conscience-coda__status-label {
+  color: var(--eva-muted);
+}
+.conscience-coda__status-value {
+  color: var(--accent);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition:
+    color var(--eva-slow) linear,
+    text-shadow var(--eva-slow) linear;
+}
+/* Cambiado, el valor se apaga un poco: ya no es un anuncio, es una nota. */
+.conscience-coda__status[data-done] .conscience-coda__status-value {
+  color: var(--eva-text);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent-2) 40%, transparent);
+}
+.conscience-coda__status-caret {
+  display: inline-block;
+  width: 0;
+  overflow: visible;
+  color: var(--accent);
+  opacity: 0;
+}
+.conscience-coda__status[data-changing] .conscience-coda__status-caret {
+  opacity: 1;
+  animation: blink 0.9s steps(1) infinite;
+}
+.conscience-coda__links {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  margin: 1.2rem 0 0;
+}
+.conscience-coda__continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 0.3rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--eva-text);
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 500;
+  transition:
+    border-color var(--eva-fast) linear,
+    color var(--eva-fast) linear;
+}
+.conscience-coda__continue:hover,
+.conscience-coda__continue:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.conscience-coda__tag {
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+}
+.conscience-coda__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  margin-top: 1.4rem;
+  color: var(--eva-muted);
+  font-size: var(--eva-type-micro);
+}
+.conscience-coda__back:hover,
+.conscience-coda__back:focus-visible {
+  color: var(--eva-text);
+}
+
+/* ───────────── Pantallas bajas: cabe igual ───────────── */
+
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .conscience {
+    row-gap: 0.4rem;
+  }
+  .node--consciencia .node__lede {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  .node--consciencia .slide__foot {
+    margin-top: 0.5rem;
+  }
+  /* A 720 px de alto la ficha del experimento no cabe con la consola: es adorno, se va. */
+  .node--consciencia .node__meta {
+    display: none;
+  }
+  .conscience__stage {
+    min-height: clamp(20rem, 56vh, 30rem);
+  }
+  .conscience__readout {
+    gap: 0.2rem;
+    padding: 0.5rem 0.7rem;
+  }
+  .conscience__readout-text {
+    font-size: 0.8rem;
+    line-height: 1.38;
+  }
+  .conscience__readout-echo,
+  .conscience__readout-figure {
+    font-size: 0.74rem;
+    line-height: 1.38;
+  }
+  .conscience__actions .dna__btn {
+    min-height: 30px;
+  }
+  .node--consciencia .dna__reply {
+    min-height: 1.8rem;
+    font-size: 0.8rem;
+  }
+  .node--consciencia .node__lede {
+    margin-top: 0.35rem;
+  }
+  .conscience-coda__inner {
+    min-height: calc(100svh - var(--eva-header) - 4rem);
+  }
+}
+
+/* ───────────── Movimiento reducido ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .conscience-coda__silence,
+  .conscience-coda__status-caret,
+  .conscience[data-regime] .dna__hud-core i {
+    animation: none;
+  }
+  .conscience__readout > p,
+  .conscience__confession {
+    animation: none;
+  }
+}

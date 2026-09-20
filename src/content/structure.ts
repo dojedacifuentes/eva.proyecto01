@@ -2,17 +2,20 @@
  * EVA // ESTRUCTURA
  *
  * El recorrido entero, en un solo sitio. La página es la Entidad, leída por
- * dentro en tres partes: lo que piensa, lo que la escribe y lo que la sostiene.
+ * dentro en tres partes —lo que piensa, lo que la escribe y lo que la
+ * sostiene— y, después del inventario, la pregunta por quien lo habita.
  *
  *   00 · Portada
  *   01 · ENTIDAD
  *        01.01 · Núcleo cerebral
  *        01.10 · Genoma digital
  *        01.11 · Cuerpo
+ *   10 · CONSCIENCIA (v8.2: un eje sin partes; su lugar es la sección entera)
  *
  * Vigilancia (10) y Autonomía (11) salieron del recorrido en la v7: el nombre
  * de EVA sigue siendo «Entidad de Vigilancia y Autonomía» (`site.expansion`,
- * `hero.acronym`), pero ya no son secciones. Para recuperarlas, ver HANDOFF §8.
+ * `hero.acronym`), pero ya no son secciones. El código 10 lo ocupa ahora la
+ * Consciencia; para recuperarlas, ver HANDOFF §8.
  *
  * La cabecera, el riel de bits, el menú móvil, el pie, los pies de slide, la
  * portada y el canal de EVA leen de aquí. Los códigos no se escriben: se
@@ -76,6 +79,14 @@ const SOURCE: readonly AxisSource[] = [
       },
     ],
   },
+  {
+    id: 'consciencia',
+    name: 'Consciencia',
+    accent: 'violet',
+    state: 'active',
+    stateLabel: 'En línea',
+    children: [],
+  },
 ];
 
 /** Ancho de cada serie: los bits de su índice mayor. La portada es el 0 de los ejes. */
@@ -132,13 +143,19 @@ export const axes: readonly AxisNode[] = SOURCE.map((axis, axisAt) => {
   };
 });
 
+/** Lema de un eje sin partes: la Consciencia lo lleva como antetítulo. Los ejes con partes no lo necesitan. */
+export const axisMottos: Readonly<Record<string, string>> = {
+  consciencia: 'Autoobservación',
+};
+
 /** Los ejes como destinos de navegación: cabecera y menú móvil. */
 export const navItems: readonly NavItem[] = axes;
 
 /**
  * Las puertas: los destinos a los que se entra de verdad. Un eje con
- * subsecciones no es una puerta: lo son sus subsecciones. La portada y el pie
- * las listan; hoy son las tres partes de la Entidad.
+ * subsecciones no es una puerta: lo son sus subsecciones; un eje sin partes
+ * es puerta él mismo. La portada y el pie las listan: las tres partes de la
+ * Entidad y la Consciencia.
  */
 export interface Door extends NavChild {
   accent: AccentToken;

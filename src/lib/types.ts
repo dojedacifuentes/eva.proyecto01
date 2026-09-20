@@ -68,3 +68,14 @@ export type WritesBlock =
       head: readonly [string, string, string];
       rows: readonly (readonly [string, string, string])[];
     };
+
+/**
+ * Consciencia (10): los cuatro estados del relato del campo de partículas, las
+ * figuras que puede reunir y los regímenes que se le imponen. Los textos de
+ * cada uno viven en `content/consciencia.ts`; la física, en el motor.
+ */
+export type ConsciousnessStateId = 'dispersion' | 'relation' | 'trace' | 'self';
+export type FigureId = 'eye' | 'spiral' | 'labyrinth' | 'double' | 'name';
+export type GravityId = 'none' | 'down' | 'center';
+export type ViscosityId = 'fluid' | 'medium' | 'dense';
+export type RegimeId = 'stable' | 'chaos' | 'drift' | 'collapse' | 'fall';

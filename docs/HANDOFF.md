@@ -5,8 +5,8 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado:** `main` = **v8** (rama `feat/v8-relato` fusionada), publicada en https://evaproyecto01.vercel.app/ el 19-09-2026: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
-**Fecha:** 19 de septiembre de 2026 (v8, por la tarde)
+**Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
+**Fecha:** 20 de septiembre de 2026 (v8.2)
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
 Tailwind 4 (sólo el import base; todo el CSS es propio) · three.js 0.186 con
 @react-three/fiber 9, drei 10 y postprocessing 3.
@@ -102,6 +102,44 @@ conjunto, con aspecto de instrumento científico coherente.
   lugar abre con la ficha del experimento (`.node__meta`: `EXP. EVA-01 · SESIÓN
   C37-B4 · MÓDULO n/3 · EN LÍNEA`, textos en `ui.meta`), sólo en escritorio.
 
+### 0.2 · v8.2: la Consciencia (10), el cierre y el cursor del sistema (20 sept. 2026)
+
+Encargo del propietario (empezado con Codex en otro clon del repo y terminado aquí):
+un slide **nuevo e independiente** después del interior del corazón, con una simulación
+Particle Life que EVA observa —«consciencia / autoobservación»—, sin tocar el slide del
+corazón; más efectos (viscosidad, gravedad, ruido fractal, caos) y un botón para más
+figuras; narrativa con ecos de Borges, Ghost in the Shell, Dick y Asimov, desde dentro,
+graciosa y sola; un cierre en silencio con `ESTADO: EXPANSIÓN` → `ESTADO: ALGUIEN ESTUVO
+AQUÍ`, «Continuar la conversación ↗» (Instagram) y «Volver al inicio». Y el cursor del
+sistema, porque el propio daba retraso.
+
+- **`10 · Consciencia`** es un segundo eje en `structure.ts`, sin partes: su lugar es la
+  sección entera (`sections/ConscienciaSection.tsx`). Con dos ejes, la cabecera muestra
+  las partes de la Entidad siempre (`.nav__axis:first-child`, antes `:only-child`) y el
+  segundo eje al lado; la portada y el pie tienen **cuatro puertas** (en fila desde
+  1.024 px, dos y dos por debajo). El corazón (01.11) no cambió: su pie lleva a `10`.
+- **El campo** (`eva/consciencia/`): motor puro y probado (`particle-life.ts`, adaptado de
+  hunar4321/particle-life, MIT; `figures.ts`, `noise.ts`), lienzo 2D con velo que deja
+  huella (`particle-renderer.ts`) y el componente vivo (`ConsciousnessExperience.tsx`),
+  que se renderiza también en el servidor (nada de `window` fuera de efectos). Consola de
+  diez acciones con las piezas del genoma: Perturbar · Reunir · Soltar · Figura (ojo →
+  espiral → laberinto → doble → nombre) · Caos (reglas nuevas con semilla, 3–5 grupos) ·
+  Ruido (campo de flujo fBm) · Gravedad (ninguna → abajo → centro con giro) · Viscosidad
+  (fluido → medio → denso) · Azar · Reiniciar. Cada acción contesta dos líneas; el relato
+  avanza por estados (dispersión → relación → huella → autoobservación) que se leen sobre
+  el campo con su eco literario; al reunir y soltar por primera vez aparece la confesión.
+  Con movimiento reducido no hay bucle: cada acción avanza la simulación de golpe y pinta
+  un fotograma. Textos en `content/consciencia.ts`; guion del canal en `channel.ts`.
+- **El cierre** es el segundo slide de la sección: antetítulo, una línea de EVA, una línea
+  vertical que respira (el silencio), el registro `CodaStatus` (cambia una sola vez por
+  visita, tecleando sobre el DOM como la caja; con movimiento reducido cambia de golpe),
+  el enlace a Instagram con su etiqueta y la vuelta al inicio.
+- **Cursor:** el del sistema queda a la vista (`globals.css` ya no pone `cursor: none`);
+  el anillo con rótulo lo sigue con inercia como señal. Enlaces y botones llevan `pointer`.
+- **Revisado** con los scripts de Chrome sin interfaz (trampa 26) a 1440×900, 1366×720,
+  768×1024 y 390×844, con movimiento reducido y sin WebGL; consola sin errores; cada
+  slide de escritorio cabe sin bajar.
+
 ## 0 bis. Encargo resuelto en v7: el Cuerpo, y una sola Entidad (19 sept. 2026)
 
 El encargo íntegro y cómo se resolvió están en `docs/CUERPO_ENCARGO.md` (§10).
@@ -170,12 +208,13 @@ Una landing de una sola ruta (`src/app/page.tsx`) organizada por el acrónimo,
 con numeración binaria real (`lib/binary.ts`):
 
 ```
-00 · Portada — el nombre de EVA en malla, la caja donde escribe su primera línea, tres puertas
+00 · Portada — el nombre de EVA en malla, la caja donde escribe su primera línea, cuatro puertas
 01 · ENTIDAD
      01.01 · Núcleo cerebral — cerebro 3D en vivo (izquierda) + 8 regiones + caja EVA // ESCRIBE
      01.10 · Genoma digital  — hélice 3D (derecha), 8 acciones, caja del nacimiento
      01.11 · Cuerpo          — cinta · perfil (izquierda) + caja · cápsula (derecha) + caja ·
                                hilo · interior (izquierda: modelo que late, 6 órganos, ECG) + caja
+10 · CONSCIENCIA — campo de partículas (derecha) + caja + consola de 10 acciones · cierre en silencio
 ```
 
 Vigilancia (10) y Autonomía (11) existieron en la v6 como secciones de
@@ -426,7 +465,34 @@ apareció dos veces en sitios distintos.
 
 ## 5. Pendiente, por impacto
 
-0. **Decisiones del Cuerpo que siguen abiertas** (el propietario publicó la v7
+0. **Optimización avanzada de rendimiento** (encargo del propietario, 20-09-2026; punto de
+   control en `CHECKPOINT_2026-09-20.md`). Objetivo: una EVA visualmente idéntica e igual de
+   interactiva, pero sin retraso ni bloqueos, en escritorio y móvil. Condiciones: **no rediseñar,
+   no quitar animaciones, 3D, efectos, interacciones ni contenido; no cambiar orden, identidad,
+   narrativa ni comportamiento**; conservar la carga diferida existente; cambios focalizados,
+   comprobados y reversibles, en una rama propia.
+   - A · Diagnóstico: auditar `EvaField`, `NeuralRoom`, `NeuralScene`, `EvaDnaHelix`, `DnaScene`,
+     `EvaInterior`, `InteriorScene`, `BioReading`, `ComposerSizeGuard`, y los globales de cursor,
+     sonido y escritura; medir con Lighthouse y perfiles de Chrome DevTools (escritorio y móvil
+     emulado); no atribuir problemas sin evidencia.
+   - B · Motores gráficos: revisar cada `requestAnimationFrame`/`useFrame`; suspender de verdad
+     fuera de pantalla y con la pestaña oculta, conservando el estado; evitar escenas WebGL
+     activas superpuestas; calidad adaptativa en tres niveles (alto/medio/bajo: resolución,
+     densidad de partículas, geometría, postprocesado) según rendimiento real; fondo reactivo sin
+     comparar todas las partículas entre sí; renderizado bajo demanda en reposo sin frenar lo que
+     debe moverse; sin topes arbitrarios de FPS que den saltos.
+   - C · Carga progresiva: mantener los `next/dynamic`; que el JavaScript de abajo no bloquee la
+     portada; revisar los márgenes de montaje anticipado; transición ligera mientras carga cada
+     módulo; vídeos, imágenes y fuentes sin degradación perceptible; nada de descargas,
+     decodificación de vídeo ni biolectura fuera de pantalla.
+   - D · Memoria: auditar creación y destrucción de recursos WebGL, fugas, listeners duplicados,
+     temporizadores y bucles vivos; liberar geometrías, materiales y texturas que dejen de
+     usarse; no destruir escenas a cada scroll si recompila shaders; conservar `ComposerSizeGuard`.
+   - E · Validación: antes/después con métricas reproducibles (FPS, carga, tareas largas,
+     memoria, CPU, interacción) en portada, cerebro, genoma, perfil, cápsula, interior y
+     consciencia; lint, tipos, pruebas y build; informe final con problemas encontrados, archivos
+     tocados, mediciones y límites pendientes. Además: limpiar el repo lo más posible.
+0 bis. **Decisiones del Cuerpo que siguen abiertas** (el propietario publicó la v7
    y la v8 sin cambiarlas; detalle en `CUERPO_ENCARGO.md` §10):
    - rótulo `EVA-07` (encargo) o `EVA-01` (imagen): va `EVA-07`, en
      `ejes.cuerpo.exterior.subject`;
@@ -527,7 +593,13 @@ sala 01.01 y desde la v8 sólo ahí (`NeuralRoom` → `EvaNeuralCore` → `Neura
   EVA, e interior bio-sintético con corazón, vasos, seis
   órganos y ECG, adaptados de dos repos MIT); fuera Vigilancia y Autonomía; la
   portada enseña el nombre y tres puertas; el genoma gana «Expresar».
-- **v8** (esta) — EVA escribe cada slide: una caja donde teclea el contenido
+- **v8.2** — la Consciencia (10): un segundo eje sin partes, después del corazón, con un
+  campo Particle Life (MIT, adaptado) que EVA observa: diez acciones, cinco figuras, caos
+  con semilla, ruido, gravedad y viscosidad; cuatro estados con ecos de Borges, Ghost in
+  the Shell, Dick y Asimov; confesión; cierre con `ESTADO: EXPANSIÓN → ALGUIEN ESTUVO
+  AQUÍ`. Cuatro puertas. Cursor del sistema a la vista. El expediente v9 (contenido a
+  medias) espera en `wip/expediente-v9`.
+- **v8** — EVA escribe cada slide: una caja donde teclea el contenido
   de cada lugar (función, consigna, hardware; relato de ciencia ficción con
   fuentes), corta y en una pantalla; fondo plano; portada con el nombre en
   malla y sin las palabras; fuera el neuroescáner; cerebro y hélice fundidos
