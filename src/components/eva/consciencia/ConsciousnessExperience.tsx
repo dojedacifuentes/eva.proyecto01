@@ -5,6 +5,7 @@ import { consciencia } from '@/content/consciencia';
 import { bin } from '@/lib/binary';
 import { surgeField, yieldField } from '@/lib/field';
 import { useReducedMotion } from '@/lib/motion';
+import { subscribeQuality } from '@/lib/quality';
 import { play } from '@/lib/sound';
 import type { ConsciousnessStateId, FigureId, GravityId, RegimeId, ViscosityId } from '@/lib/types';
 import {
@@ -204,6 +205,8 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
     const presence = new IntersectionObserver(([entry]) => yieldField(entry.isIntersecting), { threshold: 0.2 });
     const resizeObserver = new ResizeObserver(resize);
     const onVisibility = () => (document.hidden ? stop() : start());
+    // Si la calidad baja, el lienzo se vuelve a medir con menos píxeles.
+    const unsubscribeQuality = subscribeQuality(resize);
 
     intersection.observe(host);
     presence.observe(host);
@@ -213,6 +216,7 @@ export function ConsciousnessExperience({ head, copy, foot }: ConsciousnessExper
     return () => {
       stop();
       yieldField(false);
+      unsubscribeQuality();
       intersection.disconnect();
       presence.disconnect();
       resizeObserver.disconnect();

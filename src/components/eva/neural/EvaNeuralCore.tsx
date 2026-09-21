@@ -11,7 +11,8 @@ import {
   type ReactNode,
 } from 'react';
 import { neuroscan } from '@/content/neuroscan';
-import { coarsePointer, DETAIL, deviceTier, webglSupported } from './neural-data';
+import { useQuality } from '@/lib/quality';
+import { coarsePointer, DETAIL, webglSupported } from './neural-data';
 import { NeuralFallback } from './NeuralFallback';
 
 /** three.js no viaja con la página: llega cuando el núcleo se monta. */
@@ -112,7 +113,9 @@ export function EvaNeuralCore({
   const [phase, setPhase] = useState<Phase>('loading');
   const [mounted, setMounted] = useState(false);
   const supported = client ? webglSupported() : true;
-  const detail = client ? DETAIL[deviceTier()] : DETAIL.high;
+  /* En el servidor y hasta hidratar, alto; después, el nivel medido. Si baja, el cerebro se
+     reconstruye con menos neuronas, menos píxeles y sin bloom: una vez, y se nota como alivio. */
+  const detail = DETAIL[useQuality()];
   const touch = client ? coarsePointer() : false;
   const [hovered, setHovered] = useState<string | null>(null);
   const [stats, setStats] = useState<{
@@ -135,7 +138,8 @@ export function EvaNeuralCore({
   const ready = useCallback(
     (next: { neurons: number; synapses: number }) => {
       setStats(next);
-      setPhase('fading');
+      // Sólo la primera vez hay entrada; un cambio de nivel actualiza el rótulo sin repetirla.
+      setPhase((current) => (current === 'loading' ? 'fading' : current));
       onStats?.(next);
     },
     [onStats],

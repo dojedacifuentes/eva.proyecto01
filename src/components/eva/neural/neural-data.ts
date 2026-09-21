@@ -64,24 +64,12 @@ export const DETAIL: Record<Tier, Detail> = {
   },
 };
 
-/** Capacidad del dispositivo, a partir de lo que el navegador declara. Sólo en cliente. */
-export function detectTier(): Tier {
-  const width = window.innerWidth;
-  const cores = navigator.hardwareConcurrency ?? 4;
-  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
-  const coarse = window.matchMedia('(pointer: coarse)').matches;
-  if (width < 640 || cores <= 2 || memory <= 2) return 'low';
-  if (width < 1024 || coarse) return 'mid';
-  return 'high';
-}
-
-let tier: Tier | null = null;
-
-/** `detectTier`, una sola vez por página: el dispositivo no cambia entre renders. */
-export function deviceTier(): Tier {
-  tier ??= detectTier();
-  return tier;
-}
+/*
+ * Qué nivel toca no se decide aquí: lo dice `lib/quality` (`useQuality`), que
+ * arranca con lo que el dispositivo declara y baja un escalón cuando el
+ * fotograma medido es lento. Hasta la v9.3 este archivo tenía su propio
+ * detector con la misma regla: dos fuentes de la misma verdad.
+ */
 
 let coarse: boolean | null = null;
 

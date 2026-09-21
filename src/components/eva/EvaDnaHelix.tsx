@@ -9,6 +9,7 @@ import { clearGenome, publishGenome, type GenomeState } from '@/lib/genome-state
 import { sequenceId, toFasta, toNotes } from '@/lib/genome';
 import { isSoundEnabled, play, playSequence } from '@/lib/sound';
 import { pointerSignal } from '@/lib/pointer';
+import { useQuality, type QualityLevel } from '@/lib/quality';
 import { spinSignal } from '@/lib/spin';
 
 /** three.js no viaja en el paquete inicial: llega cuando el visitante se acerca a la hélice. */
@@ -19,10 +20,29 @@ const DnaScene = dynamic(() => import('./dna/DnaScene'), { ssr: false });
  * pantallas —antes, por debajo de 768 px no se montaba y por debajo de 1024 no
  * había botones—; lo que cambia es cuánto se dibuja y si hay postprocesado.
  */
-function densityFor(width: number) {
-  if (width < 768) return { pairs: 16, particles: 36, quality: 'low' as const };
-  if (width < 1024) return { pairs: 22, particles: 70, quality: 'high' as const };
-  return { pairs: 28, particles: 110, quality: 'high' as const };
+function densityFor(width: number): Density {
+  if (width < 768) return { pairs: 16, particles: 36, quality: 'low' };
+  if (width < 1024) return { pairs: 22, particles: 70, quality: 'high' };
+  return { pairs: 28, particles: 110, quality: 'high' };
+}
+
+interface Density {
+  pairs: number;
+  particles: number;
+  quality: QualityLevel;
+}
+
+/**
+ * La densidad del ancho, rebajada si la calidad medida (`lib/quality`) es
+ * menor. Los pares de bases no cambian —son la hélice—; cambian las partículas
+ * sueltas, los píxeles y el bloom. Nunca sube por encima de lo que da el ancho.
+ */
+function tuneDensity(density: Density, level: QualityLevel): Density {
+  if (level === 'low') return { ...density, particles: Math.min(density.particles, 36), quality: 'low' };
+  if (level === 'mid' && density.quality === 'high') {
+    return { ...density, particles: Math.min(density.particles, 70), quality: 'mid' };
+  }
+  return density;
 }
 
 /** Cuántas notas se tocan al sonificar: unos cuatro segundos. */
@@ -76,7 +96,9 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
   const [close, setClose] = useState(false);
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const [density, setDensity] = useState<ReturnType<typeof densityFor> | null>(null);
+  const [density, setDensity] = useState<Density | null>(null);
+  const level = useQuality();
+  const tuned = density ? tuneDensity(density, level) : null;
   const [clones, setClones] = useState(0);
   const [pulse, setPulse] = useState(0);
   const [mutate, setMutate] = useState(0);
@@ -303,11 +325,11 @@ export function EvaDnaHelix({ head, copy, foot }: EvaDnaHelixProps) {
           </span>
           <span>{genome.spin}</span>
         </p>
-        {density && close && (
+        {tuned && close && (
           <DnaScene
-            pairs={density.pairs}
-            particles={density.particles}
-            quality={density.quality}
+            pairs={tuned.pairs}
+            particles={tuned.particles}
+            quality={tuned.quality}
             reduced={reduced}
             active={visible}
             clones={clones}

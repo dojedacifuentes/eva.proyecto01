@@ -16,7 +16,8 @@ import { bin, bitsFor } from '@/lib/binary';
 import { surgeField } from '@/lib/field';
 import { useReducedMotion } from '@/lib/motion';
 import { isSoundEnabled, play } from '@/lib/sound';
-import { deviceTier, webglSupported } from '../neural/neural-data';
+import { useQuality } from '@/lib/quality';
+import { webglSupported } from '../neural/neural-data';
 import { bodySignal, resetBodySignal } from './body-signal';
 import { InteriorFallback } from './InteriorFallback';
 import { InteriorVitals } from './InteriorVitals';
@@ -97,7 +98,8 @@ export function EvaInterior({ head, foot }: EvaInteriorProps) {
   const client = useIsClient();
   const reduced = useReducedMotion();
   const supported = client ? webglSupported() : true;
-  const quality = client && deviceTier() === 'low' ? 'low' : 'high';
+  const level = useQuality();
+  const quality = level === 'low' ? 'low' : 'high';
 
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
