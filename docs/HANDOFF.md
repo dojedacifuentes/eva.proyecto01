@@ -5,20 +5,20 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**Estado (20-09-2026, noche):** `main` = **v9.3** (la v9.2 con los textos del
+**Estado (24-09-2026):** `main` = **v9.4**, publicada en
+https://evaproyecto01.vercel.app/ con el «sí» del propietario («publícalo
+todo»): la v9.3 más **la marca** —el símbolo □X y el nombre ƎVΛ en la
+cabecera, la portada, el pie, los iconos y la vista previa para redes— y la
+**calidad adaptativa en todas las escenas** (la rama `feat/calidad-escenas`,
+21-09-2026, que nunca se había subido). Ver **§0.0.4** y `docs/MARCA.md`.
+
+**v9.3 (20-09-2026, noche):** `main` = **v9.3** (la v9.2 con los textos del
 dilema reescritos, §0.0.3), publicada en
 https://evaproyecto01.vercel.app/: cuatro lugares —Consciencia `001`, Genoma
 `010`, Cerebro `011`, Cuerpo `100`—, la Consciencia abre la página, el Cuerpo
 la cierra reducido a una pantalla (el perfil con su biolectura), más el
 rendimiento fusionado de la rama `perf/rendimiento`. Ver **§0.0**, **§0.0.1** y
 **§0.0.2**. El párrafo «Estado» de abajo y §0–§0.2 describen la v8.2.
-
-**En curso (24-09-2026):** la **marca** —el símbolo □X y el nombre ƎVΛ— en la
-cabecera, la portada, el pie, los iconos y la vista previa para redes, en la
-rama `feat/marca`, **sin publicar**: espera el «sí» del propietario. Ver
-**§0.0.4** y `docs/MARCA.md`. Aparte, la rama local `feat/calidad-escenas`
-(`cb6199c`, 21-09-2026, nunca subida) lleva `useQuality()` en las escenas
-WebGL; no está en `main` ni en la marca.
 
 **Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
 **Fecha:** 20 de septiembre de 2026 (v8.2)
@@ -133,7 +133,8 @@ en una pantalla de escritorio; la Consciencia mide 1.750 px a 1440×900 (ya en l
 v9). El póster local de la rama perf (127 KB) se descartó: manda el de la v9.
 
 Pendiente: enganchar `useQuality()` a las escenas WebGL (píxeles, bloom,
-multimuestreo), que era el resto del encargo de `perf/rendimiento`; y
+multimuestreo), que era el resto del encargo de `perf/rendimiento` —**hecho
+en la v9.4**, §0.0.4—; y
 `docs/CHECKPOINT_2026-09-20.md` sigue describiendo la v8.
 
 ### 0.0.2. v9.2 — el Cuerpo vuelve, en una pantalla (20 sept. 2026, publicada)
@@ -200,7 +201,7 @@ Lo que se reescribió, sin tocar la estructura ni la interacción:
   720 px). Los estados, figuras, respuestas y la confesión de la Consciencia
   no se tocaron: ya hablaban de lo mismo.
 
-### 0.0.4. La marca (24 sept. 2026, rama `feat/marca`, sin publicar)
+### 0.0.4. v9.4 — la marca, y la calidad adaptativa en todas las escenas (24 sept. 2026, publicada)
 
 Encargo del propietario: «incorporemos el logotipo y la identidad visual de EVA
 como marca a la landing», con seis fichas (storyboard de 11 fases, mapa de
@@ -240,6 +241,22 @@ animado. Guía completa en `docs/MARCA.md`.
   con movimiento reducido: sin desbordes, la portada cabe en escritorio y
   tablet, el botón del nombre recibe los clics (`elementFromPoint`), consola
   limpia. Lint, tipos, 78 pruebas y build correctos.
+- **Publicada junto con `feat/calidad-escenas`** (`cb6199c`, escrita el
+  21-09-2026 por otra sesión y nunca subida; el propietario pidió «publícalo
+  todo»). Lo que trae: el cerebro, la hélice, el interior, el campo de la
+  Consciencia y las letras de la portada leen el nivel medido (`useQuality`,
+  `DPR_CAP`) y no un detector propio; si baja, se reconstruyen con menos
+  píxeles, partículas o bloom. El sensor ya cuenta los fotogramas de hasta
+  3 s (recortados a 0,5): antes una máquina con fotogramas de 700 ms no bajaba
+  nunca. `quality.test.ts`, siete pruebas. Revisada antes de publicar: en
+  calidad alta no cambia nada de lo que se pinta, y en esta máquina el nivel
+  se queda en alto durante todo el recorrido (728 neuronas del principio al
+  final), así que el tirón de compilar la hélice no la degrada en falso.
+- **Conflicto al fusionar**, resuelto a mano: la calidad tocaba
+  `EvaAcronymMesh`, que la marca sustituyó por `EvaLogoMesh`. El archivo viejo
+  se borra y la malla nueva recibe sus dos ajustes (tope de píxeles por nivel
+  y volver a medirse al bajar). En total: lint, tipos, 85 pruebas y build
+  correctos; consola limpia en los cinco lugares.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
@@ -759,8 +776,8 @@ apareció dos veces en sitios distintos.
      reserva**: la vista frontal usa el vídeo y su propio primer fotograma,
      porque el póster tiene que tener la proporción del vídeo;
    - revisión de tono de todos los textos nuevos del Cuerpo y de «Expresar».
-0 ter. **La marca, con el propietario** (`MARCA.md`): publicarla (espera su
-   «sí»); confirmar dos decisiones que impone la rigidez —la E más ancha que
+0 ter. **La marca, con el propietario** (`MARCA.md`): confirmar dos decisiones
+   que impone la rigidez —la E más ancha que
    alta y el aire entre la E y la V— y si quiere los vídeos de referencia en
    algún otro sitio. El permiso de publicación del diseño va con el de los
    retratos (`ASSET_LICENSES.md`).
