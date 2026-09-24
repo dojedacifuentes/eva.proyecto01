@@ -1,3 +1,4 @@
+import { EvaLogo } from '@/components/brand/EvaLogo';
 import { SoundControl } from '@/components/eva/SoundControl';
 import { navItems, structureLabels } from '@/content/structure';
 import { flags, nav, site } from '@/content/site';
@@ -18,9 +19,9 @@ export function SiteHeader() {
     <header className="header">
       <ContextSpy />
       <div className="wrap header__bar">
+        {/* La clase `wordmark` es un contrato: el menú móvil la inertiza y le devuelve el foco. */}
         <a href="#inicio" className="wordmark" aria-label={`${site.name}, inicio`}>
-          <span aria-hidden="true" className="wordmark__glyph" />
-          {site.name}
+          <EvaLogo id="marca-cabecera" className="wordmark__logo" />
         </a>
 
         <p className="status mono">

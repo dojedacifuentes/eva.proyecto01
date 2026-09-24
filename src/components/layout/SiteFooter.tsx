@@ -1,3 +1,4 @@
+import { EvaLogo } from '@/components/brand/EvaLogo';
 import { doors } from '@/content/structure';
 import { nav, sections, site } from '@/content/site';
 
@@ -7,8 +8,8 @@ export function SiteFooter() {
       <div className="wrap footer__grid">
         <div>
           <p className="wordmark">
-            <span aria-hidden="true" className="wordmark__glyph" />
-            {site.name}
+            <EvaLogo id="marca-pie" className="wordmark__logo" />
+            <span className="sr-only">{site.name}</span>
           </p>
           <p className="footer__line">{sections.footer.line}</p>
           {/* Fuera de la ficción, en letra pequeña: EVA es un personaje. */}

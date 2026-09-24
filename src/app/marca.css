@@ -1,0 +1,87 @@
+/*
+ * La marca de EVA: el símbolo —un cuadrado sobre una X— y el nombre ƎVΛ, hechos
+ * de las mismas ocho piezas (`lib/brand.ts`). Aquí sólo se colocan y respiran;
+ * la forma y el color los pone el código. Guía completa en docs/MARCA.md.
+ */
+
+/* ───────────── El logotipo quieto (EvaLogo) ───────────── */
+
+/*
+ * Dos SVG apilados: el halo debajo, el trazo encima. Quien lo usa fija el alto
+ * (`height`) y el ancho sale solo de la proporción de la figura.
+ */
+.brand-logo {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+.brand-logo svg {
+  display: block;
+  width: auto;
+  height: 100%;
+  overflow: visible;
+}
+.brand-logo__halo {
+  position: absolute;
+  inset: 0;
+  opacity: 0.85;
+}
+.brand-logo__core {
+  position: relative;
+}
+
+/* Cabecera: el nombre en el tamaño de una línea de navegación. */
+.header .wordmark__logo {
+  height: 1.4rem;
+}
+/* Pie: algo mayor, sin respiración — la página ya terminó. */
+.footer .wordmark__logo {
+  height: 1.6rem;
+}
+
+/*
+ * La fase latente del storyboard: «sólo respiración de glow». El halo es una
+ * capa propia y sólo cambia su opacidad, así que lo mueve el compositor y no
+ * se vuelve a pintar el desenfoque. Al pasar el puntero, respira más deprisa.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .header .brand-logo__halo {
+    animation: brand-breathe 3.6s ease-in-out infinite;
+    will-change: opacity;
+  }
+  .header .wordmark:hover .brand-logo__halo,
+  .header .wordmark:focus-visible .brand-logo__halo {
+    animation-duration: 1.4s;
+  }
+}
+@keyframes brand-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ───────────── El nombre en malla de la portada (EvaLogoMesh) ───────────── */
+
+/*
+ * El lienzo va dentro de un botón: pulsar el nombre repite el bucle de la
+ * marca. Sin marco ni fondo — el botón es la figura.
+ */
+.acronym__replay {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--eva-radius);
+  color: inherit;
+  background: none;
+  cursor: pointer;
+}
+.acronym__replay:focus-visible {
+  outline-color: var(--eva-brand-indigo);
+  outline-offset: 4px;
+}

@@ -13,6 +13,13 @@ la cierra reducido a una pantalla (el perfil con su biolectura), más el
 rendimiento fusionado de la rama `perf/rendimiento`. Ver **§0.0**, **§0.0.1** y
 **§0.0.2**. El párrafo «Estado» de abajo y §0–§0.2 describen la v8.2.
 
+**En curso (24-09-2026):** la **marca** —el símbolo □X y el nombre ƎVΛ— en la
+cabecera, la portada, el pie, los iconos y la vista previa para redes, en la
+rama `feat/marca`, **sin publicar**: espera el «sí» del propietario. Ver
+**§0.0.4** y `docs/MARCA.md`. Aparte, la rama local `feat/calidad-escenas`
+(`cb6199c`, 21-09-2026, nunca subida) lleva `useQuality()` en las escenas
+WebGL; no está en `main` ni en la marca.
+
 **Estado:** `main` = **v8.2** (rama `feat/consciencia` fusionada; v8 = `a90ee22`, v8.1 = `a094af5`), publicada en https://evaproyecto01.vercel.app/ el 20-09-2026: v8 más la Consciencia (10), el cierre y el cursor del sistema (§0.2). La v8: EVA escribe cada lugar en una caja (`EvaWrites`), fondo plano, dos tipografías, portada con el nombre en malla y sin las palabras del acrónimo, neuroescáner fuera, cerebro y hélice apagados para fundirse con el fondo, el Cuerpo con sus tres lecturas a la vista y el canal SINAPSIS más presente. Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844, y con movimiento reducido; consola sin errores.
 **Fecha:** 20 de septiembre de 2026 (v8.2)
 **Stack:** Next.js 16.3.5 (App Router, Turbopack) · React 19.2.4 · TypeScript ·
@@ -192,6 +199,47 @@ Lo que se reescribió, sin tocar la estructura ni la interacción:
   de escritorio caben a 1440×900 y 1366×720 (el Genoma, el más justo, 700 de
   720 px). Los estados, figuras, respuestas y la confesión de la Consciencia
   no se tocaron: ya hablaban de lo mismo.
+
+### 0.0.4. La marca (24 sept. 2026, rama `feat/marca`, sin publicar)
+
+Encargo del propietario: «incorporemos el logotipo y la identidad visual de EVA
+como marca a la landing», con seis fichas (storyboard de 11 fases, mapa de
+segmentos, medidas, colores, reglas de continuidad) y dos vídeos del logotipo
+animado. Guía completa en `docs/MARCA.md`.
+
+- **La marca es geometría** (`lib/brand.ts`): ocho piezas —cuatro lados del
+  cuadrado y cuatro brazos de la X— que sólo se trasladan y giran. Cinco poses
+  (símbolo, desacople, E + X, E / V / Λ, nombre), líneas de tiempo `REVEAL`,
+  `RETURN` y `LOOP`, colores medidos en los vídeos. `brand.test.ts` prueba
+  las reglas de la ficha: rigidez, grosor, proporciones y que ninguna letra
+  cruce a otra al alinearse.
+- **Cabecera y pie:** el rombo y el texto «EVA» pasan a ser el logotipo ƎVΛ
+  (`components/brand/EvaLogo.tsx`, de servidor). En la cabecera el halo
+  respira. La clase `.wordmark` se conserva: es el contrato del menú móvil.
+- **Portada:** `EvaAcronymMesh` → `EvaLogoMesh` (`git mv`). La malla ya no
+  rasteriza Space Grotesk: sus nodos viven en las piezas de la marca y hacen la
+  revelación al entrar en pantalla; pulsar el nombre repite el bucle (botón con
+  nombre accesible; cursor «REARMAR»). `hero.acronym` salió de `site.ts`;
+  entra `hero.logo`.
+- **Iconos y redes:** favicon (el símbolo con trazo grueso), icono de pantalla
+  de inicio (el símbolo en su órbita) y vista previa para redes (el nombre en su
+  órbita y «Entidad de Vigilancia y Autonomía»; la anterior aún mostraba las
+  palabras del acrónimo). Los iconos se generan con `scripts/brand-assets.mjs`.
+- **Tokens:** `--eva-brand-blue/indigo/violet/core`, espejo de
+  `BRAND_COLORS`. Hoja nueva: `app/marca.css`.
+- **Los vídeos de referencia no se publican** (peso, audio, marca de agua ✦ de
+  Gemini, fondo de nebulosa, geometría no rígida): ver `MARCA.md`.
+- **Rendimiento**, sobre `next build && next start`, la versión publicada
+  contra ésta, alternando. Con la tarjeta real de esta máquina (AMD Radeon por
+  D3D11), todos los lugares igual o mejor —portada 129 → 143 fps, genoma
+  129 → 139, cuerpo 128 → 143; 144 es el techo de la pantalla— y la portada
+  gasta unos 2,7 ms de JavaScript por fotograma frente a 8–11. Pintando por
+  software (SwiftShader) la portada queda en 11–12 fps frente a 14–16: el peor
+  caso, no el del propietario. Ver trampas 32 y 33.
+- Revisada en Chrome sin interfaz a 1440×900, 1366×720, 768×1024 y 390×844 y
+  con movimiento reducido: sin desbordes, la portada cabe en escritorio y
+  tablet, el botón del nombre recibe los clics (`elementFromPoint`), consola
+  limpia. Lint, tipos, 78 pruebas y build correctos.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
@@ -446,12 +494,12 @@ Lo que EVA teclea en cada caja (`writes`) vive en `ejes.ts` (y `hero.writes` en
 
 **Estilos.** Tokens en `src/styles/tokens.css` (incluye el suelo tipográfico:
 nada por debajo de 11 px, el carril del canal, `--eva-dock`, y el verde de la
-cápsula, `--eva-bio`). Siete hojas en `src/app/`: `globals.css` (base),
+cápsula, `--eva-bio`, y los colores de la marca, `--eva-brand-*`). Ocho hojas en `src/app/`: `globals.css` (base),
 `interface.css` (slides, cursor, portada), `nucleo.css` (el cerebro y su mapa
 plano), `dna.css` (genoma y vídeo), `ejes.css` (navegación, riel, sala del
 núcleo, puertas, canal), `cuerpo.css` (01.11) y `relato.css` (lo de v8: la caja
 EVA // ESCRIBE, títulos con degradado, botón del canal, encaje de cada slide,
-móvil). El acento de cada lugar sale de `structure.ts` (cada subsección tiene el
+móvil) y `marca.css` (el logotipo y el nombre en malla; ver `MARCA.md`). El acento de cada lugar sale de `structure.ts` (cada subsección tiene el
 suyo: cian, violeta, `bio`). Las consolas del Cuerpo reutilizan
 las piezas del genoma (`.dna__hud`, `.dna__btn`, `.dna__reply`) y los registros
 del núcleo (`.core__chip`): es la misma máquina.
@@ -469,7 +517,8 @@ piezas vivas como huecos (`head`, `copy`, `aside`).
 | Estructura | `content/structure.ts` + `lib/binary.ts` | El árbol del recorrido y sus códigos. `contextNodes` son los lugares que se pueden estar mirando; `hashAliases`, las anclas antiguas. |
 | Dónde está el visitante | `layout/ContextSpy.tsx` + `lib/context.ts` | Observa la franja central de la pantalla, espera 400 ms y publica el lugar. Marca `aria-current`, escribe `html[data-axis]` y `html[data-node]`, tiñe y frena el fondo, cierra el canal al pulsar un enlace interno. |
 | Canal | `eva/EvaSynapse.tsx` + `lib/channel.ts` + `content/channel.ts` | Máquina de estados pura y probada; la mecanografía escribe directo en el DOM y reserva el alto de cada línea. |
-| Acrónimo | `eva/EvaAcronymMesh.tsx` | Malla de nodos a partir de Space Grotesk 700, en fila (`direction='row'`), sólo en la portada. Se detiene fuera de pantalla. |
+| Marca | `lib/brand.ts` + `brand/EvaLogo.tsx` + `app/marca.css` | Las ocho piezas del símbolo y del nombre, sus poses y su color (`MARCA.md`). `EvaLogo` es el logotipo quieto de cabecera y pie; iconos y vista previa para redes salen de la misma geometría. |
+| Nombre en la portada | `eva/EvaLogoMesh.tsx` | Malla de nodos dentro de las piezas de la marca: revelación al entrar en pantalla, onda de cinta, empuje del puntero; pulsarla repite el bucle. Nodos como sprites, líneas agrupadas. Se detiene fuera de pantalla. |
 | Caja de EVA | `eva/EvaWrites.tsx` + `WritesBlock` (`lib/types.ts`) | EVA teclea el contenido de cada lugar: párrafos, rótulos, consignas, fichas y tablas. Una vez por visita, por id. |
 | Puertas | `sections/HeroEva.tsx` + `doors` en `structure.ts` | Las tres partes de la Entidad como enlaces bajo el nombre. |
 | Genoma | `eva/EvaDnaHelix.tsx` + `eva/dna/DnaScene.tsx` | Doble hélice con ocho acciones (la octava, Expresar, enlaza con el Cuerpo) y purga junto al contador; una sola línea de estado. También en móvil (`quality='low'`: sin bloom). Publica su estado en `<html data-genome>` (`lib/genome-state`) y sacude el fondo (`lib/field`). |
@@ -632,6 +681,41 @@ apareció dos veces en sitios distintos.
     de la caja lo respeta: la caja se salía del slide. `min-width: 0` en los
     hijos directos de `.writes` y `flex: 1 1 auto` en el lugar (que se
     recorta con puntos suspensivos).
+32. **Cientos de `arc()` en un solo `Path2D` hunden el pintado.** Agrupar los
+    nodos de la malla de la portada en un trazado por tono bajó el JavaScript
+    a un cuarto, pero los fotogramas cayeron a un tercio: el rasterizador pinta
+    un círculo suelto por su vía rápida, y un trazado con cientos de círculos,
+    no. Los nodos se estampan como sprites (`drawImage` de un degradado pintado
+    una vez por tono). Las líneas sí van bien agrupadas, como en `EvaField`.
+33. **SwiftShader exagera el coste de pintar.** El Chrome sin interfaz con
+    `--use-angle=swiftshader` pinta por CPU: sirve para capturas y para comparar
+    JavaScript, no para decidir sobre pintado. Esta máquina es la del
+    propietario y tiene tarjeta (AMD Radeon): `--enable-gpu --use-angle=d3d11
+    --ignore-gpu-blocklist --enable-gpu-rasterization` la usa, y ahí se mide lo
+    que él siente. Con tarjeta, `requestAnimationFrame` no se limita a 60: el
+    techo es el refresco de la pantalla (144).
+34. **Dos polígonos que se tocan dejan ver la costura.** Los brazos de la V se
+    tocan justo en el corte del vértice y el suavizado de bordes deja una raya
+    fina (se veía en la vista previa para redes). Un contorno del mismo color de
+    `SEAM` (0,05 unidades) la tapa sin cambiar la figura.
+35. **Una cámara suavizada deja escapar la figura.** El encuadre de la malla
+    seguía a la figura con retraso; cuando crecía deprisa (la escalera de la
+    alineación), se salía por arriba. Va sin suavizado y encuadrando sólo con las
+    piezas presentes en todas las poses (`STEADY`): su caja no salta, así que
+    no hay nada que suavizar.
+36. **La fase de una onda cambia a lo ancho de un trazo fino.** Con la onda del
+    acrónimo de antes (pensada para letras gruesas), el borde de arriba y el de
+    abajo de cada barra se movían distinto y la E parecía hecha de cuerdas. Onda
+    más baja y casi en fase a lo ancho: cada barra ondea entera.
+37. **Turbopack rechaza un `node_modules` enlazado fuera del proyecto**
+    («Symlink … points out of the filesystem root»). Para compilar otra versión
+    y compararla: `git worktree add --detach <carpeta> main` y `npm ci
+    --prefer-offline` dentro. Git no la puede borrar después (rutas demasiado
+    largas en Windows): `Remove-Item -LiteralPath '\\?\<ruta>' -Recurse -Force`
+    y `git worktree prune`.
+38. **`npx next start` sobrevive a detener la tarea en Windows**: el `node`
+    hijo sigue escuchando y sirve la compilación vieja. Cerrarlo por puerto
+    (`Get-NetTCPConnection -LocalPort <p>` → `Stop-Process`).
 
 ---
 
@@ -675,6 +759,11 @@ apareció dos veces en sitios distintos.
      reserva**: la vista frontal usa el vídeo y su propio primer fotograma,
      porque el póster tiene que tener la proporción del vídeo;
    - revisión de tono de todos los textos nuevos del Cuerpo y de «Expresar».
+0 ter. **La marca, con el propietario** (`MARCA.md`): publicarla (espera su
+   «sí»); confirmar dos decisiones que impone la rigidez —la E más ancha que
+   alta y el aire entre la E y la V— y si quiere los vídeos de referencia en
+   algún otro sitio. El permiso de publicación del diseño va con el de los
+   retratos (`ASSET_LICENSES.md`).
 1. **Revisión en dispositivos reales.** La v6 se recorrió en Chrome (headless,
    con SwiftShader) a 1440×900, 1366×720, 768×1024 y 390×844, con la lista del
    encargo entera: cerebro, hélice, canal (cerrado al cargar, aviso, abrir,

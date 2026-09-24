@@ -58,15 +58,14 @@ export const hero = {
   online: 'EVA está en línea.',
   portraitCaption: { id: 'EVA_ID // C37-B4', state: 'EN LÍNEA' },
   /**
-   * El nombre, letra a letra: «Entidad de Vigilancia y Autonomía». Desde la v8
-   * en pantalla sólo se ven las letras, en fila; las palabras quedan para la
-   * imagen de vista previa y el `h1` que oye un lector de pantalla.
+   * El nombre en la portada tiene la forma de la marca (ƎVΛ, `lib/brand`): al
+   * llegar, el símbolo se abre en las tres letras, y pulsarlo repite el bucle.
+   * El nombre entero («Entidad de Vigilancia y Autonomía») lo lleva el `h1`.
    */
-  acronym: [
-    { letter: 'E', word: 'Entidad' },
-    { letter: 'V', word: 'de Vigilancia' },
-    { letter: 'A', word: 'y Autonomía' },
-  ],
+  logo: {
+    replay: 'Ver cómo el símbolo de EVA se convierte en su nombre',
+    cursor: 'REARMAR',
+  },
   /**
    * Lo primero que EVA escribe, bajo su nombre: una caja pequeña que plantea
    * la única pregunta de la página. En la v9 cambió: antes era un guiño a Dick

@@ -8,6 +8,7 @@ import './ejes.css';
 import './consciencia.css';
 import './cuerpo.css';
 import './relato.css';
+import './marca.css';
 import { EvaField } from '@/components/eva/EvaField';
 import { EvaSynapse } from '@/components/eva/EvaSynapse';
 import { ScrollReveal } from '@/components/eva/ScrollReveal';

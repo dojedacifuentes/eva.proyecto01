@@ -101,7 +101,7 @@ const FRAME_CAP = 0.5;
 /**
  * Un fotograma más, con su duración en segundos. Lo llama el fondo (corre
  * siempre); las escenas no hace falta que lo llamen. La pestaña oculta no
- * llega aquí: el fondo reinicia su reloj al volver. Hasta la v9.4 se
+ * llega aquí: el fondo reinicia su reloj al volver. Hasta la v9.3 se
  * descartaba todo lo que pasara de 500 ms, y una máquina con fotogramas de
  * 700 ms —justo la que más lo necesita— no bajaba nunca de nivel.
  */
