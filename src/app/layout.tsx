@@ -1,22 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
-import './interface.css';
-import './cerebro.css';
-import './dna.css';
-import './ejes.css';
-import './consciencia.css';
-import './cuerpo.css';
-import './relato.css';
-import './marca.css';
-import { EvaField } from '@/components/eva/EvaField';
-import { EvaSynapse } from '@/components/eva/EvaSynapse';
-import { ScrollReveal } from '@/components/eva/ScrollReveal';
-import { EvaSignalCursor } from '@/components/eva/EvaSignalCursor';
-import { BitRail } from '@/components/layout/BitRail';
-import { SiteFooter } from '@/components/layout/SiteFooter';
-import { SiteHeader } from '@/components/layout/SiteHeader';
-import { flags, nav, site } from '@/content/site';
+import { site } from '@/content/site';
 import { siteUrl } from '@/lib/site';
 
 const grotesk = Space_Grotesk({
@@ -37,6 +22,10 @@ const jetbrains = JetBrains_Mono({
  * Dos tipografías y ninguna más: Space Grotesk para leer y JetBrains Mono para
  * lo que EVA teclea, los rótulos y los bits. El acrónimo de la portada se
  * rasteriza a partir de la primera (antes tenía una tercera, Orbitron).
+ *
+ * El layout raíz sólo pone el documento, las dos letras y la base de estilos.
+ * Lo que rodea a la landing (campo, cabecera, pie, canal) va en `SiteChrome`,
+ * que montan la landing y la 404; `/links` no lo carga.
  */
 
 export const metadata: Metadata = {
@@ -72,23 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es-CL"
       className={`${grotesk.variable} ${jetbrains.variable}`}
     >
-      <body>
-        <a href="#contenido" className="skip-link sr-only-focusable mono">
-          {nav.skip}
-        </a>
-
-        {/* Capas decorativas: detrás del contenido y sin capturar eventos. */}
-        <EvaField particles={flags.reactiveField} />
-        {flags.signalCursor && <EvaSignalCursor />}
-
-        <SiteHeader />
-        <BitRail />
-        <main id="contenido">{children}</main>
-        <SiteFooter />
-        {/* El canal de EVA acompaña toda la página, cerrado hasta que el visitante lo abre. */}
-        <EvaSynapse />
-        <ScrollReveal />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

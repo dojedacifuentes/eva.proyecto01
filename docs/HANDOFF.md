@@ -5,6 +5,8 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**En curso (24-09-2026):** rama `feat/links`, la ruta `/links` (EVA ARCADE), sin publicar: ver **§0.0.5**.
+
 **Estado (24-09-2026):** `main` = **v9.4**, publicada en
 https://evaproyecto01.vercel.app/ con el «sí» del propietario («publícalo
 todo»): la v9.3 más **la marca** —el símbolo □X y el nombre ƎVΛ en la
@@ -257,6 +259,66 @@ animado. Guía completa en `docs/MARCA.md`.
   se borra y la malla nueva recibe sus dos ajustes (tope de píxeles por nivel
   y volver a medirse al bajar). En total: lint, tipos, 85 pruebas y build
   correctos; consola limpia en los cinco lugares.
+
+### 0.0.5. `/links` — EVA ARCADE, la puerta desde las redes (24 sept. 2026, rama `feat/links`, sin publicar)
+
+Encargo del propietario: una ruta `/links` para la bio de Instagram (y TikTok,
+LinkedIn, WhatsApp) que no sea un Linktree: EVA ARCADE como protagonista, sus
+dos juegos y, abajo, la puerta a la landing. Rápida, móvil primero, sin lienzo
+ni WebGL. La landing no cambia.
+
+- **El marco de la landing salió del layout raíz.** Hasta la v9.4 el campo de
+  partículas, el cursor de señal, la cabecera, el carril de bits, el pie, el
+  canal SINAPSIS y las ocho hojas de la landing colgaban de `app/layout.tsx`,
+  así que cualquier ruta los cargaba. Ahora el raíz sólo pone el documento, las
+  dos letras y `globals.css`; todo lo demás está en
+  `components/layout/SiteChrome.tsx`, que monta `app/(eva)/layout.tsx`. La
+  portada pasó a `app/(eva)/page.tsx` (`git mv`; el grupo no cambia la URL).
+- **La 404 también vive en `(eva)`** (`(eva)/not-found.tsx`, con una ruta
+  comodín `(eva)/[...missing]` que llama a `notFound()`). Trampa: una 404 en la
+  raíz se empaqueta con **todas** las rutas; con el marco dentro, `/links`
+  descargaba 75 KB de CSS de la landing (y los aplicaba) y el código del campo
+  y del canal sin usarlos. Las rutas que no existen siguen dando 404 con
+  cabecera y pie, y las redirecciones de `next.config.ts` siguen igual.
+- **La página** (`app/links/page.tsx` + `links.css`): hero (estado, símbolo en
+  su órbita, `h1` EVA ARCADE, lema), «ARCHIVOS DISPONIBLES» con una tarjeta por
+  juego, «¿QUIÉN ES EVA?» con el nombre ƎVΛ (`EvaLogo`) y pie «EVA · 2026».
+  Componentes en `components/links/` (`ArcadeHero`, `ArcadeMark`, `GameCard`,
+  `EvaGateway`), todos de servidor. Textos y enlaces en `content/links.ts`,
+  ordenados por grupos: EVA Academy o EVA Lab se añaden ahí como otro grupo; un
+  grupo vacío no se pinta.
+- **El símbolo se anima sin JavaScript.** `lib/arcade-mark.ts` toma las poses de
+  `brand.ts` y genera, en el servidor, dos `@keyframes` (eje horizontal; eje
+  vertical + giro + opacidad) y las variables de cada pieza: □X → ≡X → ƎVΛ → □X
+  una sola vez, 3,25 s, con la alineación en L de la portada. Después sólo
+  respira el halo y dos puntos dan la vuelta a la órbita (capas propias, las
+  mueve el compositor). Con movimiento reducido, nada se mueve. Seis pruebas en
+  `arcade-mark.test.ts`.
+- **Juegos:** FORO [in]VISIBLE (nombre y descripción sacados de su propio
+  `<title>` y meta: «Simulador Procesal Chileno»; CPC, COT y CPR), azul, a la
+  izquierda; EXPEDIENTE 1725, violeta/magenta, a la derecha. La tarjeta entera
+  es el enlace y abre en la misma pestaña. Las ilustraciones son SVG abstractos
+  (etapas sobre retícula; dos órbitas que se cruzan), sin imagen que descargar.
+- **Vista previa para redes** propia (`app/links/opengraph-image.tsx`: □X en su
+  órbita, EVA ARCADE y el lema). El fondo de órbita se movió a
+  `lib/brand-art.ts` (`orbitUri`), que usan las dos; la de la landing sale igual.
+  `/links` entra en el sitemap.
+- **Recursos del propietario:** no se publican imágenes ni vídeo en esta ruta.
+  El vídeo que llegó con el encargo (`mp4 (1).mp4`) es byte a byte el
+  `mp4.mp4` que `MARCA.md` ya descartó (3,2 MB, audio, marca de agua ✦). Las
+  cuatro imágenes (□X, ≡X, ƎVΛ y la composición horizontal) son las fichas que
+  `brand.ts` ya dibuja; en código pesan unos KB y animan pieza a pieza.
+- **Peso**, sobre `next build && next start`: HTML 9 KB y CSS propio ~11 KB
+  (comprimidos); el resto es el runtime de React/Next (~175 KB, el mínimo de
+  cualquier página del App Router). Ningún `<canvas>`, ningún fragmento de
+  three.js ni del campo.
+- Revisada en Chrome sin interfaz a 320×568, 375×812, 390×844, 430×932,
+  768×1024, 1024×768 y 1440×900: sin desborde horizontal, un solo `h1`, la
+  primera tarjeta empieza a ~380 px en móvil (dentro de la primera pantalla),
+  dos columnas desde 52rem. Fotogramas de la animación comprobados; movimiento
+  reducido sin animaciones; orden de tabulación Procesal → Familia → EVA con
+  foco visible. Landing y 404 conservan su marco. Lint, tipos, 91 pruebas y
+  build correctos.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 

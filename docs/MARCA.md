@@ -77,6 +77,7 @@ cambió: la marca va en sus piezas, no repinta los lugares.
 | Favicon | `app/icon.svg` | El símbolo con **trazo grueso** (ver «Excepciones»). |
 | Icono de pantalla de inicio | `app/apple-icon.png` | El símbolo dentro de su órbita de ocho nodos, sobre el resplandor azul y violeta. |
 | Vista previa al compartir | `app/opengraph-image.tsx` | El nombre en su órbita y, debajo, «Entidad de Vigilancia y Autonomía». Reemplaza la provisional, que aún mostraba las palabras del acrónimo que salieron de la portada en la v8. |
+| `/links` (EVA ARCADE) | `components/links/ArcadeMark.tsx` + `lib/arcade-mark.ts` | El **símbolo** (□X) es de EVA ARCADE; el nombre (ƎVΛ, `EvaLogo`) queda abajo, en «¿Quién es EVA?». Al cargar, el símbolo hace una vez □X → ≡X → ƎVΛ → □X (3,25 s) **en CSS**, sin lienzo: el servidor escribe los `@keyframes` a partir de las poses. Vista previa propia: `app/links/opengraph-image.tsx` (fondo común en `lib/brand-art.ts`). Ver HANDOFF §0.0.5. |
 
 Los dos iconos se generan con `node scripts/brand-assets.mjs`: hay que volver a
 ejecutarlo si cambia la geometría o el color.
