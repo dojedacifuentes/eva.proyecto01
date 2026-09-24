@@ -1,0 +1,504 @@
+/*
+ * /links — la puerta de EVA ARCADE desde las redes. Móvil primero.
+ *
+ * Mismo sistema que la landing (tokens de `styles/tokens.css`, las dos letras,
+ * los colores de la marca) en una página que no carga nada de ella: sin
+ * lienzo, sin WebGL, sin cursor propio. El 85–90 % es negro y blanco; el azul,
+ * el violeta y el magenta son luz, borde y estado.
+ */
+
+.arcade {
+  /* La paleta de la marca aplicada a esta página. Azul a la izquierda, violeta y magenta a la derecha. */
+  --arcade-ground: #03040d;
+  --arcade-space: #060817;
+  --arcade-blue: var(--eva-brand-blue);
+  --arcade-electric: #2b9cff;
+  --arcade-violet: #7456ff;
+  --arcade-purple: #8314bd;
+  --arcade-magenta: #cf24e8;
+  --arcade-white: #f3f5ff;
+  --arcade-soft: #bcc2dc;
+  --arcade-muted: #9ca3bd;
+  --arcade-line: rgba(196, 206, 255, 0.11);
+  --arcade-line-strong: rgba(196, 206, 255, 0.24);
+  --arcade-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --accent: #9aa8ff;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: env(safe-area-inset-top);
+  overflow-x: clip;
+  background: var(--arcade-ground);
+  color: var(--arcade-white);
+}
+
+/* ───────────── El cielo: dos campos de luz y unas pocas estrellas ───────────── */
+
+.arcade__sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 55% at -8% 30%, rgba(17, 120, 255, 0.2), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 0% 85%, rgba(10, 46, 120, 0.28), transparent 70%),
+    radial-gradient(ellipse 55% 55% at 108% 62%, rgba(131, 20, 189, 0.24), transparent 70%),
+    radial-gradient(ellipse 35% 30% at 100% 18%, rgba(207, 36, 232, 0.08), transparent 70%),
+    linear-gradient(180deg, var(--arcade-ground), var(--arcade-space));
+}
+.arcade__sky svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: #dfe6ff;
+}
+
+.arcade__main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+  padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
+}
+
+/* ───────────── Hero ───────────── */
+
+.arcade-hero {
+  padding-top: clamp(1.25rem, 4svh, 3rem);
+  text-align: center;
+}
+
+.arcade-hero__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--arcade-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.24em;
+}
+.arcade-hero__status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--arcade-electric), var(--arcade-violet));
+  box-shadow: 0 0 8px rgba(90, 96, 255, 0.8);
+}
+
+/* El símbolo en su órbita: las cuatro capas comparten caja. */
+.arcade-mark {
+  position: relative;
+  width: min(15rem, 64vw);
+  aspect-ratio: 60 / 44;
+  margin: 0.5rem auto 0;
+}
+.arcade-mark svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.arcade-mark__halo {
+  opacity: 0.9;
+}
+
+/*
+ * Cada pieza en reposo: el símbolo. Las variables las pone la hoja que genera
+ * `lib/arcade-mark.ts`; el paso 0 es □X.
+ */
+.arcade-mark .mark-x {
+  transform: translateX(var(--x0));
+}
+.arcade-mark .mark-y {
+  transform: translateY(var(--y0)) rotate(var(--a0));
+  opacity: var(--o0);
+}
+
+.arcade-hero__title {
+  margin: 0.35rem 0 0;
+  /* El espaciado se suma a la derecha de la última letra: se compensa para centrar. */
+  padding-left: 0.16em;
+  font-size: clamp(1.9rem, 8.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.16em;
+  color: var(--arcade-white);
+}
+
+.arcade-hero__tagline {
+  margin: 0.5rem 0 0;
+  color: var(--arcade-soft);
+  font-size: 0.95rem;
+}
+
+/* ───────────── Grupos: ARCHIVOS DISPONIBLES ───────────── */
+
+.arcade-group {
+  margin-top: clamp(1.75rem, 4svh, 2.75rem);
+}
+
+.arcade-group__label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--arcade-muted);
+  font-size: var(--eva-type-micro);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+}
+.arcade-group__label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--arcade-line-strong), transparent);
+}
+
+.arcade-group__list {
+  display: grid;
+  gap: 1rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ───────────── Tarjeta de juego ───────────── */
+
+.arcade-card {
+  --card-accent: var(--arcade-electric);
+  --card-ink: #86c1ff;
+  --card-glow: rgba(43, 156, 255, 0.35);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--arcade-line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(12, 16, 36, 0.78), rgba(6, 8, 20, 0.88));
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 240ms var(--arcade-ease),
+    border-color 240ms linear,
+    box-shadow 240ms linear,
+    background 240ms linear;
+}
+.arcade-card[data-accent='magenta'] {
+  --card-accent: var(--arcade-magenta);
+  --card-ink: #e396f2;
+  --card-glow: rgba(207, 36, 232, 0.32);
+}
+/* Un filo de luz arriba, del color del juego. */
+.arcade-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-accent), transparent);
+  opacity: 0.7;
+}
+
+.arcade-card__art {
+  position: relative;
+  height: 7rem;
+  border-bottom: 1px solid var(--arcade-line);
+  color: var(--card-accent);
+  background: radial-gradient(60% 90% at 50% 55%, color-mix(in srgb, var(--card-accent) 12%, transparent), transparent 75%);
+}
+.arcade-card__art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 260ms var(--arcade-ease);
+}
+
+.arcade-card__node,
+.arcade-card__status {
+  position: absolute;
+  top: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(3, 4, 13, 0.72);
+  color: #cdd3f0;
+  font-size: var(--eva-type-micro);
+  line-height: 1.4;
+  letter-spacing: 0.18em;
+}
+.arcade-card__node {
+  left: 0.75rem;
+}
+.arcade-card__status {
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.arcade-card__status::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--card-accent);
+  box-shadow: 0 0 6px var(--card-accent);
+}
+
+.arcade-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 1.15rem 1.1rem;
+}
+
+.arcade-card__category {
+  margin: 0;
+  color: var(--card-ink);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.18em;
+}
+
+.arcade-card__title {
+  margin: 0.4rem 0 0;
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: 0.02em;
+  color: var(--arcade-white);
+}
+
+.arcade-card__text {
+  margin: 0.4rem 0 0;
+  color: var(--arcade-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.arcade-card__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  margin-top: auto;
+  padding-top: 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--arcade-white);
+}
+.arcade-card__arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 45%, transparent);
+  border-radius: 8px;
+  color: var(--card-ink);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  transition:
+    transform 220ms var(--arcade-ease),
+    border-color 220ms linear,
+    background 220ms linear;
+}
+
+.arcade-card:focus-visible {
+  outline: 2px solid var(--card-ink);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+.arcade-card:active {
+  transform: scale(0.99);
+  background: linear-gradient(180deg, rgba(18, 22, 46, 0.86), rgba(8, 10, 24, 0.92));
+}
+
+@media (hover: hover) {
+  .arcade-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--card-accent) 42%, transparent);
+    box-shadow: 0 14px 44px -22px var(--card-glow);
+  }
+  .arcade-card:hover .arcade-card__art svg {
+    transform: scale(1.02);
+  }
+}
+.arcade-card:hover .arcade-card__arrow,
+.arcade-card:focus-visible .arcade-card__arrow {
+  transform: translateX(3px);
+  border-color: var(--card-accent);
+  background: color-mix(in srgb, var(--card-accent) 14%, transparent);
+}
+
+/* ───────────── Conoce a EVA ───────────── */
+
+.arcade-gate {
+  position: relative;
+  max-width: 28rem;
+  margin: clamp(3rem, 8svh, 4.5rem) auto 0;
+  padding-top: 2.5rem;
+  text-align: center;
+}
+.arcade-gate::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--arcade-line-strong), transparent);
+}
+
+.arcade-gate__logo {
+  height: 1.35rem;
+}
+
+.arcade-gate__title {
+  margin: 1.2rem 0 0;
+  color: var(--arcade-muted);
+  font-size: var(--eva-type-micro);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+}
+
+.arcade-gate__text {
+  margin: 0.45rem 0 0;
+  color: var(--arcade-soft);
+  font-size: 1.05rem;
+}
+
+.arcade-gate__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  margin-top: 1.1rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--arcade-line-strong);
+  border-radius: 10px;
+  color: var(--arcade-white);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-decoration: none;
+  transition:
+    border-color 220ms linear,
+    background 220ms linear;
+}
+.arcade-gate__arrow {
+  transition: transform 220ms var(--arcade-ease);
+}
+.arcade-gate__link:hover,
+.arcade-gate__link:focus-visible {
+  border-color: var(--eva-brand-indigo);
+  background: rgba(90, 96, 255, 0.1);
+}
+.arcade-gate__link:hover .arcade-gate__arrow,
+.arcade-gate__link:focus-visible .arcade-gate__arrow {
+  transform: translateX(3px);
+}
+.arcade-gate__link:active {
+  background: rgba(90, 96, 255, 0.16);
+}
+
+/* ───────────── Pie ───────────── */
+
+.arcade__foot {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 1rem calc(1.75rem + env(safe-area-inset-bottom));
+  color: var(--arcade-muted);
+  font-size: var(--eva-type-micro);
+  letter-spacing: 0.24em;
+  text-align: center;
+}
+
+/* ───────────── Escritorio: los dos juegos lado a lado ───────────── */
+
+@media (min-width: 52rem) {
+  .arcade__main {
+    max-width: 62rem;
+  }
+  .arcade-hero {
+    padding-top: clamp(2rem, 6svh, 4rem);
+  }
+  .arcade-mark {
+    width: 19rem;
+  }
+  .arcade-group {
+    margin-top: 3rem;
+  }
+  /* Procesal a la izquierda (azul), Familia a la derecha (violeta): el mismo reparto que el fondo. */
+  .arcade-group__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .arcade-card__art {
+    height: 8.5rem;
+  }
+  .arcade-card__body {
+    padding: 1.2rem 1.4rem 1.3rem;
+  }
+  .arcade-card__title {
+    font-size: 1.8rem;
+  }
+}
+
+/* ───────────── Movimiento ───────────── */
+
+/*
+ * Sólo con movimiento permitido: la entrada del símbolo (una vez), la
+ * respiración del halo y los dos puntos de la órbita. Con movimiento reducido
+ * el símbolo está quieto desde el principio y no hay nada más que se mueva.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .arcade-mark {
+    animation: arcade-appear 500ms ease-out both;
+  }
+  .arcade-mark .mark-x {
+    animation: arcade-mark-x var(--mark-ms) linear 250ms both;
+  }
+  .arcade-mark .mark-y {
+    animation: arcade-mark-y var(--mark-ms) linear 250ms both;
+  }
+  .arcade-mark__halo {
+    animation: arcade-breathe 8s ease-in-out calc(var(--mark-ms) + 250ms) infinite;
+    will-change: opacity;
+  }
+  .arcade-mark__drift {
+    animation: arcade-drift 36s linear infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes arcade-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes arcade-breathe {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes arcade-drift {
+  to {
+    transform: rotate(360deg);
+  }
+}

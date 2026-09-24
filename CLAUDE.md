@@ -17,5 +17,8 @@
 - **La marca** (el símbolo □X y el nombre ƎVΛ son las mismas ocho piezas): geometría en
   `src/lib/brand.ts`, guía en `docs/MARCA.md`. El logotipo de cabecera y pie, el nombre en malla
   de la portada, los iconos y la vista previa para redes salen de ahí.
+- **`/links`** (rama `feat/links`, sin publicar): EVA ARCADE, la puerta desde las redes, en
+  `src/app/links/` y `src/components/links/`; textos en `src/content/links.ts`. No pasa por el
+  marco de la landing (`SiteChrome`, que montan `app/(eva)/layout.tsx` y la 404). HANDOFF §0.0.5.
 - Los vídeos e imágenes de `public/eva/` son del propietario: no se borran aunque dejen de usarse.
 - No integrar en `main` ni publicar sin el «sí» del propietario.

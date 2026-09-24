@@ -1,26 +1,25 @@
 import { ImageResponse } from 'next/og';
+import { links } from '@/content/links';
 import { BRAND_COLORS, brandDataUri, viewBoxOf } from '@/lib/brand';
 import { orbitUri } from '@/lib/brand-art';
-import { site } from '@/content/site';
 
-export const alt = `${site.name} — ${site.expansion}`;
+export const alt = `${links.hero.title} — ${links.hero.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const W = size.width;
 const H = size.height;
-/** Radio de la órbita: el nombre cabe dentro, como en las fichas de la marca. */
-const ORBIT = 292;
-const LOGO_WIDTH = 540;
+const ORBIT = 300;
+const MARK_HEIGHT = 250;
 
 /**
- * Vista previa al compartir el enlace: el nombre de EVA con la forma de su
- * marca (ƎVΛ) dentro de su órbita y, debajo, lo que significa. Los colores
- * salen de `lib/brand`: `next/og` no lee variables CSS.
+ * Vista previa de `/links` al compartir el enlace: el símbolo (□X) en la
+ * órbita de la marca y, debajo, EVA ARCADE y su lema. El mismo fondo que la
+ * de la landing, que lleva el nombre (ƎVΛ).
  */
 export default function OpengraphImage() {
-  const box = viewBoxOf('logotype', 1.6);
-  const logoHeight = Math.round((LOGO_WIDTH * box.height) / box.width);
+  const box = viewBoxOf('isotype', 1.6);
+  const markWidth = Math.round((MARK_HEIGHT * box.width) / box.height);
 
   return new ImageResponse(
     (
@@ -39,17 +38,12 @@ export default function OpengraphImage() {
         {/* eslint-disable-next-line @next/next/no-img-element -- next/og sólo entiende <img> */}
         <img src={orbitUri(W, H, ORBIT)} alt="" width={W} height={H} style={{ position: 'absolute', left: 0, top: 0 }} />
         {/* eslint-disable-next-line @next/next/no-img-element -- next/og sólo entiende <img> */}
-        <img src={brandDataUri('logotype', { pad: 1.6, blur: 0.8 })} alt="" width={LOGO_WIDTH} height={logoHeight} />
-        <div
-          style={{
-            display: 'flex',
-            marginTop: 26,
-            fontSize: 22,
-            letterSpacing: 9,
-            color: '#b9c3e8',
-          }}
-        >
-          {site.expansion.toUpperCase()}
+        <img src={brandDataUri('isotype', { pad: 1.6, blur: 0.8 })} alt="" width={markWidth} height={MARK_HEIGHT} />
+        <div style={{ display: 'flex', marginTop: 18, fontSize: 58, fontWeight: 600, letterSpacing: 12, color: '#f3f5ff' }}>
+          {links.hero.title}
+        </div>
+        <div style={{ display: 'flex', marginTop: 10, fontSize: 24, letterSpacing: 2, color: '#b9c3e8' }}>
+          {links.hero.tagline}
         </div>
       </div>
     ),
