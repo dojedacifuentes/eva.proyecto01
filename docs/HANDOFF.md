@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**En curso (24-09-2026):** rama `feat/links`, la ruta `/links` (EVA ARCADE), sin publicar: ver **§0.0.5**.
+**Publicada (24-09-2026):** `main` = `79927c1`, la v9.4 más `/links` (EVA ARCADE), con el «sí, publica todo» del propietario: https://evaproyecto01.vercel.app/links. Ver **§0.0.5**.
 
 **Estado (24-09-2026):** `main` = **v9.4**, publicada en
 https://evaproyecto01.vercel.app/ con el «sí» del propietario («publícalo
@@ -260,7 +260,7 @@ animado. Guía completa en `docs/MARCA.md`.
   y volver a medirse al bajar). En total: lint, tipos, 85 pruebas y build
   correctos; consola limpia en los cinco lugares.
 
-### 0.0.5. `/links` — EVA ARCADE, la puerta desde las redes (24 sept. 2026, rama `feat/links`, sin publicar)
+### 0.0.5. `/links` — EVA ARCADE, la puerta desde las redes (24 sept. 2026, publicada)
 
 Encargo del propietario: una ruta `/links` para la bio de Instagram (y TikTok,
 LinkedIn, WhatsApp) que no sea un Linktree: EVA ARCADE como protagonista, sus
