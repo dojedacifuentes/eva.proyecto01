@@ -240,21 +240,11 @@ button:disabled {
   gap: 1.5rem;
   height: 100%;
 }
+/* El nombre de EVA en cabecera y pie: es el logotipo de la marca (marca.css). */
 .wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
   min-height: 44px;
-  font-weight: 700;
-  font-size: 1.15rem;
-  letter-spacing: 0.22em;
-}
-.wordmark__glyph {
-  width: 0.6rem;
-  height: 0.6rem;
-  border: 1px solid var(--eva-cyan);
-  rotate: 45deg;
-  background: linear-gradient(135deg, var(--eva-cyan), transparent 70%);
 }
 .status {
   display: inline-flex;

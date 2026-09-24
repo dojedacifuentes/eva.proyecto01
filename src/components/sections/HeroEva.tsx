@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { EvaAcronymMesh } from '@/components/eva/EvaAcronymMesh';
+import { EvaLogoMesh } from '@/components/eva/EvaLogoMesh';
 import { EvaProfile } from '@/components/eva/EvaProfile';
 import { EvaWrites } from '@/components/eva/EvaWrites';
 import { contextNodes, doors } from '@/content/structure';
@@ -8,10 +8,10 @@ import { hero, site } from '@/content/site';
 const rise = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
- * Portada (00): el nombre de EVA como una sola palabra —tres letras en fila,
- * dibujadas como una red de nodos—, lo que ella teclea debajo y las tres
- * puertas por las que se entra en ella: consciencia, genoma y cerebro. Al
- * lado, su retrato.
+ * Portada (00): el nombre de EVA con la forma de su marca (ƎVΛ), dibujado
+ * como una red de nodos que al llegar hace la transformación del logotipo —el
+ * cuadrado sobre la X se abre en las tres letras—; lo que ella teclea debajo
+ * y las puertas por las que se entra en ella. Al lado, su retrato.
  *
  * Desde la v8 el acrónimo no se desglosa en pantalla: las palabras «Entidad»,
  * «de Vigilancia» y «Autonomía» flotaban sin llevar a ningún sitio. El nombre
@@ -37,17 +37,13 @@ export function HeroEva() {
                 {hero.label}
               </p>
 
-              {/* El h1 lleva el nombre entero; la palabra en malla es su versión visual. */}
+              {/* El h1 lleva el nombre entero; la marca en malla es su versión visual. */}
               <h1 id="hero-titulo" className="sr-only">
                 {site.name} — {site.expansion}
               </h1>
 
-              <div className="acronym acronym--word" aria-hidden="true" data-rise style={rise(1)}>
-                <EvaAcronymMesh
-                  letters={hero.acronym.map((item) => item.letter)}
-                  fontVar="--font-grotesk"
-                  direction="row"
-                />
+              <div className="acronym acronym--word" data-rise style={rise(1)}>
+                <EvaLogoMesh replayLabel={hero.logo.replay} cursorLabel={hero.logo.cursor} />
               </div>
 
               <div className="hero__line" data-rise style={rise(2)}>

@@ -25,6 +25,17 @@
   /* Verde bioluminiscente: el del líquido de la cápsula. Sólo lo usa el Cuerpo (01.11). */
   --eva-bio: #78f0b4;
 
+  /*
+   * Marca: medidos en los fotogramas del vídeo del logotipo. Halo de azul
+   * eléctrico a violeta, siempre de izquierda a derecha; trazo casi blanco.
+   * Son los mismos que BRAND_COLORS en lib/brand.ts (el lienzo y el SVG no
+   * leen variables CSS): si cambia uno, cambia el otro.
+   */
+  --eva-brand-blue: #2a8cff;
+  --eva-brand-indigo: #5a60ff;
+  --eva-brand-violet: #a24dff;
+  --eva-brand-core: #f4f6ff;
+
   /* Acento activo: cada universo lo redefine con [data-accent]. */
   --accent: var(--eva-cyan);
   --accent-2: var(--eva-blue);
