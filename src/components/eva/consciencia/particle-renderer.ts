@@ -1,3 +1,4 @@
+import { DPR_CAP, getQuality } from '@/lib/quality';
 import type { ConsciousnessStateId, RegimeId } from '@/lib/types';
 import type { ParticleWorld } from './particle-life';
 
@@ -17,9 +18,12 @@ export interface FieldSize {
   dpr: number;
 }
 
-/** Ajusta el lienzo a su caja y a la densidad de píxeles (con tope: es 2D y hay que pintar cada fotograma). */
+/**
+ * Ajusta el lienzo a su caja y a la densidad de píxeles, con tope: es 2D y hay
+ * que pintar cada fotograma. El tope baja con la calidad medida (`lib/quality`).
+ */
 export function sizeParticleCanvas(canvas: HTMLCanvasElement, width: number, height: number): FieldSize {
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.6, DPR_CAP[getQuality()]);
   const pixelWidth = Math.max(1, Math.round(width * dpr));
   const pixelHeight = Math.max(1, Math.round(height * dpr));
   if (canvas.width !== pixelWidth) canvas.width = pixelWidth;

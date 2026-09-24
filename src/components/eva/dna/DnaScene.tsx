@@ -533,18 +533,25 @@ export interface DnaSceneProps extends SceneProps {
   /** `false` deja el bucle a demanda cuando la hélice sale de pantalla. */
   active: boolean;
   /**
-   * `low` en móvil: sin postprocesado y con menos resolución. El bloom es lo
-   * más caro de la escena, y en un teléfono convive con el cerebro una pantalla
-   * más arriba.
+   * `low` en móvil o con la calidad medida por los suelos: sin postprocesado y
+   * con menos resolución. El bloom es lo más caro de la escena, y en un teléfono
+   * convive con el cerebro una pantalla más arriba. `mid` conserva el bloom y
+   * recorta píxeles.
    */
-  quality?: 'low' | 'high';
+  quality?: 'low' | 'mid' | 'high';
 }
+
+const DPR: Record<NonNullable<DnaSceneProps['quality']>, [number, number]> = {
+  low: [1, 1.2],
+  mid: [1, 1.4],
+  high: [1, 1.6],
+};
 
 export default function DnaScene({ active, quality = 'high', ...scene }: DnaSceneProps) {
   const low = quality === 'low';
   return (
     <Canvas
-      dpr={low ? [1, 1.3] : [1, 1.6]}
+      dpr={DPR[quality]}
       /* A demanda y no `never`: inactiva no se anima, pero pinta su primer
          fotograma y se repinta si el lienzo cambia de tamaño. */
       frameloop={active ? 'always' : 'demand'}

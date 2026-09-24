@@ -19,6 +19,13 @@ import { useSyncExternalStore } from 'react';
  */
 export type QualityLevel = 'high' | 'mid' | 'low';
 
+/**
+ * Tope de densidad de píxeles de un lienzo 2D según el nivel. Un lienzo que se
+ * repinta cada fotograma cuesta lo que mide en píxeles: a la mitad de densidad,
+ * la cuarta parte del trabajo. Cada lienzo pone su propio máximo por encima.
+ */
+export const DPR_CAP: Record<QualityLevel, number> = { high: 2, mid: 1.4, low: 1 };
+
 const ORDER: readonly QualityLevel[] = ['high', 'mid', 'low'];
 /** Fotograma medio a partir del cual el nivel baja (segundos). */
 const SLOW_FRAME = 0.04;
@@ -44,7 +51,7 @@ function detectLevel(): QualityLevel {
 }
 
 export function getQuality(): QualityLevel {
-  level ??= detectLevel();
+  level ??= typeof window === 'undefined' ? 'high' : detectLevel();
   return level;
 }
 
@@ -86,24 +93,32 @@ let slowFor = 0;
 let alive = 0;
 let quietUntil = WARMUP;
 
+/** Un fotograma más largo que esto no es lentitud, es ausencia (depurador, sistema parado). */
+const ABSENT_FRAME = 3;
+/** Los fotogramas lentos cuentan hasta aquí: uno de 700 ms pesa lo mismo que uno de 500. */
+const FRAME_CAP = 0.5;
+
 /**
  * Un fotograma más, con su duración en segundos. Lo llama el fondo (corre
- * siempre); las escenas no hace falta que lo llamen. Ignora los fotogramas
- * enormes (pestaña oculta, depurador): no son lentitud, son ausencia.
+ * siempre); las escenas no hace falta que lo llamen. La pestaña oculta no
+ * llega aquí: el fondo reinicia su reloj al volver. Hasta la v9.4 se
+ * descartaba todo lo que pasara de 500 ms, y una máquina con fotogramas de
+ * 700 ms —justo la que más lo necesita— no bajaba nunca de nivel.
  */
 export function reportFrame(seconds: number) {
-  if (!(seconds > 0) || seconds > 0.5) return;
-  alive += seconds;
-  average += (seconds - average) * 0.1;
+  if (!(seconds > 0) || seconds > ABSENT_FRAME) return;
+  const frame = Math.min(seconds, FRAME_CAP);
+  alive += frame;
+  average += (frame - average) * 0.1;
   if (alive < quietUntil) return;
   if (average > SLOW_FRAME) {
-    slowFor += seconds;
+    slowFor += frame;
     if (slowFor >= SLOW_SPAN) {
       slowFor = 0;
       if (degradeQuality()) quietUntil = alive + COOLDOWN;
     }
   } else {
-    slowFor = Math.max(0, slowFor - seconds * 0.5);
+    slowFor = Math.max(0, slowFor - frame * 0.5);
   }
 }
 

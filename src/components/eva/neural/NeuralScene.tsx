@@ -350,6 +350,12 @@ export default function NeuralScene({
     return resetCoreSignal;
   }, []);
 
+  /* Si el nivel de calidad cambia, el cerebro se reconstruye: el rótulo de neuronas y sinapsis lo sigue. */
+  const created = useRef(false);
+  useEffect(() => {
+    if (created.current) onReady({ neurons: data.count, synapses: data.edgeCount });
+  }, [data, onReady]);
+
   return (
     <Canvas
       dpr={detail.dpr}
@@ -363,7 +369,10 @@ export default function NeuralScene({
         alpha: true,
         powerPreference: 'high-performance',
       }}
-      onCreated={() => onReady({ neurons: data.count, synapses: data.edgeCount })}
+      onCreated={() => {
+        created.current = true;
+        onReady({ neurons: data.count, synapses: data.edgeCount });
+      }}
       onPointerMissed={(event) => {
         // Doble clic en el vacío: la cámara vuelve. Sobre una región no cuenta.
         if (event.type === 'dblclick') coreSignal.resetRequested = true;

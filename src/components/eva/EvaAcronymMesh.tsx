@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { pointerSignal } from '@/lib/pointer';
+import { DPR_CAP, getQuality, subscribeQuality } from '@/lib/quality';
 
 interface Node {
   /** Sitio de reposo, en píxeles del lienzo. */
@@ -117,7 +118,8 @@ export function EvaAcronymMesh({
     const build = () => {
       const box = canvas.getBoundingClientRect();
       if (box.width < 4 || box.height < 4) return;
-      const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
+      // Con tope por calidad medida: las letras se repintan cada fotograma.
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.75, DPR_CAP[getQuality()]);
       width = box.width;
       height = box.height;
       canvas.width = Math.round(width * ratio);
@@ -337,10 +339,12 @@ export function EvaAcronymMesh({
     );
     spy.observe(canvas);
     document.addEventListener('visibilitychange', start);
+    const unsubscribeQuality = subscribeQuality(rebuild);
 
     return () => {
       stopped = true;
       cancelAnimationFrame(frame);
+      unsubscribeQuality();
       observer.disconnect();
       spy.disconnect();
       document.removeEventListener('visibilitychange', start);
