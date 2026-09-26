@@ -485,7 +485,8 @@ autoría original se conserva):
 - El Studio exportaba PNG y SVG **sin las tipografías dentro**: en un equipo sin Space Grotesk
   salía otra letra (trampa 42). Ahora el archivo exportado lleva sus `@font-face` (el SVG pasa de
   ~9 a ~420 KB) y el PNG sale igual que las piezas del paquete. El preset de Familia dice
-  `NODE 10`.
+  `NODE 10`. La copia del Studio del paquete (`06_SOCIAL_STUDIO/EVA_Social_Studio.html`) se
+  sustituyó por esta.
 - `/links`: su `openGraph` sustituía entero al del layout raíz y perdía `og:site_name` y
   `og:locale` (auditoría, P2-1). Repuestos.
 - `render-frames.mjs`: un aviso de lint (un ternario como instrucción).
