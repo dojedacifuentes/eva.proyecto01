@@ -20,5 +20,9 @@
 - **`/links`** (publicada el 24-09-2026): EVA ARCADE, la puerta desde las redes, en
   `src/app/links/` y `src/components/links/`; textos en `src/content/links.ts`. No pasa por el
   marco de la landing (`SiteChrome`, que montan `app/(eva)/layout.tsx` y la 404). HANDOFF §0.0.5.
+  Desde el 26-09 (rama `feat/academy-lab`, sin publicar) lleva también EVA ACADEMY y EVA LAB, que
+  enlazan a evaprompts; y el sitio entero, la estadística de Vercel (§0.0.6).
+- **EVA LAB** (evaprompts, otro repositorio: `../eva.prompts`) lleva la marca de EVA. Su logotipo
+  sale de aquí: `node scripts/brand-assets.mjs --kit ../eva.prompts`; no se copia la geometría.
 - Los vídeos e imágenes de `public/eva/` son del propietario: no se borran aunque dejen de usarse.
 - No integrar en `main` ni publicar sin el «sí» del propietario.

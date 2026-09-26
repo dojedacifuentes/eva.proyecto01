@@ -106,7 +106,8 @@ export const ejes = {
 
     /** Las dos tomas exteriores, cada una con su biolectura y su caja. */
     exterior: {
-      subject: 'EVA-07',
+      /** Decisión del propietario (26-09-2026): EVA-01, como la imagen de la cápsula y «Proyecto 01». */
+      subject: 'EVA-01',
       title: 'BIOLECTURA',
       hud: { state: 'ESTADO', cycle: 'CICLO' },
       states: { idle: 'EN ESPERA', scanning: 'LEYENDO', traced: 'TRAZADO', done: 'ANALIZADO' },

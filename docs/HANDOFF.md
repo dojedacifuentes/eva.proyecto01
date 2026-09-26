@@ -5,6 +5,8 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**En curso (26-09-2026):** ramas `feat/academy-lab` (aquí) y `feat/marca-eva` (en eva.prompts), sin publicar: Academy y Lab en `/links`, estadística de visitas, EVA-01 y la marca de EVA en EVA LAB. Ver **§0.0.6**.
+
 **Publicada (24-09-2026):** `main` = `79927c1`, la v9.4 más `/links` (EVA ARCADE), con el «sí, publica todo» del propietario: https://evaproyecto01.vercel.app/links. Ver **§0.0.5**.
 
 **Estado (24-09-2026):** `main` = **v9.4**, publicada en
@@ -319,6 +321,70 @@ ni WebGL. La landing no cambia.
   reducido sin animaciones; orden de tabulación Procesal → Familia → EVA con
   foco visible. Landing y 404 conservan su marco. Lint, tipos, 91 pruebas y
   build correctos.
+
+### 0.0.6. Academy y Lab en `/links`, estadística de visitas, EVA-01 y la marca en EVA LAB (26 sept. 2026, ramas sin publicar)
+
+Encargo del propietario, al responder la lista de «cómo progresar»: «1 si
+funciona» (la estadística de visitas), «6 me parece bien» (las dos decisiones
+abiertas de la marca), «7 es eva01»; en `/links`, las secciones EVA ACADEMY y
+EVA LAB con enlaces al curso y al generador de prompts de evaprompts; y en el
+repositorio de evaprompts, la identidad de marca de EVA —logotipos, paleta—
+«dejando todo íntegro».
+
+- **Estadística de visitas** (`@vercel/analytics` 2.0.1, MIT): `<Analytics />`
+  en el layout raíz, así que cuenta la landing y `/links`. **Excepción a la
+  regla «sin dependencias nuevas»**, pedida por el propietario. En el plan
+  gratuito de Vercel: 50.000 eventos al mes, un mes de historia, visitas y de
+  dónde llegan (Instagram, por ejemplo); **no cuenta clics** (los eventos
+  propios son de pago). Para saber qué tarjeta de `/links` funciona se mira el
+  destino: su estadística muestra `/links` como origen, y por eso EVA LAB
+  también la lleva. **Hay que activarla en cada proyecto de Vercel**
+  (Analytics → Enable) antes de publicar: Vercel crea `/_vercel/insights/*` en
+  el despliegue siguiente. Sin eso, y siempre en local, la consola muestra un
+  404 de `/_vercel/insights/script.js`: inofensivo.
+- **`/links`**: dos grupos nuevos en `content/links.ts`. EVA ACADEMY →
+  «Construye tu prompt» (`evaprompts.vercel.app/curso`, nodo 03, índigo) y EVA
+  LAB → el Prompt Lab, el generador de prompts jurídicos
+  (`evaprompts.vercel.app/prompt-lab`, nodo 04, violeta); nombres y
+  descripciones sacados del propio sitio. El Arcade sigue siendo el
+  protagonista (grupo `featured`: tarjetas grandes con ilustración); los demás
+  van en **tarjetas compactas** —ilustración cuadrada con el nodo dentro, texto
+  al lado— y, desde 52rem, lado a lado y del mismo alto: Academy bajo Procesal,
+  Lab bajo Familia. `GameCard` pasó a `EntryCard` (grande o compacta) y las
+  ilustraciones a `EntryArt.tsx`, una por entrada (`art`): dos nuevas, el curso
+  (cinco etapas en escalera, tres hechas) y el generador (doce decisiones en
+  una retícula de 4 × 3 que convergen en un prompt). Descripción SEO al día.
+- **EVA-01** en la biolectura y el interior (`ejes.cuerpo.exterior.subject`);
+  `CUERPO_ENCARGO.md` y `CONTENT_GUIDE.md` al día.
+- **Marca**: confirmadas la E más ancha que alta y el zum del encuadre
+  (`MARCA.md`, «Excepciones»).
+- **La marca en EVA LAB** (repositorio `dojedacifuentes/eva.prompts`, clonado en
+  `PROYECTO EVA01/eva.prompts`, rama `feat/marca-eva`). Next 16.2, Tailwind 4,
+  sin pruebas; su README explica todo. Lo que cambió:
+  - El logotipo: fuera el monograma en rombo; dentro el nombre ƎVΛ + LAB (barra
+    lateral, portada, pie: `components/marca/LogoLab.tsx`) y el símbolo □X
+    (cabecera en móvil, portada: `EvaLogo.tsx`). **La geometría no se copia**:
+    `node scripts/brand-assets.mjs --kit ../eva.prompts` (desde aquí) escribe
+    allí `src/lib/marca-eva.ts` —las dos poses ya colocadas, colores y un SVG
+    suelto con halo— y los mismos `icon.svg` y `apple-icon.png`.
+  - La paleta sin tocar componentes: su `globals.css` redefine la escala
+    `cyan-*` de Tailwind como el azul de EVA (`cyan-500` = #2a8cff, mismos pasos
+    de luminosidad: `cyan-400` sobre el fondo da 8,8 : 1). Su `indigo` y su
+    `purple` ya eran, a ojo, el índigo y el violeta de la marca. Tokens,
+    brillos, foco visible y fondo (azul a la izquierda, violeta a la derecha)
+    al día; verde, ámbar y rojo siguen siendo estados.
+  - El PDF del Prompt Lab: paleta de la marca, franja azul-índigo-violeta y la
+    firma ƎVΛ LAB dibujada con las piezas (jsPDF no desenfoca: sin halo).
+  - Vista previa para redes nueva (no tenía), color de la barra del navegador
+    en móvil, enlace «Universo EVA» a `/links` en el pie, y la estadística.
+- **Revisado.** Aquí: lint (0 errores; el aviso de siempre en
+  `docs/maqueta`), tipos, 91 pruebas y build; `/links` sin desborde a 320, 390,
+  768, 1024 y 1440. En EVA LAB: lint y build limpios; capturas antes y después
+  de las seis secciones a 1440 y 390 (mismo alto de página, ±4 px); el
+  asistente abre y cierra, el Prompt Lab pasa del paso 1 al 2, el PDF sale
+  con sus tres páginas (renderizado con pdf.js para mirarlo), el `h1` se lee
+  «EVA LAB» y el foco es azul; consola sin errores salvo el 404 de la
+  estadística sin activar.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
@@ -829,8 +895,8 @@ apareció dos veces en sitios distintos.
      tocados, mediciones y límites pendientes. Además: limpiar el repo lo más posible.
 0 bis. **Decisiones del Cuerpo que siguen abiertas** (el propietario publicó la v7
    y la v8 sin cambiarlas; detalle en `CUERPO_ENCARGO.md` §10):
-   - rótulo `EVA-07` (encargo) o `EVA-01` (imagen): va `EVA-07`, en
-     `ejes.cuerpo.exterior.subject`;
+   - ~~rótulo `EVA-07` (encargo) o `EVA-01` (imagen)~~ resuelto el 26-09-2026:
+     **`EVA-01`**, en `ejes.cuerpo.exterior.subject`;
    - título y lema del Cuerpo e interior: provisionales, marcados en el código;
    - ~~los vídeos pesan 5,8 y 9,3 MB~~ resuelto en la v8.1: recomprimidos y en
      marcha en todas las pantallas;

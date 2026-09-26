@@ -169,7 +169,7 @@
   list-style: none;
 }
 
-/* ───────────── Tarjeta de juego ───────────── */
+/* ───────────── Tarjeta: base común ───────────── */
 
 .arcade-card {
   --card-accent: var(--arcade-electric);
@@ -193,6 +193,16 @@
     box-shadow 240ms linear,
     background 240ms linear;
 }
+.arcade-card[data-accent='indigo'] {
+  --card-accent: var(--eva-brand-indigo);
+  --card-ink: #aaaeff;
+  --card-glow: rgba(90, 96, 255, 0.34);
+}
+.arcade-card[data-accent='violet'] {
+  --card-accent: var(--eva-brand-violet);
+  --card-ink: #cfa2ff;
+  --card-glow: rgba(162, 77, 255, 0.32);
+}
 .arcade-card[data-accent='magenta'] {
   --card-accent: var(--arcade-magenta);
   --card-ink: #e396f2;
@@ -212,6 +222,7 @@
 .arcade-card__art {
   position: relative;
   height: 7rem;
+  flex: none;
   border-bottom: 1px solid var(--arcade-line);
   color: var(--card-accent);
   background: radial-gradient(60% 90% at 50% 55%, color-mix(in srgb, var(--card-accent) 12%, transparent), transparent 75%);
@@ -339,6 +350,76 @@
   background: color-mix(in srgb, var(--card-accent) 14%, transparent);
 }
 
+/* ───────────── Tarjeta compacta: Academy y Lab ───────────── */
+
+/*
+ * Pesa menos que las del Arcade a propósito: ilustración cuadrada a la
+ * izquierda (con el número de nodo dentro) y el texto al lado, sin estado.
+ */
+.arcade-card--compact {
+  flex-direction: row;
+}
+.arcade-card--compact .arcade-card__art {
+  width: 5.5rem;
+  height: auto;
+  border-right: 1px solid var(--arcade-line);
+  border-bottom: 0;
+  background: radial-gradient(80% 60% at 50% 50%, color-mix(in srgb, var(--card-accent) 14%, transparent), transparent 75%);
+}
+.arcade-card--compact .arcade-card__art svg {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4.25rem;
+  height: 4.25rem;
+}
+.arcade-card--compact .arcade-card__node {
+  top: auto;
+  bottom: 0.5rem;
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.1rem 0.35rem;
+}
+.arcade-card--compact .arcade-card__body {
+  min-width: 0;
+  padding: 0.9rem 1rem 0.85rem;
+}
+.arcade-card--compact .arcade-card__title {
+  margin-top: 0.3rem;
+  font-size: 1.15rem;
+}
+.arcade-card--compact .arcade-card__text {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.arcade-card--compact .arcade-card__cta {
+  min-height: 2.25rem;
+  padding-top: 0.55rem;
+  font-size: 0.72rem;
+}
+.arcade-card--compact .arcade-card__arrow {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.85rem;
+}
+
+/* Los grupos que siguen al Arcade: uno bajo otro en móvil, lado a lado en escritorio. */
+.arcade-more {
+  display: grid;
+  gap: clamp(1.5rem, 4svh, 2rem);
+  margin-top: clamp(1.75rem, 4svh, 2.5rem);
+}
+.arcade-more .arcade-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+/* Las dos tarjetas de la fila, del mismo alto aunque una tenga más texto. */
+.arcade-more .arcade-group__list {
+  flex: 1;
+}
+
 /* ───────────── Conoce a EVA ───────────── */
 
 .arcade-gate {
@@ -436,18 +517,24 @@
     margin-top: 3rem;
   }
   /* Procesal a la izquierda (azul), Familia a la derecha (violeta): el mismo reparto que el fondo. */
-  .arcade-group__list {
+  .arcade-group--featured .arcade-group__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem;
   }
-  .arcade-card__art {
+  .arcade-card--featured .arcade-card__art {
     height: 8.5rem;
   }
-  .arcade-card__body {
+  .arcade-card--featured .arcade-card__body {
     padding: 1.2rem 1.4rem 1.3rem;
   }
-  .arcade-card__title {
+  .arcade-card--featured .arcade-card__title {
     font-size: 1.8rem;
+  }
+  /* Academy bajo Procesal, Lab bajo Familia: la misma retícula que el Arcade. */
+  .arcade-more {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
   }
 }
 

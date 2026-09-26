@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { site } from '@/content/site';
@@ -26,6 +27,11 @@ const jetbrains = JetBrains_Mono({
  * El layout raíz sólo pone el documento, las dos letras y la base de estilos.
  * Lo que rodea a la landing (campo, cabecera, pie, canal) va en `SiteChrome`,
  * que montan la landing y la 404; `/links` no lo carga.
+ *
+ * `Analytics` cuenta visitas con la estadística de Vercel (sin cookies): cuántas,
+ * de dónde llegan —Instagram, por ejemplo— y a qué ruta. Sólo funciona si la
+ * estadística está activada en el proyecto de Vercel; en el plan gratuito no
+ * cuenta clics.
  */
 
 export const metadata: Metadata = {
@@ -61,7 +67,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es-CL"
       className={`${grotesk.variable} ${jetbrains.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
