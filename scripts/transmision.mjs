@@ -17,7 +17,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { CALC_MS, TYPE_MS, holdAfter, pauseAfter } from '../src/lib/channel.ts';
 
 const args = process.argv.slice(2);
@@ -34,7 +34,8 @@ const fps = opt('fps', 30);
 const tail = opt('tail', 2.5);
 const speed = opt('speed', 1);
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+// `fileURLToPath`, no `new URL(…).pathname`: en Windows ésta da «/C:/…» con los espacios en %20.
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { compose, offsetOf } = await import(pathToFileURL(path.join(root, 'tools/social-studio/src/templates.js')).href);
 /** Las mismas fuentes incrustadas que el Studio (OFL 1.1), para que Chrome no dependa del sistema. */
 function fontFaces() {

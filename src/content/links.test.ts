@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isBinaryCode } from '@/lib/binary';
+import { bin, isBinaryCode } from '@/lib/binary';
 import { groups, links } from './links';
 
 test('los nodos de cada grupo van en binario, por posición y con el ancho de su serie', () => {
@@ -9,9 +9,13 @@ test('los nodos de cada grupo van en binario, por posición y con el ancho de su
     assert.ok(nodes.every(isBinaryCode), `${group.id}: ${nodes.join(' ')}`);
     assert.deepEqual(nodes, [...new Set(nodes)], 'sin repetidos');
     assert.ok(nodes.every((node) => node.length === (nodes[0]?.length ?? 0)), 'mismo ancho');
+    // Cada grupo es su propia serie: empieza en 1.
+    if (nodes.length) assert.equal(nodes[0], bin(1, nodes[0].length), `${group.id} empieza en ${nodes[0]}`);
   }
-  const arcade = groups.find((group) => group.id === 'arcade');
-  assert.deepEqual(arcade?.entries.map((entry) => entry.node), ['01', '10']);
+  const nodesOf = (id: string) => groups.find((group) => group.id === id)?.entries.map((entry) => entry.node);
+  assert.deepEqual(nodesOf('arcade'), ['01', '10']);
+  assert.deepEqual(nodesOf('academy'), ['01']);
+  assert.deepEqual(nodesOf('lab'), ['01']);
 });
 
 test('los ids son únicos y todo destino es una URL absoluta o una ruta del sitio', () => {
@@ -22,7 +26,7 @@ test('los ids son únicos y todo destino es una URL absoluta o una ruta del siti
   }
 });
 
-test('un grupo sin entradas existe para el futuro y no rompe nada', () => {
-  const empty = groups.filter((group) => group.entries.length === 0);
-  assert.ok(empty.every((group) => group.label.length > 0));
+test('el Arcade es el único grupo protagonista y todo grupo lleva rótulo', () => {
+  assert.deepEqual(groups.filter((group) => group.featured).map((group) => group.id), ['arcade']);
+  assert.ok(groups.every((group) => group.label.trim().length > 0));
 });

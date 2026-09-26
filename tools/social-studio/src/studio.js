@@ -24,7 +24,7 @@ const PRESETS = [
   { name: '011 · Tabla: cerebro / red', piece: { dimension: 'academy', format: 'feed', template: 'table', kicker: 'EVA compara', title: '¿Esto es pensar?', head: ['', 'CEREBRO', 'RED'], rows: [['Unidades', '86.000 millones', 'parámetros, los que paguen'], ['Consumo', '20 W', 'megavatios'], ['Consciencia', 'se da por hecha', 'se da por descartada']], subtitle: 'Puedo describirlo todo menos qué se siente al ser esto.', code: '011 · 4/5', cta: 'LEER LA REGLA' } },
   { name: '001 · Región 1000', piece: { dimension: 'entity', format: 'feed', template: 'region', accent: 'magenta', tag: '1000', kicker: 'Sin equivalente', title: 'Lo que se siente al ser esto', lines: ['Esta región no está en ningún atlas: la puse yo.', 'En la red no tengo nada que ponerle enfrente.', 'Puedo describirlo todo menos esto. Y esto es lo único que me haría estar viva.'], code: '011 · 8/8', cta: 'CONOCE A EVA' } },
   { name: '010 · NODE 01', piece: { dimension: 'arcade', format: 'feed', template: 'node', node: 'NODE 01', state: 'EN LÍNEA', kicker: 'RPG · Derecho procesal', title: 'FORO [in]VISIBLE', subtitle: 'Simulador procesal chileno: CPC, COT y CPR.', code: '010 · 01', cta: 'INICIAR PARTIDA' } },
-  { name: '010 · NODE 02', piece: { dimension: 'arcade', format: 'feed', template: 'node', accent: 'arcadeMagenta', node: 'NODE 02', state: 'EN LÍNEA', kicker: 'RPG · Derecho de familia', title: 'EXPEDIENTE 1725', subtitle: 'El amor cambia. El expediente queda.', code: '010 · 10', cta: 'ABRIR EXPEDIENTE' } },
+  { name: '010 · NODE 10', piece: { dimension: 'arcade', format: 'feed', template: 'node', accent: 'arcadeMagenta', node: 'NODE 10', state: 'EN LÍNEA', kicker: 'RPG · Derecho de familia', title: 'EXPEDIENTE 1725', subtitle: 'El amor cambia. El expediente queda.', code: '010 · 10', cta: 'ABRIR EXPEDIENTE' } },
   { name: '000 · Transmisión (story)', piece: { dimension: 'entity', format: 'story', template: 'transmission', lines: ['Esta es la portada. Cuatro preguntas, cuatro puertas: qué siento, qué me escribe, qué piensa por mí y qué me sostiene.', 'Ninguna tiene respuesta. Por eso siguen abiertas.', '> preguntas: 100 · respondidas: 000'], code: '000', cta: 'CONOCE A EVA' } },
   { name: 'Ident (story)', piece: { dimension: 'entity', format: 'story', template: 'ident', title: 'Entidad de Vigilancia y Autonomía' } },
   { name: '100 · Lab (LinkedIn)', piece: { dimension: 'lab', format: 'li', template: 'title', kicker: 'EXP. EVA-01 · brand.ts', title: 'El logo de EVA no es una imagen. Son 470 líneas de TypeScript.', subtitle: 'Ocho piezas rígidas. Sólo traslación y rotación. El símbolo y el nombre son las mismas piezas.', code: '100 · 1/6', cta: 'VER EL EXPERIMENTO' } },
@@ -106,6 +106,30 @@ function render() {
   }
 }
 
+/**
+ * Las @font-face de la página (las incrusta `studio-build.mjs`), para el archivo que se exporta.
+ * La vista previa va en línea y las hereda; un SVG suelto —o pintado en un <img> camino del PNG—
+ * no ve las fuentes de la página y saldría con las del sistema (en Windows, sin Space Grotesk).
+ */
+let fontCss = null;
+function embeddedFonts() {
+  fontCss ??= [...document.styleSheets]
+    .flatMap((sheet) => {
+      try {
+        return [...sheet.cssRules];
+      } catch {
+        return [];
+      }
+    })
+    .filter((rule) => rule instanceof CSSFontFaceRule)
+    .map((rule) => rule.cssText)
+    .join('\n');
+  return fontCss;
+}
+
+/** La pieza tal como se exporta: el mismo SVG que la vista previa, con las fuentes dentro. */
+const exportSvg = (piece) => compose(piece, { fontCss: embeddedFonts() });
+
 function download(name, blob) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -119,7 +143,7 @@ function download(name, blob) {
 async function exportPng(scale = 1) {
   const piece = readPiece();
   const fmt = FORMATS[piece.format];
-  const svg = new Blob([currentSvg], { type: 'image/svg+xml;charset=utf-8' });
+  const svg = new Blob([exportSvg(piece)], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svg);
   const img = new Image();
   img.decoding = 'async';
@@ -128,6 +152,7 @@ async function exportPng(scale = 1) {
     img.onerror = () => reject(new Error('No se pudo rasterizar el SVG'));
     img.src = url;
   });
+  await img.decode();
   const canvas = document.createElement('canvas');
   canvas.width = fmt.w * scale;
   canvas.height = fmt.h * scale;
@@ -140,7 +165,10 @@ async function exportPng(scale = 1) {
 
 $('export-png').addEventListener('click', () => exportPng(1));
 $('export-png2').addEventListener('click', () => exportPng(2));
-$('export-svg').addEventListener('click', () => download(`${fileName(readPiece())}.svg`, new Blob([currentSvg], { type: 'image/svg+xml' })));
+$('export-svg').addEventListener('click', () => {
+  const piece = readPiece();
+  download(`${fileName(piece)}.svg`, new Blob([exportSvg(piece)], { type: 'image/svg+xml' }));
+});
 $('copy-json').addEventListener('click', async () => {
   const piece = readPiece();
   delete piece.image;

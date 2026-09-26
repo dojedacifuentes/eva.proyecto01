@@ -1,4 +1,4 @@
-> **Histórico.** Describe la v8.2 (20-09-2026). El estado actual está en `HANDOFF.md` (§0.0 a §0.0.6) y en `CONTENT_SYSTEM.md`.
+> **Histórico.** Describe la v8.2 (20-09-2026). El estado actual está en `HANDOFF.md` (§0.0 a §0.0.8) y en `CONTENT_SYSTEM.md`.
 
 # Punto de control — 20 de septiembre de 2026 (v8.2)
 

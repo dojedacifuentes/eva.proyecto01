@@ -18,8 +18,9 @@ cuestionamiento desde dentro —una pregunta, cuatro lugares—, todo con numera
 ```
 
 EVA se organiza en cuatro dimensiones (`docs/CONTENT_SYSTEM.md`): **ENTITY** (la landing, lo que
-EVA es), **ARCADE** (`/links`: sus juegos, en línea), **ACADEMY** (lo que enseña; hoy contenido,
-no ruta) y **LAB** (cómo se hace: los motores y las herramientas de `scripts/` y `tools/`).
+EVA es), **ARCADE** (`/links`: sus juegos, en línea), **ACADEMY** (lo que enseña: en `/links`, el
+curso de EVA LAB; en redes, las microclases) y **LAB** (con qué trabaja y cómo se hace: en `/links`,
+el generador de prompts de EVA LAB; aquí, los motores y las herramientas de `scripts/` y `tools/`).
 
 Cada lugar tiene una caja **EVA // ESCRIBE** donde EVA teclea su contenido, corto y en una sola
 pantalla: ciencia ficción con humor negro (Dick, Asimov, el Titiritero de Ghost in the Shell),
@@ -36,7 +37,7 @@ ni productos.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Space Grotesk / JetBrains Mono ·
 three.js con React Three Fiber, drei y postprocessing (genoma, núcleo neural e interior del cuerpo,
-cargados en diferido). Sin librerías de animación ni de audio: el movimiento es CSS, el fondo y la
+cargados en diferido) · estadística de visitas de Vercel (`@vercel/analytics`). Sin librerías de animación ni de audio: el movimiento es CSS, el fondo y la
 biolectura son canvas 2D propios y los microsonidos se sintetizan con Web Audio.
 
 ## Desarrollo
@@ -50,10 +51,11 @@ npm test           # lógica pura (binario, estructura, canal, encuadre, biolect
 npm run build
 ```
 
-Herramientas de Lab (sin dependencias; Node 22+ y el Chrome de la máquina):
+Herramientas de Lab (sin dependencias; Node 22+ y el Chrome de la máquina; los vídeos, con ffmpeg):
 
 ```bash
 npm run brand:assets   # favicon e icono de inicio desde la geometría de la marca
+node scripts/brand-assets.mjs --kit ../eva.prompts   # la marca para EVA LAB y los juegos (sin copiar la geometría)
 npm run brand:frames   # poses y fotogramas de la marca en SVG (→ render → ffmpeg)
 npm run studio         # empaqueta tools/social-studio/index.html (generador de piezas para redes)
 node scripts/render-frames.mjs <svg|carpeta> <salida>     # SVG/HTML → PNG con Chrome (CDP)
@@ -68,8 +70,10 @@ Despliegue: Vercel, sin configuración. Con dominio propio, definir `NEXT_PUBLIC
 Sitio: https://evaproyecto01.vercel.app/ · rama de producción: `main`.
 Runtime: Node 24.x. Next.js y eslint-config-next: 16.3.5.
 
-Biolink: https://evaproyecto01.vercel.app/links (EVA ARCADE: los juegos, numerados en binario, y
-la puerta a la landing; no carga nada de la landing). El botón «Escribir a EVA» usa el Instagram
+Biolink: https://evaproyecto01.vercel.app/links (EVA ARCADE: los dos juegos, numerados en binario
+—`NODE 01`, `NODE 10`—; EVA ACADEMY y EVA LAB, con el curso y el generador de prompts de EVA LAB,
+https://evaprompts.vercel.app/; y la puerta a la landing; no carga nada de la landing). Estadística
+de visitas de Vercel (sin cookies) en todo el sitio. El botón «Escribir a EVA» usa el Instagram
 público de EVA. Las antiguas rutas `/cursos`, `/informes`, `/prototipos`, `/estudios-juridicos` y
 `/panel` redirigen a la portada y `/eva` al cerebro; las anclas de versiones anteriores llevan a
 donde hoy vive lo que contaban: `#nucleo` al Cerebro, `#entidad`, `#redes`, `#causas`,
@@ -94,7 +98,8 @@ src/
                        ASSET_LICENSES)
     layout/            SiteChrome, SiteHeader, ContextSpy (dónde está el visitante), BitRail,
                        MobileNavigation, SiteFooter
-    links/             ArcadeHero, ArcadeMark (el símbolo animado en CSS), GameCard, EvaGateway
+    links/             ArcadeHero, ArcadeMark (el símbolo animado en CSS), EntryCard y EntryArt
+                       (tarjetas grandes y compactas, con su ilustración), EvaGateway
     sections/          HeroEva, ConscienciaSection, GenomaSection, CerebroSection, CuerpoSection
   content/             ← todo lo editable: structure (el recorrido), ejes, consciencia, channel,
                        site, neuroscan, assets, links

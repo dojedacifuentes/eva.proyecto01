@@ -91,7 +91,7 @@ ninguna imagen dibujada a mano:
 
 | Qué | Cómo | Dónde |
 |---|---|---|
-| Las cinco poses como SVG/PNG y los fotogramas de `REVEAL`/`LOOP` | `brandSvgFromPose` (`brand.ts`) + `scripts/brand-frames.mjs` → `scripts/render-frames.mjs` (Chrome, sin dependencias) → ffmpeg | `tools/`, paquete `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS` |
+| Las cinco poses como SVG/PNG y los fotogramas de `REVEAL`/`LOOP` | `brandSvgFromPose` (`brand.ts`) + `scripts/brand-frames.mjs` → `scripts/render-frames.mjs` (Chrome, sin dependencias) → ffmpeg | `tools/out/` (no se sube a git), paquete `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS` |
 | Piezas para Instagram y LinkedIn (feed, story, documento) | **EVA Social Studio**: `tools/social-studio/` (plantillas SVG sobre `brand.ts` y `brand-art.ts`; un solo HTML con las fuentes incrustadas) | `node scripts/studio-build.mjs` |
 | El campo de la Consciencia como vídeo | `scripts/eva-signal.mjs` (motor puro, determinista) | ídem |
 | Texto tecleado con el ritmo de SINAPSIS | `scripts/transmision.mjs` | ídem |

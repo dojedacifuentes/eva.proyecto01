@@ -26,5 +26,11 @@
   `../famialiarpg`) llevan la marca de EVA. Su logotipo sale de aquí: `node scripts/brand-assets.mjs
   --kit <repositorio>`; no se copia la geometría. El clon `../eva.game.proce` tiene trabajo ajeno sin
   guardar: no tocarlo (§0.0.7).
+- **Sistema de contenido** (26-09-2026, rama `feat/eva-content-system` hasta el «sí»): cuatro
+  dimensiones (Entity · Arcade · Academy · Lab), guía en `docs/CONTENT_SYSTEM.md`. Herramientas de
+  Lab sin dependencias en `scripts/` (marca a fotogramas, SVG → PNG con Chrome, campo de partículas,
+  transmisiones) y el EVA Social Studio en `tools/social-studio/` (doble clic en su `index.html`;
+  se regenera con `npm run studio`). El paquete de origen —auditoría, Brand OS, banco de ideas,
+  piezas de Instagram y LinkedIn— está en `../EVA_CONTENT_SYSTEM_v1/`. HANDOFF §0.0.8.
 - Los vídeos e imágenes de `public/eva/` son del propietario: no se borran aunque dejen de usarse.
 - No integrar en `main` ni publicar sin el «sí» del propietario.

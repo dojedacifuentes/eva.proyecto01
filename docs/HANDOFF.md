@@ -436,48 +436,81 @@ de tocar nada), en la rama `feat/eva-arcade`:
 
 ### 0.0.8. El sistema de contenido y las herramientas de Lab (26 sept. 2026, en rama)
 
-Encargo: convertir los activos de EVA en un sistema sostenible de producto, marca, contenido,
-distribución y experimentación, con cuatro dimensiones (ENTITY · ARCADE · ACADEMY · LAB), sin
-destruir la dimensión filosófica ni convertir EVA en una landing corporativa. Auditar antes de
-tocar; trabajar fuera de `main`; distinguir siempre existente / prototipo / concepto / roadmap.
-Todo el material está en `EVA_CONTENT_SYSTEM_v1/` (fuera del repo) y la guía en
+Llegó como paquete: `EVA_CONTENT_SYSTEM_v1`, un zip que el propietario pasó con «IMPLEMENTA». Es
+el trabajo de otra sesión (commits de «Natalia (Hackea)», con Claude) que ordena a EVA como sistema
+de producto, marca, contenido, distribución y experimentación en cuatro dimensiones —ENTITY ·
+ARCADE · ACADEMY · LAB— sin tocar la landing. Trae una auditoría (P0–P3), el Brand OS (voz, tokens,
+logos, animación, fuentes), un banco de 67 semillas, las piezas del primer ciclo de Instagram y
+LinkedIn ya renderizadas (PNG, MP4, PDF), cinco prototipos, un roadmap de 90 días y la rama
+`feat/eva-content-system` (bundle y parches) sobre `fa008e3`, anterior a Academy y Lab. El paquete,
+descomprimido, queda junto a los repositorios: `PROYECTO EVA01/EVA_CONTENT_SYSTEM_v1/`. La guía es
 `docs/CONTENT_SYSTEM.md`.
 
-- **Nada cambia en la landing.** Ni secciones, ni interacción, ni textos, ni estilos. Academy y Lab
-  nacen como grupos en `content/links.ts` (vacíos: no se pintan) y como contenido.
+**Lo que trae la rama** (sus cuatro commits, reaplicados sobre `main` con `cherry-pick -x`; la
+autoría original se conserva):
+
+- **Nada cambia en la landing.** Ni secciones, ni interacción, ni textos, ni estilos.
 - **`lib/brand.ts`:** `brandSvgFromPose(pose, { pad, blur, box, ground, halo })` acepta cualquier
   pose —también las intermedias de `sample()`— y pinta las piezas a medio apagar con su opacidad;
-  `brandSvg(poseId)` la llama. Tres pruebas más (`brand.test.ts`, 11). Con esto la marca se
-  exporta a SVG/PNG/vídeo sin navegador (`scripts/brand-frames.mjs` + `render-frames.mjs` + ffmpeg).
-- **`content/links.ts`:** los nodos de cada grupo salen de su posición en binario con `lib/binary`
-  (`withNodes`): `01`, `10` (antes «02» a mano). `gateway.href` pasa a `'/'` (relativo: vale con
-  dominio propio y en previews). Grupos `academy` y `lab` vacíos. Prueba nueva `links.test.ts` (3).
-- **Herramientas** (`scripts/`, sin dependencias): `render-frames.mjs` (SVG/HTML → PNG por CDP,
-  misma técnica que `perf-audit`; PNG transparente si no se pasa `--bg`, gracias a
-  `Emulation.setDefaultBackgroundColorOverride`), `eva-signal.mjs` (el motor de la Consciencia a
-  fotogramas; determinista, 10 s en ~0,4 s), `transmision.mjs` (texto tecleado con el ritmo de
-  `channel.ts`), `studio-build.mjs` (empaqueta el Social Studio; `--render` por guion).
+  `brandSvg(poseId)` la llama. Salida idéntica a la de antes salvo un redondeo en el degradado del
+  nombre (`-15.825000000000001` → `-15.825`): iconos, vistas previas y el kit de EVA LAB y de los
+  juegos no cambian a la vista. Tres pruebas más (`brand.test.ts`, 11).
+- **`content/links.ts`:** los nodos salen de la posición de cada entrada en su grupo, en binario
+  (`withNodes`, con `lib/binary`): `NODE 01`, `NODE 10` (antes «02» a mano). `gateway.href` pasa a
+  `'/'` (relativo: vale con dominio propio y en las vistas previas). Prueba nueva `links.test.ts`.
+- **Herramientas** (`scripts/`, sin dependencias): `brand-frames.mjs` (las poses y los fotogramas de
+  `REVEAL`/`LOOP` en SVG), `render-frames.mjs` (SVG/HTML → PNG con el Chrome de la máquina por CDP,
+  transparente si no se pasa `--bg`), `eva-signal.mjs` (el motor de la Consciencia a fotogramas;
+  determinista), `transmision.mjs` (texto tecleado con el ritmo de `channel.ts`), `studio-build.mjs`
+  (empaqueta el Studio; `--render` por guion). `package.json`: `brand:assets`, `brand:frames`,
+  `studio`. Lo que generan va a `tools/out/`, que git ignora (regla `out/`).
 - **EVA Social Studio** (`tools/social-studio/`): plantillas SVG (`src/templates.js`) sobre la
-  geometría de la marca y los tokens; interfaz en un solo HTML con las fuentes incrustadas
-  (`index.html`, generado; se abre con doble clic; exporta PNG/SVG sin red). Herramienta interna:
-  `tools/` no lo sirve Next. Comprobado en Chrome sin interfaz a 1440×900 y 390×844, consola limpia,
-  exportación PNG desde el navegador verificada.
-- **Docs:** README (cuatro lugares, rutas reales, `/links`, herramientas), `MARCA.md` (duraciones
-  reales: REVEAL 4,05 s, LOOP 7,5 s; sección «Fuera de la página»), `CONTENT_GUIDE.md` (ruta de la
-  página, `/links`), `ASSET_LICENSES.md` (permisos confirmados el 26-09-2026; póster de la portada
-  y fuentes incrustadas registrados), `CHECKPOINT` y `LANDING_ROADMAP` marcados como históricos;
-  comentarios obsoletos corregidos en `structure.ts`, `site.ts`, `types.ts`, `context.ts`,
-  `channel-store.ts`.
-- **Límite de esta sesión:** el registro npm estaba bloqueado en su entorno, así que `npm ci` no
-  corrió: se ejecutaron las 94 pruebas puras (`node --test`; `quality.test.ts` importa React y
-  queda para CI), un typecheck parcial con `tsc 6` sobre los módulos puros y un lint con las reglas
-  base sobre los scripts. **Lint, typecheck completo y build se comprueban en el workflow de GitHub
-  Actions del PR antes de fusionar.** Vercel despliega `main`.
-- Trampa nueva (39): **un `data:` HTML no puede cargar `file://`.** Para rasterizar un SVG con
-  Chrome hay que escribir un HTML junto al archivo (`--allow-file-access-from-files`) y, si se
-  quiere fondo transparente, `Emulation.setDefaultBackgroundColorOverride`; si no, el PNG sale
-  blanco opaco. Y (40): **`overlay` de ffmpeg con una imagen fija de un solo fotograma nunca llega a
-  `st=3` de un `fade`**: la imagen va con `-loop 1` y el filtro con `shortest=1`.
+  geometría de la marca y los tokens del Brand OS; un solo HTML (`index.html`, generado) con las
+  fuentes incrustadas que se abre con doble clic y exporta PNG/SVG sin red. Herramienta interna:
+  `tools/` no lo sirve Next.
+- **Docs:** README, `MARCA.md` (duraciones reales: `REVEAL` 4,05 s, `LOOP` 7,5 s; «Fuera de la
+  página»), `CONTENT_GUIDE.md`, `ASSET_LICENSES.md` (retratos, vídeos y marca registrados como
+  **confirmados para redes el 26-09-2026** por la sesión del paquete; fuentes incrustadas en
+  `tools/`), `CHECKPOINT` y `LANDING_ROADMAP` marcados como históricos, comentarios obsoletos
+  corregidos en `structure.ts`, `site.ts`, `types.ts`, `context.ts` y `channel-store.ts`.
+
+**Al integrarla** (lo que cambió respecto del paquete):
+
+- El paquete dejaba Academy y Lab vacíos. Se conservan el curso y el generador (§0.0.6), numerados
+  también con `withNodes`: **cada grupo es su propia serie**, así que el curso y el generador son
+  `01` de su grupo (antes `03` y `04`, seguidos en toda la página). Así sigue siendo cierto lo que
+  dicen las piezas del paquete: «el segundo juego es `NODE 10`, el tercero `NODE 11`». La sección
+  del paquete era §0.0.6; aquí es §0.0.8.
+- `scripts/transmision.mjs` no arrancaba en Windows (trampa 41).
+- El Studio exportaba PNG y SVG **sin las tipografías dentro**: en un equipo sin Space Grotesk
+  salía otra letra (trampa 42). Ahora el archivo exportado lleva sus `@font-face` (el SVG pasa de
+  ~9 a ~420 KB) y el PNG sale igual que las piezas del paquete. El preset de Familia dice
+  `NODE 10`.
+- `/links`: su `openGraph` sustituía entero al del layout raíz y perdía `og:site_name` y
+  `og:locale` (auditoría, P2-1). Repuestos.
+- `render-frames.mjs`: un aviso de lint (un ternario como instrucción).
+- Quick win Q3 del roadmap (UTM en la bio): en el plan gratuito de Vercel la estadística no muestra
+  UTM (son de Web Analytics Plus). No se usa; el origen de las visitas ya sale en «Referrers».
+
+**Comprobado aquí** (lo que la sesión del paquete no pudo: su entorno no tenía el registro de npm):
+lint (0 errores; el aviso de siempre en `docs/maqueta`), tipos, 97 pruebas, build y
+`npm audit --omit=dev`. En Windows: `npm run brand:frames` (5 poses, 347 fotogramas),
+`render-frames` (15 PNG, con transparencia), `eva-signal` (60 fotogramas en ~0,4 s),
+`transmision` (209 fotogramas) y `npm run studio` (el mismo contenido que trae el paquete). El
+Studio en Chrome sin interfaz a 1440×900 y 390×844: sus diez presets componen, exporta un PNG de
+1080×1350 con las fuentes correctas y el SVG, consola limpia, sin desborde. `/links` en el
+navegador, en móvil y escritorio: `NODE 01`, `NODE 10`, `01`, `01`, la puerta a `/`,
+`og:site_name` «EVA» y `og:locale` «es_CL»; sin desborde ni errores. No hay ffmpeg en esta máquina:
+los vídeos del ciclo ya vienen hechos en el paquete.
+
+**Qué cambia en producción al publicar:** sólo `/links` —los números de las tarjetas (`NODE 10`
+en vez de `02`; `01` en Academy y Lab en vez de `03` y `04`), la puerta relativa y el nombre del
+sitio y el idioma al compartir—. La landing, EVA LAB y los juegos no cambian.
+
+**Abierto, del propietario:** el tono de los textos nuevos del paquete marcados ⚠️ (el carrusel C4
+y los posts de LinkedIn en primera persona); grabar R4 (gameplay); si Academy y Lab siguen en
+índigo y violeta en `/links` o toman el verde y el cian que el Brand OS les da en redes; y lo del
+roadmap 31–60 (tokens con una sola fuente, EVA Scanner, sonido de marca). Trampas nuevas: 39 a 42.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
@@ -954,6 +987,21 @@ apareció dos veces en sitios distintos.
 38. **`npx next start` sobrevive a detener la tarea en Windows**: el `node`
     hijo sigue escuchando y sirve la compilación vieja. Cerrarlo por puerto
     (`Get-NetTCPConnection -LocalPort <p>` → `Stop-Process`).
+39. **Un `data:` HTML no puede cargar `file://`.** Para rasterizar un SVG con
+    Chrome, `render-frames` escribe un HTML junto al archivo
+    (`--allow-file-access-from-files`); para un PNG transparente hace falta
+    `Emulation.setDefaultBackgroundColorOverride`: si no, sale blanco opaco.
+40. **`overlay` de ffmpeg con una imagen fija de un solo fotograma nunca llega
+    a `st=3` de un `fade`**: la imagen va con `-loop 1` y el filtro con
+    `shortest=1`.
+41. **`new URL(import.meta.url).pathname` no es una ruta en Windows**: da
+    `/C:/…` con los espacios en `%20` (el proyecto vive en «PROYECTO EVA01»), y
+    `path.resolve` lo convierte en `C:\C:\…`. En los scripts, siempre
+    `fileURLToPath(import.meta.url)`.
+42. **Un SVG suelto no ve las fuentes de la página.** Ni al descargarlo ni al
+    pintarlo en un `<img>` camino de un PNG: usa las del sistema, y en un equipo
+    sin Space Grotesk sale otra letra. El Studio exporta con las `@font-face`
+    (en `data:`) dentro del SVG, como ya hacía `studio-build --render`.
 
 ---
 
@@ -1016,12 +1064,13 @@ apareció dos veces en sitios distintos.
    (`ejes.genoma.birth`), explicaciones del canal (`channel.scripts`) y líneas
    de estado.
 4. ~~El vídeo pesa 3,71 MB~~ Recomprimidos los tres en la v8.1 (0,56 / 0,80 / 1,43 MB, sin audio).
-5. **Permiso de publicación de retratos y vídeo** (`ASSET_LICENSES.md`).
+5. ~~**Permiso de publicación de retratos y vídeo**~~ registrado como confirmado para redes el
+   26-09-2026 (paquete del sistema de contenido, §0.0.8; `ASSET_LICENSES.md`).
 6. El contacto es el Instagram público. No inventar otro canal.
 7. `prefers-reduced-motion`, Safari iOS y lector de pantalla: implementados,
    nunca probados de punta a punta.
-8. **Sistema de contenido** (26-09-2026, `docs/CONTENT_SYSTEM.md`): fusionar la rama tras CI;
-   publicar el ciclo de 30 días; tokens con una sola fuente (`interface.css` redefine nueve en la
+8. **Sistema de contenido** (26-09-2026, `docs/CONTENT_SYSTEM.md`, §0.0.8): publicar la rama con
+   el «sí» del propietario; publicar el ciclo de 30 días (lo hace el propietario, desde el paquete); tokens con una sola fuente (`interface.css` redefine nueve en la
    landing y `/links` tiene su paleta: documentado en `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS/tokens.json`,
    sin tocar el CSS todavía); EVA Scanner (biolectura sobre cualquier imagen) y sonido de marca
    (`lib/genome.ts` → WAV) en el roadmap 31–60.

@@ -26,7 +26,7 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Activar/desactivar efectos | `content/site.ts` | `flags` |
 | Colores, radios, tiempos, suelo tipográfico | `src/styles/tokens.css` | Variables `--eva-*` |
 | SEO | `content/site.ts` | `site.seo` |
-| **`/links` (EVA ARCADE)**: hero, tarjetas de los juegos, la puerta a la landing; los grupos EVA ACADEMY y EVA LAB (vacíos hasta que tengan entradas) | `content/links.ts` | `links`, `groups` (el nodo de cada entrada sale de su posición, en binario: `01`, `10`, `11`…) |
+| **`/links` (EVA ARCADE)**: hero, tarjetas de los juegos, los grupos EVA ACADEMY y EVA LAB (el curso y el generador de prompts de EVA LAB), la puerta a la landing | `content/links.ts` | `links`, `groups` (el nodo de cada entrada sale de su posición dentro del grupo, en binario: los juegos `01`, `10`, `11`…; Academy y Lab empiezan en `01`) |
 | Piezas para redes (Instagram, LinkedIn) | `tools/social-studio/` + `docs/CONTENT_SYSTEM.md` | plantillas y guiones; la voz es la de esta guía |
 
 ## Numeración binaria

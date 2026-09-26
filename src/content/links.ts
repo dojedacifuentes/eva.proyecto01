@@ -7,6 +7,10 @@
  * Los demás —EVA ACADEMY, EVA LAB— van debajo, en tarjetas compactas y, en
  * escritorio, lado a lado. Un grupo nuevo se añade a `groups`; un grupo sin
  * entradas no se muestra.
+ *
+ * Cada grupo numera sus entradas en binario, como su propia serie: los juegos
+ * van `NODE 01`, `NODE 10` (el tercero será `NODE 11`) y la primera entrada de
+ * Academy o de Lab es `01`.
  */
 
 import { bin, bitsFor } from '@/lib/binary';
@@ -23,7 +27,8 @@ export interface LinkEntry {
   /**
    * Número de nodo, en binario y con el ancho de su serie («01», «10», «11»…), como todo
    * identificador de EVA (CONTENT_GUIDE, «Numeración binaria»). Lo pone `withNodes` a partir de
-   * la posición; no se escribe. Hasta el 26-09-2026 iba en decimal («01», «02»).
+   * la posición dentro de su grupo; no se escribe. Hasta el 26-09-2026 iba en decimal y seguido
+   * en toda la página («01» a «04»).
    */
   node: string;
   /** Rótulo de arriba: qué es y de qué trata. */
