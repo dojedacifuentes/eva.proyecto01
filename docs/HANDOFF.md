@@ -5,6 +5,8 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**En curso (26-09-2026, tarde):** rama `feat/eva-arcade` en los dos juegos (y `feat/kit-juegos` aquí), sin publicar: los juegos entran en EVA ARCADE. Ver **§0.0.7**.
+
 **Publicada (26-09-2026):** `main` = `0d2e777` aquí y `7f00094` en eva.prompts, con el «sí publica» del propietario: Academy y Lab en `/links`, estadística de visitas (activa en los dos proyectos), EVA-01 y la marca de EVA en EVA LAB (https://evaprompts.vercel.app/). Ver **§0.0.6**.
 
 **Publicada (24-09-2026):** `main` = `79927c1`, la v9.4 más `/links` (EVA ARCADE), con el «sí, publica todo» del propietario: https://evaproyecto01.vercel.app/links. Ver **§0.0.5**.
@@ -386,6 +388,40 @@ repositorio de evaprompts, la identidad de marca de EVA —logotipos, paleta—
   con sus tres páginas (renderizado con pdf.js para mirarlo), el `h1` se lee
   «EVA LAB» y el foco es azul; consola sin errores salvo el 404 de la
   estadística sin activar.
+
+### 0.0.7. Los dos juegos entran en EVA ARCADE (26 sept. 2026, ramas sin publicar)
+
+Encargo del propietario: en los juegos, «el símbolo □X con "EVA ARCADE", el
+icono de pestaña, la imagen para compartir y un botón para volver a /links».
+Dos repositorios, cada uno con sus propias reglas (su `HANDOFF` se leyó antes
+de tocar nada), en la rama `feat/eva-arcade`:
+
+- **FORO [in]VISIBLE** (`dojedacifuentes/eva.game.proce`, evagameproce.vercel.app).
+  **Ojo:** el clon de siempre (`PROYECTO EVA01/eva.game.proce`) tiene cambios
+  sin guardar de otra sesión en una rama vieja; no se tocó. Se trabajó en un
+  clon limpio de `main`: `PROYECTO EVA01/eva.game.proce-main`. Su `EvaMark`
+  (monograma provisional en rombo) pasó a ser el □X oficial; «← □X EVA ARCADE»
+  en la portada y «□X EVA ARCADE» en la cabecera desde 768 px (en el teléfono
+  la fila de 56 px ya va llena). Nombre, destino y color en su `lib/brand.ts`
+  (regla de la casa: la marca no se escribe fuera de ahí). En pantallas de
+  menos de 720 px de alto la frase rotativa decorativa de la portada cede su
+  sitio a la fila de la vuelta. Pasó su arnés entero (avanzar, overlays,
+  teclado, repaso, a11y, medir, contraste2) y `npm audit` sigue en 0.
+- **EXPEDIENTE 1725** (`dojedacifuentes/famialiarpg`, **evaarcadefamilia.vercel.app**;
+  su `metadataBase` apuntaba a famialiarpg.vercel.app, que no existe: corregido,
+  o la imagen para compartir no habría cargado). Su «ƎVΛ // ARCADE» dibujado a
+  mano pasó a ser el □X oficial con «EVA ARCADE» (portada, partida rápida,
+  centro del mapa); la vuelta, en su propia fila sobre la tarjeta de la portada
+  y en el HUD desde 768 px. El icono de pestaña era una balanza.
+- En los dos: icono de pestaña e icono de inicio del □X, vista previa para
+  redes (□X en la órbita, EVA ARCADE, el juego y su categoría, con el color de
+  su tarjeta en `/links`) y la estadística de Vercel (activarla en cada
+  proyecto antes de publicar).
+- `scripts/brand-assets.mjs --kit` acepta ahora repositorios sin `src/`
+  (los juegos tienen `app/` y `lib/` en la raíz).
+- Medido en Chrome sin interfaz: portadas sin solapes a 320×568, 375×667,
+  360×800, 390×844, 1024×768, 1366×768 y 1440×900; la tarjeta de Familia
+  cabe entera en todos. Lint, tipos, pruebas (97 y 44) y build en los dos.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 

@@ -22,7 +22,9 @@
   marco de la landing (`SiteChrome`, que montan `app/(eva)/layout.tsx` y la 404). HANDOFF §0.0.5.
   Desde el 26-09 (publicado) lleva también EVA ACADEMY y EVA LAB, que
   enlazan a evaprompts; y el sitio entero, la estadística de Vercel (§0.0.6).
-- **EVA LAB** (evaprompts, otro repositorio: `../eva.prompts`) lleva la marca de EVA. Su logotipo
-  sale de aquí: `node scripts/brand-assets.mjs --kit ../eva.prompts`; no se copia la geometría.
+- **EVA LAB** (evaprompts, `../eva.prompts`) y los dos juegos del Arcade (`../eva.game.proce-main`,
+  `../famialiarpg`) llevan la marca de EVA. Su logotipo sale de aquí: `node scripts/brand-assets.mjs
+  --kit <repositorio>`; no se copia la geometría. El clon `../eva.game.proce` tiene trabajo ajeno sin
+  guardar: no tocarlo (§0.0.7).
 - Los vídeos e imágenes de `public/eva/` son del propietario: no se borran aunque dejen de usarse.
 - No integrar en `main` ni publicar sin el «sí» del propietario.

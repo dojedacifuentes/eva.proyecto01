@@ -6,15 +6,18 @@
  *
  *   node scripts/brand-assets.mjs
  *
- * Y para un sitio hermano que lleva la marca (EVA LAB, en evaprompts):
+ * Y para un sitio hermano que lleva la marca (EVA LAB y los dos juegos del
+ * Arcade):
  *
  *   node scripts/brand-assets.mjs --kit ../eva.prompts
+ *   node scripts/brand-assets.mjs --kit ../eva.game.proce-main
+ *   node scripts/brand-assets.mjs --kit ../famialiarpg
  *
- * escribe en ese repositorio los mismos dos iconos (`src/app/icon.svg`,
- * `src/app/apple-icon.png`) y `src/lib/marca-eva.ts`: el símbolo y el nombre ya
- * colocados —las piezas de cada pose, su caja, los colores y un SVG suelto con
- * halo—, para que allí no haga falta la geometría. La marca se sigue dibujando
- * sólo aquí.
+ * escribe en ese repositorio los mismos dos iconos (`app/icon.svg`,
+ * `app/apple-icon.png`) y `lib/marca-eva.ts` —dentro de `src/` si el
+ * repositorio la usa—: el símbolo y el nombre ya colocados (las piezas de cada
+ * pose, su caja, los colores y un SVG suelto con halo), para que allí no haga
+ * falta la geometría. La marca se sigue dibujando sólo aquí.
  *
  * Se vuelve a ejecutar sólo si cambia la marca. `sharp` llega con Next; no es
  * una dependencia del proyecto.
@@ -25,7 +28,7 @@
  * misma figura —cuadrado sobre X, mismas proporciones, tapas horizontales—
  * con el trazo engrosado.
  */
-import { writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -203,11 +206,14 @@ writeFileSync(path.join(root, 'src/app/icon.svg'), icon);
 writeFileSync(path.join(root, 'src/app/apple-icon.png'), apple);
 
 if (kit) {
+  // Con carpeta `src/` (EVA LAB) o sin ella (los juegos del Arcade: `app/` y `lib/` en la raíz).
   const target = path.resolve(kit);
-  writeFileSync(path.join(target, 'src/app/icon.svg'), icon);
-  writeFileSync(path.join(target, 'src/app/apple-icon.png'), apple);
-  writeFileSync(path.join(target, 'src/lib/marca-eva.ts'), kitModule());
-  console.log(`kit de la marca escrito en ${target}`);
+  const base = existsSync(path.join(target, 'src/app')) ? path.join(target, 'src') : target;
+  if (!existsSync(path.join(base, 'app'))) throw new Error(`${target} no tiene carpeta app/ ni src/app/`);
+  writeFileSync(path.join(base, 'app/icon.svg'), icon);
+  writeFileSync(path.join(base, 'app/apple-icon.png'), apple);
+  writeFileSync(path.join(base, 'lib/marca-eva.ts'), kitModule());
+  console.log(`kit de la marca escrito en ${base}`);
 }
 
 // Vistas previas para revisar a ojo, fuera del proyecto si se pide.
