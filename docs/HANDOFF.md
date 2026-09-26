@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**En curso (26-09-2026, tarde):** rama `feat/eva-arcade` en los dos juegos (y `feat/kit-juegos` aquí), sin publicar: los juegos entran en EVA ARCADE. Ver **§0.0.7**.
+**Publicada (26-09-2026, tarde):** los dos juegos entran en EVA ARCADE, con el «publica todos los cambios» del propietario: `main` = `e6d96a5` en eva.game.proce, `6afd8cf` en famialiarpg y `73720fe` aquí (el kit). Estadística de Vercel activa en los cuatro sitios. Ver **§0.0.7**.
 
 **Publicada (26-09-2026):** `main` = `0d2e777` aquí y `7f00094` en eva.prompts, con el «sí publica» del propietario: Academy y Lab en `/links`, estadística de visitas (activa en los dos proyectos), EVA-01 y la marca de EVA en EVA LAB (https://evaprompts.vercel.app/). Ver **§0.0.6**.
 
@@ -389,7 +389,7 @@ repositorio de evaprompts, la identidad de marca de EVA —logotipos, paleta—
   «EVA LAB» y el foco es azul; consola sin errores salvo el 404 de la
   estadística sin activar.
 
-### 0.0.7. Los dos juegos entran en EVA ARCADE (26 sept. 2026, ramas sin publicar)
+### 0.0.7. Los dos juegos entran en EVA ARCADE (26 sept. 2026, publicada)
 
 Encargo del propietario: en los juegos, «el símbolo □X con "EVA ARCADE", el
 icono de pestaña, la imagen para compartir y un botón para volver a /links».
@@ -422,6 +422,10 @@ de tocar nada), en la rama `feat/eva-arcade`:
 - Medido en Chrome sin interfaz: portadas sin solapes a 320×568, 375×667,
   360×800, 390×844, 1024×768, 1366×768 y 1440×900; la tarjeta de Familia
   cabe entera en todos. Lint, tipos, pruebas (97 y 44) y build en los dos.
+- **Publicado** y comprobado en producción: botones de vuelta a `/links`,
+  iconos, vista previa con la dirección correcta de cada juego (la de Familia,
+  evaarcadefamilia.vercel.app), estadística respondiendo y portadas sin
+  solapes en los siete tamaños.
 
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
