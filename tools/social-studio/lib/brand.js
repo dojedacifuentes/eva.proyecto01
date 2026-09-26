@@ -435,34 +435,67 @@ export function polygonsOf(pose        ) {
 }
 
 /**
- * La marca como documento SVG suelto, para lo que no pasa por React: la imagen
- * de vista previa al compartir el enlace y el icono de la pantalla de inicio.
- * Las mismas dos capas que `EvaLogo`: halo desenfocado y trazo casi blanco.
+ * La marca como documento SVG suelto a partir de una pose cualquiera —con nombre o intermedia,
+ * como las que devuelve `sample()`—, para lo que no pasa por React: la imagen de vista previa,
+ * el icono de inicio, los fotogramas de un vídeo. Las mismas dos capas que `EvaLogo`: halo
+ * desenfocado y trazo casi blanco. Las piezas a medio apagar se pintan con su opacidad: es lo
+ * que hace el desacople. `box` fija el encuadre (útil para que una secuencia no salte);
+ * `ground` pinta un fondo; sin él, el SVG es transparente.
  */
-export function brandSvg(pose        , { pad = 1.6, blur = 0.8 }                                  = {}) {
-  const box = viewBoxOf(pose, pad);
-  const shapes = polygonsOf(pose)
-    .map((shape) => `<polygon points="${shape.points}"/>`)
+export function brandSvgFromPose(
+  pose      ,
+  {
+    pad = 1.6,
+    blur = 0.8,
+    box,
+    ground,
+    halo = true,
+  }                                                                              = {},
+) {
+  const b = box ?? boundsOf(pose);
+  const x = round(b.left - pad);
+  const y = round(b.top - pad);
+  const width = round(b.right - b.left + pad * 2);
+  const height = round(b.bottom - b.top + pad * 2);
+  const shapes = SEGMENTS.filter((id) => pose[id].alpha > 0.02)
+    .map((id) => {
+      const alpha = pose[id].alpha;
+      const opacity = alpha < 0.98 ? ` opacity="${round(alpha)}"` : '';
+      return `<polygon points="${pointsOf(placeShape(id, pose[id]))}"${opacity}/>`;
+    })
     .join('');
-  const across = `gradientUnits="userSpaceOnUse" x1="${box.x + pad}" x2="${round(box.x + box.width - pad)}" y1="0" y2="0"`;
+  const across = `gradientUnits="userSpaceOnUse" x1="${round(x + pad)}" x2="${round(x + width - pad)}" y1="0" y2="0"`;
   const stops = (colors                   ) =>
     colors.map((color, k) => `<stop offset="${k / (colors.length - 1)}" stop-color="${color}"/>`).join('');
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box.x} ${box.y} ${box.width} ${box.height}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${width} ${height}">`,
     '<defs>',
     `<linearGradient id="g" ${across}>${stops(BRAND_COLORS.glow)}</linearGradient>`,
     `<linearGradient id="c" ${across}>${stops(BRAND_COLORS.core)}</linearGradient>`,
-    '<filter id="b" x="-25%" y="-80%" width="150%" height="260%">',
-    `<feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="w"/>`,
-    `<feGaussianBlur in="SourceGraphic" stdDeviation="${round(blur * 0.32)}" result="t"/>`,
-    // Un solo halo ancho: dos rellenaban los huecos de la E y dejaban una caja detrás.
-    '<feMerge><feMergeNode in="w"/><feMergeNode in="t"/><feMergeNode in="t"/></feMerge>',
-    '</filter>',
+    halo
+      ? [
+          '<filter id="b" x="-25%" y="-80%" width="150%" height="260%">',
+          `<feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="w"/>`,
+          `<feGaussianBlur in="SourceGraphic" stdDeviation="${round(blur * 0.32)}" result="t"/>`,
+          // Un solo halo ancho: dos rellenaban los huecos de la E y dejaban una caja detrás.
+          '<feMerge><feMergeNode in="w"/><feMergeNode in="t"/><feMergeNode in="t"/></feMerge>',
+          '</filter>',
+        ].join('')
+      : '',
     '</defs>',
-    `<g fill="url(#g)" filter="url(#b)">${shapes}</g>`,
+    ground ? `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${ground}"/>` : '',
+    halo ? `<g fill="url(#g)" filter="url(#b)">${shapes}</g>` : '',
     `<g fill="url(#c)" stroke="url(#c)" stroke-width="${SEAM}">${shapes}</g>`,
     '</svg>',
   ].join('');
+}
+
+/**
+ * La marca en una de sus poses con nombre, como documento SVG. Es lo que usan la vista previa
+ * al compartir y el icono de la pantalla de inicio.
+ */
+export function brandSvg(pose        , { pad = 1.6, blur = 0.8 }                                  = {}) {
+  return brandSvgFromPose(POSES[pose], { pad, blur });
 }
 
 /** El mismo SVG como `data:` URI, para una etiqueta `<img>`. */
