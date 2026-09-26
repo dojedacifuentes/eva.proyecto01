@@ -157,7 +157,7 @@ reales y `alt` descriptivo en español.
 **Ojo con el nombre:** la imagen dice **EVA-01** (y el sitio se llama «EVA / Proyecto 01»), pero
 el encargo pide etiquetar el HUD como **`EVA-07`**. Es una decisión del propietario (§8). Hasta
 que responda, usar `EVA-07` como pide el encargo y dejar el rótulo en `content/ejes.ts` para
-cambiarlo en un sitio.
+cambiarlo en un sitio. **Respondió el 26-09-2026: `EVA-01`.**
 
 ## 4. El encargo, estructurado (requisitos)
 
@@ -369,7 +369,7 @@ botones HTML además del clic 3D (teclado). Mantener los colores legibles sobre 
 
 | Pregunta | Por defecto mientras no responda |
 |---|---|
-| ¿El HUD dice `EVA-07` (como el encargo) o `EVA-01` (como la imagen y «Proyecto 01»)? | `EVA-07`, en `content/ejes.ts` |
+| ¿El HUD dice `EVA-07` (como el encargo) o `EVA-01` (como la imagen y «Proyecto 01»)? | **`EVA-01`**: decisión del propietario, 26-09-2026 (`ejes.cuerpo.exterior.subject`) |
 | ¿La cinta del genoma (`GenomeStrand`) se queda como apertura de CUERPO o se va? | Se queda como apertura; las dos piezas nuevas van al final, como pide el encargo |
 | ¿Vídeo también en móvil (5,8 MB) o sólo el póster, como hace la portada? | Vídeo en escritorio; póster en móvil y con movimiento reducido |
 | ¿Se recomprime el vídeo y se le quita el audio? (mejora clara de peso) | No tocar el archivo sin permiso; se sirve `muted` |
@@ -471,7 +471,7 @@ cabecera de cada archivo adaptado. **Dependencias nuevas: ninguna.**
 
 | Pregunta | Aplicado |
 |---|---|
-| `EVA-07` o `EVA-01` | `EVA-07`, en `ejes.cuerpo.exterior.subject` |
+| `EVA-07` o `EVA-01` | **`EVA-01`** (decisión del propietario, 26-09-2026), en `ejes.cuerpo.exterior.subject` |
 | ¿La cinta del genoma se queda? | Sí, abre la sección |
 | ¿Vídeo en móvil? | Sólo si se pide; póster siempre |
 | ¿Recomprimir los vídeos y quitarles el audio? | No se tocaron los archivos; se sirven `muted` |

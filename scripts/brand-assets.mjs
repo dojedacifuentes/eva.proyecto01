@@ -6,6 +6,16 @@
  *
  *   node scripts/brand-assets.mjs
  *
+ * Y para un sitio hermano que lleva la marca (EVA LAB, en evaprompts):
+ *
+ *   node scripts/brand-assets.mjs --kit ../eva.prompts
+ *
+ * escribe en ese repositorio los mismos dos iconos (`src/app/icon.svg`,
+ * `src/app/apple-icon.png`) y `src/lib/marca-eva.ts`: el símbolo y el nombre ya
+ * colocados —las piezas de cada pose, su caja, los colores y un SVG suelto con
+ * halo—, para que allí no haga falta la geometría. La marca se sigue dibujando
+ * sólo aquí.
+ *
  * Se vuelve a ejecutar sólo si cambia la marca. `sharp` llega con Next; no es
  * una dependencia del proyecto.
  *
@@ -19,7 +29,7 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { BRAND_COLORS, POSES, brandSvg, placeShape } from '../src/lib/brand.ts';
+import { BRAND_COLORS, POSES, SEAM, SEGMENTS, STROKE, boundsOf, brandSvg, placeShape } from '../src/lib/brand.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const round = (value) => Math.round(value * 100) / 100;
@@ -120,12 +130,88 @@ function appleIcon(size = 180) {
 </svg>`;
 }
 
+/* ───────────── Kit para un sitio hermano ───────────── */
+
+const round3 = (value) => Math.round(value * 1000) / 1000;
+const list = (colors) => `[${colors.map((color) => `'${color}'`).join(', ')}]`;
+
+/** Una pose ya colocada: su caja, sus piezas visibles y un SVG suelto con halo. */
+function kitPose(pose) {
+  const box = boundsOf(POSES[pose]);
+  const pieces = SEGMENTS.filter((id) => POSES[pose][id].alpha > 0.5).map((id) =>
+    placeShape(id, POSES[pose][id]).map(([x, y]) => [round3(x), round3(y)]),
+  );
+  const width = round3(box.right - box.left);
+  const height = round3(box.bottom - box.top);
+  return [
+    '{',
+    `      caja: { x: ${round3(box.left)}, y: ${round3(box.top)}, ancho: ${width}, alto: ${height} },`,
+    '      piezas: [',
+    ...pieces.map((points) => `        ${JSON.stringify(points)},`),
+    '      ],',
+    `      svg: ${JSON.stringify(brandSvg(pose, { pad: 1.6, blur: 0.8 }))},`,
+    '    }',
+  ].join('\n');
+}
+
+function kitModule() {
+  return [
+    '/**',
+    ' * La marca de EVA —el símbolo □X y el nombre ƎVΛ—, ya colocada.',
+    ' *',
+    ' * GENERADO: no se edita a mano. Sale del repositorio de la landing',
+    ' * (eva.proyecto01) con `node scripts/brand-assets.mjs --kit <este repositorio>`,',
+    ' * a partir de su `src/lib/brand.ts`, donde vive y se prueba la geometría: ocho',
+    ' * piezas rígidas (los cuatro lados del cuadrado y los cuatro brazos de la X)',
+    ' * que sólo se trasladan y giran. Aquí llegan en sus dos poses.',
+    ' *',
+    ' * Unidades de la marca: el lado del cuadrado mide 10.',
+    ' */',
+    '',
+    "export type PoseMarca = 'simbolo' | 'nombre';",
+    '',
+    'export const MARCA = {',
+    '  /** Trazo casi blanco; halo de azul eléctrico a violeta, siempre de izquierda a derecha. */',
+    '  colores: {',
+    `    trazo: ${list(BRAND_COLORS.core)},`,
+    `    halo: ${list(BRAND_COLORS.glow)},`,
+    `    fondo: '${BRAND_COLORS.ground}',`,
+    '  },',
+    '  /** Grosor de todo trazo. */',
+    `  grosor: ${STROKE},`,
+    '  /** Contorno del color del relleno que tapa la costura de los vértices. */',
+    `  costura: ${SEAM},`,
+    '  poses: {',
+    '    /** El símbolo: el cuadrado sobre la X. */',
+    `    simbolo: ${kitPose('isotype')},`,
+    '    /** El nombre: ƎVΛ, las tres letras del mismo alto. */',
+    `    nombre: ${kitPose('logotype')},`,
+    '  },',
+    '} as const;',
+    '',
+  ].join('\n');
+}
+
+const args = process.argv.slice(2);
+const kitAt = args.indexOf('--kit');
+const kit = kitAt >= 0 ? args[kitAt + 1] : undefined;
+if (kitAt >= 0 && !kit) throw new Error('--kit necesita la carpeta del repositorio de destino');
+
 const icon = favicon({});
+const apple = await sharp(Buffer.from(appleIcon())).png().toBuffer();
 writeFileSync(path.join(root, 'src/app/icon.svg'), icon);
-await sharp(Buffer.from(appleIcon())).png().toFile(path.join(root, 'src/app/apple-icon.png'));
+writeFileSync(path.join(root, 'src/app/apple-icon.png'), apple);
+
+if (kit) {
+  const target = path.resolve(kit);
+  writeFileSync(path.join(target, 'src/app/icon.svg'), icon);
+  writeFileSync(path.join(target, 'src/app/apple-icon.png'), apple);
+  writeFileSync(path.join(target, 'src/lib/marca-eva.ts'), kitModule());
+  console.log(`kit de la marca escrito en ${target}`);
+}
 
 // Vistas previas para revisar a ojo, fuera del proyecto si se pide.
-const preview = process.argv[2];
+const preview = args.find((arg, k) => !arg.startsWith('--') && args[k - 1] !== '--kit');
 if (preview) {
   const cells = [16, 32, 64, 128]
     .map((px) => sharp(Buffer.from(icon)).resize(px, px).png().toBuffer())

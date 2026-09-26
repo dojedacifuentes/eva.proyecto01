@@ -76,6 +76,7 @@ cambió: la marca va en sus piezas, no repinta los lugares.
 | Portada | `components/eva/EvaLogoMesh.tsx` | El nombre en malla de nodos, como el acrónimo de antes, pero los nodos viven **dentro de las ocho piezas**. Al entrar en pantalla hace la revelación del storyboard; después ondea como una cinta y se aparta del puntero. Pulsarlo repite el bucle entero. |
 | Favicon | `app/icon.svg` | El símbolo con **trazo grueso** (ver «Excepciones»). |
 | Icono de pantalla de inicio | `app/apple-icon.png` | El símbolo dentro de su órbita de ocho nodos, sobre el resplandor azul y violeta. |
+| **EVA LAB** (evaprompts, otro repositorio) | `src/lib/marca-eva.ts` de eva.prompts, generado desde aquí | El nombre ƎVΛ + LAB (barra lateral, portada, pie), el símbolo □X (cabecera en móvil), iconos, vista previa y la firma del PDF del Prompt Lab. La geometría no se copia: `node scripts/brand-assets.mjs --kit ../eva.prompts` escribe allí las dos poses ya colocadas y los dos iconos. Paleta: su escala `cyan-*` es el azul de la marca. HANDOFF §0.0.6. |
 | Vista previa al compartir | `app/opengraph-image.tsx` | El nombre en su órbita y, debajo, «Entidad de Vigilancia y Autonomía». Reemplaza la provisional, que aún mostraba las palabras del acrónimo que salieron de la portada en la v8. |
 | `/links` (EVA ARCADE) | `components/links/ArcadeMark.tsx` + `lib/arcade-mark.ts` | El **símbolo** (□X) es de EVA ARCADE; el nombre (ƎVΛ, `EvaLogo`) queda abajo, en «¿Quién es EVA?». Al cargar, el símbolo hace una vez □X → ≡X → ƎVΛ → □X (3,25 s) **en CSS**, sin lienzo: el servidor escribe los `@keyframes` a partir de las poses. Vista previa propia: `app/links/opengraph-image.tsx` (fondo común en `lib/brand-art.ts`). Ver HANDOFF §0.0.5. |
 
@@ -116,6 +117,9 @@ cambia a símbolo y vuelve sin viaje.
 
 ### Excepciones, a propósito
 
+Las dos primeras las confirmó el propietario el 26-09-2026 («me parece bien»):
+la E más ancha que alta (≡) y el zum del encuadre quedan como están.
+
 - **Zum de cámara.** La ficha prohíbe mover la cámara, pero el símbolo es alto y
   el nombre, ancho: en una caja apaisada no caben los dos a la misma escala. El
   encuadre sigue a la figura (las piezas no cambian de tamaño entre sí). El
@@ -153,5 +157,7 @@ intro), se pueden recomprimir sin audio con `ffmpeg-static` desde el scratchpad
 2. `npm test`: las pruebas de `brand.test.ts` comprueban rigidez, grosor, que el
    símbolo sea un cuadrado sobre una X tan ancha como él, que el nombre esté en
    una fila del mismo alto y que ninguna letra cruce a otra al alinearse.
-3. `node scripts/brand-assets.mjs` para regenerar favicon e icono de inicio.
+3. `node scripts/brand-assets.mjs` para regenerar favicon e icono de inicio, y
+   `node scripts/brand-assets.mjs --kit ../eva.prompts` para llevar la marca nueva
+   a EVA LAB (luego, en ese repositorio, lint, build y commit).
 4. Si cambia el color: `BRAND_COLORS` **y** los `--eva-brand-*` de `tokens.css`.

@@ -3,8 +3,8 @@ import '../marca.css';
 import './links.css';
 import { ArcadeHero } from '@/components/links/ArcadeHero';
 import { EvaGateway } from '@/components/links/EvaGateway';
-import { GameCard } from '@/components/links/GameCard';
-import { groups, links } from '@/content/links';
+import { EntryCard } from '@/components/links/EntryCard';
+import { groups, links, type LinkGroup } from '@/content/links';
 import { seeded } from '@/lib/random';
 
 export const metadata: Metadata = {
@@ -46,14 +46,38 @@ const STARS = (() => {
   });
 })();
 
+/** Un grupo de la página: su rótulo y sus tarjetas. */
+function Group({ group }: { group: LinkGroup }) {
+  return (
+    <section
+      className={`arcade-group${group.featured ? ' arcade-group--featured' : ''}`}
+      aria-labelledby={`group-${group.id}`}
+    >
+      <h2 id={`group-${group.id}`} className="arcade-group__label mono">
+        <span aria-hidden="true">↓</span> {group.label}
+      </h2>
+      <ul className="arcade-group__list" role="list">
+        {group.entries.map((entry) => (
+          <li key={entry.id}>
+            <EntryCard entry={entry} featured={group.featured} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /**
- * `/links`: la entrada desde las redes. EVA ARCADE y sus juegos arriba; la
- * puerta a la landing, abajo. Sin el campo de partículas, la cabecera ni el
+ * `/links`: la entrada desde las redes. EVA ARCADE y sus juegos arriba; debajo,
+ * EVA ACADEMY y EVA LAB (el curso y el generador de prompts de EVA LAB); al
+ * final, la puerta a la landing. Sin el campo de partículas, la cabecera ni el
  * canal de la landing (no pasa por `SiteChrome`): todo es HTML, CSS y SVG, y
  * lo único que se anima es el símbolo al llegar.
  */
 export default function LinksPage() {
   const visible = groups.filter((group) => group.entries.length > 0);
+  const featured = visible.filter((group) => group.featured);
+  const rest = visible.filter((group) => !group.featured);
   return (
     <div className="arcade">
       <div className="arcade__sky" aria-hidden="true">
@@ -67,20 +91,17 @@ export default function LinksPage() {
       <main className="arcade__main">
         <ArcadeHero />
 
-        {visible.map((group) => (
-          <section key={group.id} className="arcade-group" aria-labelledby={`group-${group.id}`}>
-            <h2 id={`group-${group.id}`} className="arcade-group__label mono">
-              <span aria-hidden="true">↓</span> {group.label}
-            </h2>
-            <ul className="arcade-group__list" role="list">
-              {group.entries.map((entry) => (
-                <li key={entry.id}>
-                  <GameCard entry={entry} />
-                </li>
-              ))}
-            </ul>
-          </section>
+        {featured.map((group) => (
+          <Group key={group.id} group={group} />
         ))}
+
+        {rest.length > 0 && (
+          <div className="arcade-more">
+            {rest.map((group) => (
+              <Group key={group.id} group={group} />
+            ))}
+          </div>
+        )}
 
         <EvaGateway />
       </main>
