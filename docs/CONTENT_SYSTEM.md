@@ -85,9 +85,9 @@ hook, dificultad y estado existente/prototipo/concepto). Calendario y piezas del
 2. **Arcade numera en binario**: `links.ts` calcula los nodos por posición (`01`, `10`, `11`…); el
    segundo juego pasa de «NODE 02» a «NODE 10». Cada grupo es su propia serie: el curso (Academy)
    y el generador (Lab) son `01` de su grupo. Prueba en `links.test.ts`.
-3. **La rama `feat/eva-content-system` se integra en `main`** con el «sí» del propietario (regla de
-   `CLAUDE.md`). Lint, pruebas, build, tipos y `npm audit` se comprobaron en local al integrarla
-   (26-09-2026); el workflow de GitHub los repite al publicar.
+3. **La rama `feat/eva-content-system` se integró en `main` y se publicó** el mismo 26-09-2026,
+   con el «sube todo» del propietario. Lint, pruebas, build, tipos y `npm audit` se comprobaron en
+   local antes; el workflow de GitHub los repite en cada publicación.
 
 ## 6. Qué no hacer
 

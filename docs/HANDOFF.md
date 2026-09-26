@@ -5,12 +5,11 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**En rama `feat/eva-content-system` (26-09-2026, noche):** EVA como sistema de contenido —Entity ·
-Arcade · Academy · Lab—: las herramientas de Lab (`scripts/brand-frames`, `render-frames`,
-`eva-signal`, `transmision`, `studio-build` + `tools/social-studio`), el Arcade numerado en binario y
-las docs al día. Llegó como paquete (`EVA_CONTENT_SYSTEM_v1`) de otra sesión, sobre `fa008e3`; aquí
-se integró sobre lo publicado hoy. Se publica con el «sí» del propietario. Ver **§0.0.8** y
-`docs/CONTENT_SYSTEM.md`.
+**Publicada (26-09-2026, noche):** `main` = `7f077bd`, con el «sube todo» del propietario: EVA como
+sistema de contenido —Entity · Arcade · Academy · Lab—, las herramientas de Lab (`scripts/brand-frames`,
+`render-frames`, `eva-signal`, `transmision`, `studio-build` + `tools/social-studio`), el Arcade
+numerado en binario y las docs al día. Llegó como paquete (`EVA_CONTENT_SYSTEM_v1`) de otra sesión,
+sobre `fa008e3`; se integró sobre lo publicado ese día. Ver **§0.0.8** y `docs/CONTENT_SYSTEM.md`.
 
 **Publicada (26-09-2026, tarde):** los dos juegos entran en EVA ARCADE, con el «publica todos los cambios» del propietario: `main` = `e6d96a5` en eva.game.proce, `6afd8cf` en famialiarpg y `73720fe` aquí (el kit). Estadística de Vercel activa en los cuatro sitios. Ver **§0.0.7**.
 
@@ -434,7 +433,7 @@ de tocar nada), en la rama `feat/eva-arcade`:
   evaarcadefamilia.vercel.app), estadística respondiendo y portadas sin
   solapes en los siete tamaños.
 
-### 0.0.8. El sistema de contenido y las herramientas de Lab (26 sept. 2026, en rama)
+### 0.0.8. El sistema de contenido y las herramientas de Lab (26 sept. 2026, publicada)
 
 Llegó como paquete: `EVA_CONTENT_SYSTEM_v1`, un zip que el propietario pasó con «IMPLEMENTA». Es
 el trabajo de otra sesión (commits de «Natalia (Hackea)», con Claude) que ordena a EVA como sistema
@@ -504,9 +503,18 @@ navegador, en móvil y escritorio: `NODE 01`, `NODE 10`, `01`, `01`, la puerta a
 `og:site_name` «EVA» y `og:locale` «es_CL»; sin desborde ni errores. No hay ffmpeg en esta máquina:
 los vídeos del ciclo ya vienen hechos en el paquete.
 
-**Qué cambia en producción al publicar:** sólo `/links` —los números de las tarjetas (`NODE 10`
-en vez de `02`; `01` en Academy y Lab en vez de `03` y `04`), la puerta relativa y el nombre del
-sitio y el idioma al compartir—. La landing, EVA LAB y los juegos no cambian.
+**Qué cambió en producción:** sólo `/links` —los números de las tarjetas (`NODE 10` en vez de
+`02`; `01` en Academy y Lab en vez de `03` y `04`), la puerta relativa y el nombre del sitio y el
+idioma al compartir—. La landing, EVA LAB y los juegos no cambian.
+
+**Publicada** el 26-09-2026 (noche) con el «sube todo» del propietario: `main` = `7f077bd` (y la
+rama `feat/eva-content-system` en GitHub). El workflow de GitHub pasó entero (lint, pruebas,
+build, tipos, audit) y Vercel la sirvió a los ~30 s. Comprobado en producción:
+portada, `/links`, sus dos vistas previas, iconos, `sitemap.xml` y la estadística responden 200;
+`/links` muestra `NODE 01`, `NODE 10`, `01`, `01`, la puerta a `/`, `og:site_name` «EVA» y
+`og:locale` «es_CL»; y `tools/`, `scripts/` y `docs/` dan 404 (no se sirven). El repositorio es
+público: el código del Studio y las guías se ven en GitHub; el paquete
+(`PROYECTO EVA01/EVA_CONTENT_SYSTEM_v1/`: imágenes, vídeos, borradores) no se subió.
 
 **Abierto, del propietario:** el tono de los textos nuevos del paquete marcados ⚠️ (el carrusel C4
 y los posts de LinkedIn en primera persona); grabar R4 (gameplay); si Academy y Lab siguen en
@@ -1070,8 +1078,8 @@ apareció dos veces en sitios distintos.
 6. El contacto es el Instagram público. No inventar otro canal.
 7. `prefers-reduced-motion`, Safari iOS y lector de pantalla: implementados,
    nunca probados de punta a punta.
-8. **Sistema de contenido** (26-09-2026, `docs/CONTENT_SYSTEM.md`, §0.0.8): publicar la rama con
-   el «sí» del propietario; publicar el ciclo de 30 días (lo hace el propietario, desde el paquete); tokens con una sola fuente (`interface.css` redefine nueve en la
+8. **Sistema de contenido** (26-09-2026, `docs/CONTENT_SYSTEM.md`, §0.0.8; publicado): publicar
+   el ciclo de 30 días (lo hace el propietario, desde el paquete); tokens con una sola fuente (`interface.css` redefine nueve en la
    landing y `/links` tiene su paleta: documentado en `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS/tokens.json`,
    sin tocar el CSS todavía); EVA Scanner (biolectura sobre cualquier imagen) y sonido de marca
    (`lib/genome.ts` → WAV) en el roadmap 31–60.
