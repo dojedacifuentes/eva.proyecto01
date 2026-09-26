@@ -5,7 +5,7 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
-**En curso (26-09-2026):** ramas `feat/academy-lab` (aquí) y `feat/marca-eva` (en eva.prompts), sin publicar: Academy y Lab en `/links`, estadística de visitas, EVA-01 y la marca de EVA en EVA LAB. Ver **§0.0.6**.
+**Publicada (26-09-2026):** `main` = `0d2e777` aquí y `7f00094` en eva.prompts, con el «sí publica» del propietario: Academy y Lab en `/links`, estadística de visitas (activa en los dos proyectos), EVA-01 y la marca de EVA en EVA LAB (https://evaprompts.vercel.app/). Ver **§0.0.6**.
 
 **Publicada (24-09-2026):** `main` = `79927c1`, la v9.4 más `/links` (EVA ARCADE), con el «sí, publica todo» del propietario: https://evaproyecto01.vercel.app/links. Ver **§0.0.5**.
 
@@ -322,7 +322,7 @@ ni WebGL. La landing no cambia.
   foco visible. Landing y 404 conservan su marco. Lint, tipos, 91 pruebas y
   build correctos.
 
-### 0.0.6. Academy y Lab en `/links`, estadística de visitas, EVA-01 y la marca en EVA LAB (26 sept. 2026, ramas sin publicar)
+### 0.0.6. Academy y Lab en `/links`, estadística de visitas, EVA-01 y la marca en EVA LAB (26 sept. 2026, publicada)
 
 Encargo del propietario, al responder la lista de «cómo progresar»: «1 si
 funciona» (la estadística de visitas), «6 me parece bien» (las dos decisiones
@@ -341,7 +341,8 @@ repositorio de evaprompts, la identidad de marca de EVA —logotipos, paleta—
   también la lleva. **Hay que activarla en cada proyecto de Vercel**
   (Analytics → Enable) antes de publicar: Vercel crea `/_vercel/insights/*` en
   el despliegue siguiente. Sin eso, y siempre en local, la consola muestra un
-  404 de `/_vercel/insights/script.js`: inofensivo.
+  404 de `/_vercel/insights/script.js`: inofensivo. El propietario la activó
+  antes de publicar: en producción el script responde 200 en los dos sitios.
 - **`/links`**: dos grupos nuevos en `content/links.ts`. EVA ACADEMY →
   «Construye tu prompt» (`evaprompts.vercel.app/curso`, nodo 03, índigo) y EVA
   LAB → el Prompt Lab, el generador de prompts jurídicos
