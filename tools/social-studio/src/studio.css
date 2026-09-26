@@ -35,7 +35,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .bar__brand { display: flex; align-items: center; gap: 0.9rem; }
 .bar__brand svg { height: 20px; width: auto; display: block; }
-.bar__name { font-weight: 700; letter-spacing: 0.02em; }
+.bar__name { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; }
 .bar__tag { font-family: var(--mono); font-size: 0.6875rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 .bar__actions { display: flex; gap: 0.5rem; }
 
