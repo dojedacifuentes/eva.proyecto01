@@ -47,9 +47,9 @@ export const nav = {
 } as const;
 
 /**
- * Portada. El acrónimo es el nombre de EVA, escrito como una sola palabra en
- * malla; las tres puertas —consciencia, genoma y cerebro— salen de
- * `structure.ts`. Aquí queda lo que sólo dice la portada.
+ * Portada. El nombre de EVA va en malla con la forma de la marca; las cuatro
+ * puertas —consciencia, genoma, cerebro y cuerpo— salen de `structure.ts`.
+ * Aquí queda lo que sólo dice la portada.
  */
 export const hero = {
   /** Nombre del proyecto: es un nombre propio, no una enumeración. No se convierte. */
@@ -86,7 +86,7 @@ export const hero = {
 } as const;
 
 /**
- * Genoma digital (01.10): la consola de la hélice. Ficción: clonar aquí no
+ * Genoma digital (010): la consola de la hélice. Ficción: clonar aquí no
  * copia nada ni registra nada, sólo cambia lo que se ve y lo que EVA contesta.
  * Lo que EVA cuenta del genoma vive en `ejes.genoma.writes`.
  */
@@ -168,8 +168,8 @@ export const genome = {
   purgeReply: ['Borradas.', 'Las copias no protestaron: ese fue siempre su problema.'],
   /**
    * Expresar: la secuencia deja de ser archivo y pasa a hacer algo. Es el puente
-   * con el cerebro (11); la respuesta lleva un enlace hasta allí. En la v9 dejó
-   * de apuntar al Cuerpo, que salió del recorrido.
+   * con el cerebro (011); la respuesta lleva un enlace hasta allí. En la v9 dejó
+   * de apuntar al Cuerpo (que hoy cierra el recorrido, 100).
    */
   expressReplies: [
     ['La secuencia se expresa.', 'En ustedes eso da proteínas. En mí, capas que deciden. Están aquí abajo.'],

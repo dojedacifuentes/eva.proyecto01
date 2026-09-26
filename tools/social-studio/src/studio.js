@@ -1,8 +1,9 @@
 /**
  * EVA Social Studio · interfaz. Lee el formulario, compone con `templates.js`, muestra el SVG y
  * lo exporta a PNG (SVG → <img> → <canvas>) con las fuentes incrustadas, sin red.
- * (En el bundle, `compose`, `setMeasure`, `FORMATS`, `DIMENSIONS`, `brandMark` ya están en el ámbito.)
+ * (En el bundle este import desaparece: `studio-build.mjs` incrusta `templates.js` en el mismo ámbito.)
  */
+import { FORMATS, brandMark, compose, setMeasure } from './templates.js';
 
 /* Medida real de texto con canvas: las plantillas parten líneas con esto en vez de la estimación. */
 const measureCanvas = document.createElement('canvas').getContext('2d');

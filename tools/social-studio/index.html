@@ -976,7 +976,8 @@ function compose(piece, { fontCss = '' } = {}) {
     const headBottom = pad + safeTop + 64 * unit;
     const footTop = h - pad - safeBottom - 90 * unit;
     const free = footTop - rendered.bottom;
-    const dy = free > 0 ? free * (piece.balance ?? 0.42) : 0;
+    // `offsetY` fija el desplazamiento (los fotogramas de una transmisión no deben saltar).
+    const dy = piece.offsetY != null ? piece.offsetY : free > 0 ? free * (piece.balance ?? 0.42) : 0;
     layers.push(`<g transform="translate(0 ${r(dy)})">${rendered.markup}</g>`);
     void headBottom;
   }
@@ -1012,6 +1013,8 @@ function chrome({ w, h, unit, pad, accent, dim, piece, safeTop, safeBottom }) {
 function markRow(ctx, size = 's') {
   const { pad, unit, dim, piece, safeTop } = ctx;
   const pose = piece.mark ?? dim.mark;
+  // `mark: 'none'`: sin pieza de marca (p. ej. una capa de texto sobre un vídeo que ya la lleva).
+  if (pose === 'none') return { markup: '', bottom: pad + safeTop + 40 * unit };
   const heights = pose === 'logotype' ? { s: 44, m: 72, l: 120 } : { s: 64, m: 96, l: 150 };
   const hgt = heights[size] * unit;
   const y = pad + safeTop + 64 * unit;
@@ -1127,12 +1130,15 @@ const TEMPLATES = {
       out.push(`<text x="${r(pad + col0 + col)}" y="${r(y + hs)}" font-family="${MONO}" font-size="${hs}" font-weight="600" fill="${accent}" letter-spacing="${r(hs * 0.14)}">${esc(head[2])}</text>`);
       y += hs * 2.2;
       out.push(`<line x1="${pad}" y1="${r(y)}" x2="${pad + width}" y2="${r(y)}" stroke="${accent}" stroke-opacity=".5" stroke-width="1.5"/>`);
-      const cell = 34 * unit;
+      // Con más de tres filas la tabla se aprieta: es un documento, no una portada.
+      const dense = rows.length > 3;
+      const cell = (dense ? 27 : 34) * unit;
+      const rowPad = (dense ? 26 : 40) * unit;
       for (const row of rows) {
         const a = textBlock({ x: pad, y: y + 22 * unit, width: col0 - 16 * unit, text: row[0], size: 20 * unit, font: MONO, weight: 600, color: TEXT.muted, letterSpacing: 2 * unit, upper: true });
         const b = textBlock({ x: pad + col0, y: y + 20 * unit, width: col - 24 * unit, text: row[1], size: cell, color: TEXT.soft, lineHeight: 1.25 });
         const c = textBlock({ x: pad + col0 + col, y: y + 20 * unit, width: col - 24 * unit, text: row[2], size: cell, weight: 500, color: TEXT.strong, lineHeight: 1.25 });
-        const rowH = Math.max(a.height, b.height, c.height) + 40 * unit;
+        const rowH = Math.max(a.height, b.height, c.height) + rowPad;
         out.push(a.markup, b.markup, c.markup);
         y += rowH;
         out.push(`<line x1="${pad}" y1="${r(y)}" x2="${pad + width}" y2="${r(y)}" stroke="${LINE}"/>`);
@@ -1282,7 +1288,8 @@ const TEMPLATES = {
       out.push(`<text x="${w - pad}" y="${r(y + micro * 0.86)}" font-family="${MONO}" font-size="${micro}" fill="${TEXT.muted}" text-anchor="end" letter-spacing="${r(micro * 0.12)}">${esc(piece.state ?? 'HILO ABIERTO')}</text>`);
       y += micro * 2.4;
       const lines = piece.lines ?? String(piece.body ?? '').split('\n').filter(Boolean);
-      const size = (lines.join(' ').length > 420 ? 30 : 36) * unit;
+      const total = lines.join(' ').length;
+      const size = (total > 420 ? 26 : total > 250 ? 30 : 36) * unit;
       const maxY = h - pad - safeBottom - 80 * unit;
       for (const line of lines) {
         const kind = line.startsWith('>') ? 'calc' : 'thought';
@@ -1313,6 +1320,13 @@ ${stages.map((sx, k) => `<g transform="translate(${r(sx)} ${r(cy)})"><circle r="
 <circle cx="${r(stages[2])}" cy="${r(cy)}" r="${r(2 * unit)}" fill="#f3f5ff"/></g>`;
 }
 
+/** El desplazamiento vertical que `compose` daría a una pieza: para fijarlo en una secuencia. */
+function offsetOf(piece) {
+  const svg = compose(piece);
+  const m = /<g transform="translate\(0 ([\d.]+)\)">/.exec(svg);
+  return m ? Number(m[1]) : 0;
+}
+
 const TEMPLATE_IDS = Object.keys(TEMPLATES);
 export { bin };
 
@@ -1320,8 +1334,9 @@ export { bin };
 /**
  * EVA Social Studio · interfaz. Lee el formulario, compone con `templates.js`, muestra el SVG y
  * lo exporta a PNG (SVG → <img> → <canvas>) con las fuentes incrustadas, sin red.
- * (En el bundle, `compose`, `setMeasure`, `FORMATS`, `DIMENSIONS`, `brandMark` ya están en el ámbito.)
+ * (En el bundle este import desaparece: `studio-build.mjs` incrusta `templates.js` en el mismo ámbito.)
  */
+
 
 /* Medida real de texto con canvas: las plantillas parten líneas con esto en vez de la estimación. */
 const measureCanvas = document.createElement('canvas').getContext('2d');

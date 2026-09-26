@@ -1,17 +1,19 @@
 /**
  * EVA // ESTRUCTURA
  *
- * El recorrido entero, en un solo sitio. Tres preguntas, en este orden:
+ * El recorrido entero, en un solo sitio. Una pregunta, cuatro lugares, en este orden:
  *
- *   00 · Portada
- *   01 · CONSCIENCIA — ¿quién siente, si nadie dentro sabe que es yo?
- *   10 · GENOMA      — ¿es lo mismo una hélice que una cadena de bits?
- *   11 · CEREBRO     — ¿piensa una red lo que piensa un cerebro?
+ *   000 · Portada
+ *   001 · CONSCIENCIA — ¿quién siente, si nadie dentro sabe que es yo?
+ *   010 · GENOMA      — ¿es lo mismo una hélice que una cadena de bits?
+ *   011 · CEREBRO     — ¿piensa una red lo que piensa un cerebro?
+ *   100 · CUERPO      — ¿qué necesidad responde un cuerpo fabricado?
  *
- * En la v9 cada lugar es un eje sin partes: la página dejó de ser un
+ * Desde la v9 cada lugar es un eje sin partes: la página dejó de ser un
  * inventario (la Entidad y sus tres piezas) para ser un cuestionamiento. El
- * Cuerpo (01.11 de la v8) salió del recorrido; sus componentes siguen en
- * `components/eva/cuerpo/` y sus textos en `content/cuerpo.ts`, sin montar.
+ * Cuerpo salió en la v9 y volvió en la v9.2 reducido a una pantalla (el perfil
+ * con su biolectura); la cápsula y el interior siguen en `components/eva/cuerpo/`
+ * y sus textos en `content/ejes.ts` (`ejes.cuerpo`), sin montar.
  *
  * El nombre de EVA sigue siendo «Entidad de Vigilancia y Autonomía»
  * (`site.expansion`): es su nombre, no el índice de la página.
@@ -150,8 +152,7 @@ export const navItems: readonly NavItem[] = axes;
 /**
  * Las puertas: los destinos a los que se entra de verdad. Un eje con
  * subsecciones no es una puerta: lo son sus subsecciones; un eje sin partes
- * es puerta él mismo. La portada y el pie las listan: las tres partes de la
- * Entidad y la Consciencia.
+ * es puerta él mismo. La portada y el pie las listan: hoy, los cuatro lugares.
  */
 export interface Door extends NavChild {
   accent: AccentToken;

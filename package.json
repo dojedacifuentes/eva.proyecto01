@@ -11,7 +11,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "node --import ./scripts/test-hooks.mjs --test \"src/**/*.test.ts\""
+    "test": "node --import ./scripts/test-hooks.mjs --test \"src/**/*.test.ts\"",
+    "brand:assets": "node scripts/brand-assets.mjs",
+    "brand:frames": "node --import ./scripts/test-hooks.mjs scripts/brand-frames.mjs tools/out/brand-frames",
+    "studio": "node scripts/studio-build.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

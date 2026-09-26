@@ -17,9 +17,8 @@
  * Los PNG y el vídeo no salen de aquí: sale SVG puro, sin dependencias. Para rasterizar,
  * `scripts/render-frames.mjs` usa el Chrome de la máquina, y ffmpeg hace el MP4/GIF.
  *
- * Reutiliza `src/lib/brand.ts` tal cual. Lo único que añade es `brandSvgFromPose`: `brandSvg`
- * sólo acepta una pose con nombre, y los fotogramas de `sample()` son poses intermedias.
- * Cuando el propietario dé el «sí», esa función debería vivir en `brand.ts` con su prueba.
+ * Reutiliza `src/lib/brand.ts` tal cual: `brandSvgFromPose` acepta las poses intermedias de
+ * `sample()` (antes `brandSvg` sólo aceptaba una pose con nombre).
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -28,12 +27,9 @@ import {
   LOOP,
   POSES,
   REVEAL,
-  SEAM,
-  SEGMENTS,
   boundsOf,
+  brandSvgFromPose as svgFromPose,
   durationOf,
-  placeShape,
-  pointsOf,
   sample,
 } from '../src/lib/brand.ts';
 
@@ -76,35 +72,9 @@ const fixed = (() => {
   return steadyBox();
 })();
 
-/**
- * La marca en SVG a partir de una pose (con nombre o intermedia). Mismas dos capas que `brandSvg`
- * y `EvaLogo`: halo desenfocado con el degradado azul→violeta y trazo casi blanco. Las piezas
- * a medio apagar (`alpha` entre 0 y 1) se pintan con esa opacidad: es lo que hace el desacople.
- */
-export function brandSvgFromPose(pose, { box = fixed, blur = 0.8, halo = true, ground = null } = {}) {
-  const x = round(box.left - pad);
-  const y = round(box.top - pad);
-  const width = round(box.right - box.left + pad * 2);
-  const height = round(box.bottom - box.top + pad * 2);
-  const shapes = SEGMENTS.filter((id) => pose[id].alpha > 0.02)
-    .map((id) => `<polygon points="${pointsOf(placeShape(id, pose[id]))}"${pose[id].alpha < 0.98 ? ` opacity="${round(pose[id].alpha)}"` : ''}/>`)
-    .join('');
-  const across = `gradientUnits="userSpaceOnUse" x1="${round(x + pad)}" x2="${round(x + width - pad)}" y1="0" y2="0"`;
-  const stops = (colors) => colors.map((c, k) => `<stop offset="${k / (colors.length - 1)}" stop-color="${c}"/>`).join('');
-  return [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${width} ${height}">`,
-    '<defs>',
-    `<linearGradient id="g" ${across}>${stops(BRAND_COLORS.glow)}</linearGradient>`,
-    `<linearGradient id="c" ${across}>${stops(BRAND_COLORS.core)}</linearGradient>`,
-    halo
-      ? `<filter id="b" x="-25%" y="-80%" width="150%" height="260%"><feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="w"/><feGaussianBlur in="SourceGraphic" stdDeviation="${round(blur * 0.32)}" result="t"/><feMerge><feMergeNode in="w"/><feMergeNode in="t"/><feMergeNode in="t"/></feMerge></filter>`
-      : '',
-    '</defs>',
-    ground ? `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${ground}"/>` : '',
-    halo ? `<g fill="url(#g)" filter="url(#b)">${shapes}</g>` : '',
-    `<g fill="url(#c)" stroke="url(#c)" stroke-width="${SEAM}">${shapes}</g>`,
-    '</svg>',
-  ].join('');
+/** La marca en SVG desde una pose cualquiera: `brandSvgFromPose` de `src/lib/brand.ts`, con el encuadre fijo por defecto. */
+function brandSvgFromPose(pose, { box = fixed, blur = 0.8, halo = true, ground = null } = {}) {
+  return svgFromPose(pose, { pad, blur, box, halo, ground: ground ?? undefined });
 }
 
 /* ───────────── Escritura ───────────── */

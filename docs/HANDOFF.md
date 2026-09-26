@@ -5,6 +5,13 @@
 > razón, y casi todos los fallos de esta rama se repitieron dos veces porque la
 > segunda no estaba escrita en ningún sitio.
 
+**En rama `feat/eva-content-system` (26-09-2026, noche):** EVA como sistema de contenido —Entity ·
+Arcade · Academy · Lab—: las herramientas de Lab (`scripts/brand-frames`, `render-frames`,
+`eva-signal`, `transmision`, `studio-build` + `tools/social-studio`), el Arcade numerado en binario y
+las docs al día. Llegó como paquete (`EVA_CONTENT_SYSTEM_v1`) de otra sesión, sobre `fa008e3`; aquí
+se integró sobre lo publicado hoy. Se publica con el «sí» del propietario. Ver **§0.0.8** y
+`docs/CONTENT_SYSTEM.md`.
+
 **Publicada (26-09-2026, tarde):** los dos juegos entran en EVA ARCADE, con el «publica todos los cambios» del propietario: `main` = `e6d96a5` en eva.game.proce, `6afd8cf` en famialiarpg y `73720fe` aquí (el kit). Estadística de Vercel activa en los cuatro sitios. Ver **§0.0.7**.
 
 **Publicada (26-09-2026):** `main` = `0d2e777` aquí y `7f00094` en eva.prompts, con el «sí publica» del propietario: Academy y Lab en `/links`, estadística de visitas (activa en los dos proyectos), EVA-01 y la marca de EVA en EVA LAB (https://evaprompts.vercel.app/). Ver **§0.0.6**.
@@ -427,6 +434,51 @@ de tocar nada), en la rama `feat/eva-arcade`:
   evaarcadefamilia.vercel.app), estadística respondiendo y portadas sin
   solapes en los siete tamaños.
 
+### 0.0.8. El sistema de contenido y las herramientas de Lab (26 sept. 2026, en rama)
+
+Encargo: convertir los activos de EVA en un sistema sostenible de producto, marca, contenido,
+distribución y experimentación, con cuatro dimensiones (ENTITY · ARCADE · ACADEMY · LAB), sin
+destruir la dimensión filosófica ni convertir EVA en una landing corporativa. Auditar antes de
+tocar; trabajar fuera de `main`; distinguir siempre existente / prototipo / concepto / roadmap.
+Todo el material está en `EVA_CONTENT_SYSTEM_v1/` (fuera del repo) y la guía en
+`docs/CONTENT_SYSTEM.md`.
+
+- **Nada cambia en la landing.** Ni secciones, ni interacción, ni textos, ni estilos. Academy y Lab
+  nacen como grupos en `content/links.ts` (vacíos: no se pintan) y como contenido.
+- **`lib/brand.ts`:** `brandSvgFromPose(pose, { pad, blur, box, ground, halo })` acepta cualquier
+  pose —también las intermedias de `sample()`— y pinta las piezas a medio apagar con su opacidad;
+  `brandSvg(poseId)` la llama. Tres pruebas más (`brand.test.ts`, 11). Con esto la marca se
+  exporta a SVG/PNG/vídeo sin navegador (`scripts/brand-frames.mjs` + `render-frames.mjs` + ffmpeg).
+- **`content/links.ts`:** los nodos de cada grupo salen de su posición en binario con `lib/binary`
+  (`withNodes`): `01`, `10` (antes «02» a mano). `gateway.href` pasa a `'/'` (relativo: vale con
+  dominio propio y en previews). Grupos `academy` y `lab` vacíos. Prueba nueva `links.test.ts` (3).
+- **Herramientas** (`scripts/`, sin dependencias): `render-frames.mjs` (SVG/HTML → PNG por CDP,
+  misma técnica que `perf-audit`; PNG transparente si no se pasa `--bg`, gracias a
+  `Emulation.setDefaultBackgroundColorOverride`), `eva-signal.mjs` (el motor de la Consciencia a
+  fotogramas; determinista, 10 s en ~0,4 s), `transmision.mjs` (texto tecleado con el ritmo de
+  `channel.ts`), `studio-build.mjs` (empaqueta el Social Studio; `--render` por guion).
+- **EVA Social Studio** (`tools/social-studio/`): plantillas SVG (`src/templates.js`) sobre la
+  geometría de la marca y los tokens; interfaz en un solo HTML con las fuentes incrustadas
+  (`index.html`, generado; se abre con doble clic; exporta PNG/SVG sin red). Herramienta interna:
+  `tools/` no lo sirve Next. Comprobado en Chrome sin interfaz a 1440×900 y 390×844, consola limpia,
+  exportación PNG desde el navegador verificada.
+- **Docs:** README (cuatro lugares, rutas reales, `/links`, herramientas), `MARCA.md` (duraciones
+  reales: REVEAL 4,05 s, LOOP 7,5 s; sección «Fuera de la página»), `CONTENT_GUIDE.md` (ruta de la
+  página, `/links`), `ASSET_LICENSES.md` (permisos confirmados el 26-09-2026; póster de la portada
+  y fuentes incrustadas registrados), `CHECKPOINT` y `LANDING_ROADMAP` marcados como históricos;
+  comentarios obsoletos corregidos en `structure.ts`, `site.ts`, `types.ts`, `context.ts`,
+  `channel-store.ts`.
+- **Límite de esta sesión:** el registro npm estaba bloqueado en su entorno, así que `npm ci` no
+  corrió: se ejecutaron las 94 pruebas puras (`node --test`; `quality.test.ts` importa React y
+  queda para CI), un typecheck parcial con `tsc 6` sobre los módulos puros y un lint con las reglas
+  base sobre los scripts. **Lint, typecheck completo y build se comprueban en el workflow de GitHub
+  Actions del PR antes de fusionar.** Vercel despliega `main`.
+- Trampa nueva (39): **un `data:` HTML no puede cargar `file://`.** Para rasterizar un SVG con
+  Chrome hay que escribir un HTML junto al archivo (`--allow-file-access-from-files`) y, si se
+  quiere fondo transparente, `Emulation.setDefaultBackgroundColorOverride`; si no, el PNG sale
+  blanco opaco. Y (40): **`overlay` de ffmpeg con una imagen fija de un solo fotograma nunca llega a
+  `st=3` de un `fade`**: la imagen va con `-loop 1` y el filtro con `shortest=1`.
+
 ## 0. Encargo resuelto en v8: EVA escribe cada slide (19 sept. 2026)
 
 Encargo del propietario, en cuatro mensajes seguidos: fondo plano sin cuadrados; portada sin
@@ -610,7 +662,7 @@ reorganización mayor pedida por el propietario:
 
 ## 1. Qué es esta página
 
-Una landing de una sola ruta (`src/app/page.tsx`) organizada por el acrónimo,
+Una landing de una sola ruta (`src/app/(eva)/page.tsx`; el grupo no cambia la URL) organizada por el acrónimo,
 con numeración binaria real (`lib/binary.ts`):
 
 ```
@@ -680,8 +732,8 @@ Lo que EVA teclea en cada caja (`writes`) vive en `ejes.ts` (y `hero.writes` en
 
 **Estilos.** Tokens en `src/styles/tokens.css` (incluye el suelo tipográfico:
 nada por debajo de 11 px, el carril del canal, `--eva-dock`, y el verde de la
-cápsula, `--eva-bio`, y los colores de la marca, `--eva-brand-*`). Ocho hojas en `src/app/`: `globals.css` (base),
-`interface.css` (slides, cursor, portada), `nucleo.css` (el cerebro y su mapa
+cápsula, `--eva-bio`, y los colores de la marca, `--eva-brand-*`). Diez hojas en `src/app/`: `globals.css` (base),
+`interface.css` (slides, cursor, portada), `cerebro.css` (el cerebro y su mapa
 plano), `dna.css` (genoma y vídeo), `ejes.css` (navegación, riel, sala del
 núcleo, puertas, canal), `cuerpo.css` (01.11) y `relato.css` (lo de v8: la caja
 EVA // ESCRIBE, títulos con degradado, botón del canal, encaje de cada slide,
@@ -968,6 +1020,11 @@ apareció dos veces en sitios distintos.
 6. El contacto es el Instagram público. No inventar otro canal.
 7. `prefers-reduced-motion`, Safari iOS y lector de pantalla: implementados,
    nunca probados de punta a punta.
+8. **Sistema de contenido** (26-09-2026, `docs/CONTENT_SYSTEM.md`): fusionar la rama tras CI;
+   publicar el ciclo de 30 días; tokens con una sola fuente (`interface.css` redefine nueve en la
+   landing y `/links` tiene su paleta: documentado en `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS/tokens.json`,
+   sin tocar el CSS todavía); EVA Scanner (biolectura sobre cualquier imagen) y sonido de marca
+   (`lib/genome.ts` → WAV) en el roadmap 31–60.
 
 ## 6. Reglas editoriales que conviene mantener
 

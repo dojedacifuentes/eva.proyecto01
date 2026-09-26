@@ -1,7 +1,7 @@
 /**
  * Dónde está el visitante.
  *
- * Una tienda mínima para `useSyncExternalStore`, como `lib/stage`: el
+ * Una tienda mínima para `useSyncExternalStore` (el patrón que tenía `lib/stage`, retirado en la v8): el
  * observador de la página (`ContextSpy`) escribe el nodo del recorrido que
  * ocupa el centro de la pantalla, y lo leen la navegación, el canal de EVA y
  * el fondo. Un solo dueño de la verdad: antes la cabecera tenía su observador

@@ -68,6 +68,7 @@
  *
  * Sale SVG puro, sin dependencias. No toca ningún archivo del repo.
  */
+import { performance } from 'node:perf_hooks';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {

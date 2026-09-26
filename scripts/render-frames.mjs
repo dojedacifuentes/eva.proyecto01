@@ -1,7 +1,10 @@
 /**
  * EVA LAB · render-frames — de SVG/HTML a PNG con el Chrome de la máquina, sin dependencias.
  *
- *   node scripts/render-frames.mjs <entrada> <salida> [--width=1080] [--height=1080] [--scale=1] [--glob=frames/loop-]
+ *   node scripts/render-frames.mjs <entrada> <salida> [--width=1080] [--height=1080] [--scale=1] [--glob=loop-] [--bg=#03050d]
+ *
+ * Si el SVG declara `width`/`height` (las piezas del Studio), manda su tamaño salvo que se pase --width.
+ * `--bg` rellena lo que el SVG no cubra (por defecto transparente): útil para un vídeo vertical.
  *
  * <entrada> puede ser un archivo (.svg o .html) o una carpeta: entonces rasteriza todos los .svg
  * (o los que empiecen por --glob) y escribe un PNG por cada uno en <salida>. Cada archivo se
@@ -33,6 +36,7 @@ const width = Number(opt('width', 1080));
 const height = Number(opt('height', 1080));
 const scale = Number(opt('scale', 1));
 const prefix = opt('glob', '');
+const bg = opt('bg', 'transparent');
 
 const CANDIDATES = [
   process.env.EVA_CHROME,
@@ -135,6 +139,8 @@ try {
   const cdp = new CDP(ws);
   await cdp.send('Page.enable');
   await cdp.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: scale, mobile: false });
+  // Sin esto, Chrome pinta blanco detrás de lo que no cubre el documento: un PNG «transparente» salía opaco.
+  if (bg === 'transparent') await cdp.send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } });
 
   let done = 0;
   let current = { w: width, h: height };
@@ -152,7 +158,7 @@ try {
         current = { w, h };
       }
       // Un documento mínimo, junto al SVG (un `data:` no puede cargar `file://`), que lo estira al lienzo entero.
-      const html = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;width:${w}px;height:${h}px;overflow:hidden;background:transparent}img{display:block;width:100%;height:100%;object-fit:contain}</style><img src="${path.basename(file)}">`;
+      const html = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;width:${w}px;height:${h}px;overflow:hidden;background:${bg}}img{display:block;width:100%;height:100%;object-fit:contain}</style><img src="${path.basename(file)}">`;
       const wrapper = `${file}.render.html`;
       writeFileSync(wrapper, html);
       await cdp.send('Page.navigate', { url: pathToFileURL(wrapper).href });

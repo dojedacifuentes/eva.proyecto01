@@ -9,6 +9,8 @@
  * entradas no se muestra.
  */
 
+import { bin, bitsFor } from '@/lib/binary';
+
 /** Campo de color de la marca: azul e índigo a la izquierda, violeta y magenta a la derecha. */
 export type LinkAccent = 'blue' | 'indigo' | 'violet' | 'magenta';
 
@@ -18,7 +20,11 @@ export type LinkArt = 'procesal' | 'familia' | 'curso' | 'generador';
 /** Una experiencia a la que lleva la página: un juego, un curso, una herramienta. */
 export interface LinkEntry {
   id: string;
-  /** Número de nodo, con dos cifras: «01». */
+  /**
+   * Número de nodo, en binario y con el ancho de su serie («01», «10», «11»…), como todo
+   * identificador de EVA (CONTENT_GUIDE, «Numeración binaria»). Lo pone `withNodes` a partir de
+   * la posición; no se escribe. Hasta el 26-09-2026 iba en decimal («01», «02»).
+   */
   node: string;
   /** Rótulo de arriba: qué es y de qué trata. */
   category: string;
@@ -57,20 +63,26 @@ export const links = {
     title: '¿QUIÉN ES EVA?',
     text: 'Una entidad apareció dentro de una red.',
     cta: 'CONOCE A EVA',
-    href: 'https://evaproyecto01.vercel.app/',
+    /** La portada, relativa: así vale con dominio propio y en las vistas previas de Vercel. */
+    href: '/',
   },
   footer: 'EVA · 2026',
 } as const;
+
+/** Numera las entradas de un grupo por su posición, en binario y con el ancho de la serie. */
+function withNodes(entries: readonly Omit<LinkEntry, 'node'>[]): LinkEntry[] {
+  const width = bitsFor(entries.length);
+  return entries.map((entry, at) => ({ ...entry, node: bin(at + 1, width) }));
+}
 
 export const groups: readonly LinkGroup[] = [
   {
     id: 'arcade',
     label: 'ARCHIVOS DISPONIBLES',
     featured: true,
-    entries: [
+    entries: withNodes([
       {
         id: 'procesal',
-        node: '01',
         category: 'RPG · DERECHO PROCESAL',
         // Nombre y descripción oficiales del juego (su <title> y su meta description).
         title: 'FORO [in]VISIBLE',
@@ -83,7 +95,6 @@ export const groups: readonly LinkGroup[] = [
       },
       {
         id: 'familia',
-        node: '02',
         category: 'RPG · DERECHO DE FAMILIA',
         title: 'EXPEDIENTE 1725',
         description: 'El amor cambia. El expediente queda.',
@@ -93,15 +104,14 @@ export const groups: readonly LinkGroup[] = [
         art: 'familia',
         status: 'EN LÍNEA',
       },
-    ],
+    ]),
   },
   {
     id: 'academy',
     label: 'EVA ACADEMY',
-    entries: [
+    entries: withNodes([
       {
         id: 'curso',
-        node: '03',
         category: 'CURSO · A TU RITMO',
         // Nombre y etapas del curso en EVA LAB (evaprompts: /curso).
         title: 'CONSTRUYE TU PROMPT',
@@ -111,15 +121,14 @@ export const groups: readonly LinkGroup[] = [
         accent: 'indigo',
         art: 'curso',
       },
-    ],
+    ]),
   },
   {
     id: 'lab',
     label: 'EVA LAB',
-    entries: [
+    entries: withNodes([
       {
         id: 'generador',
-        node: '04',
         category: 'GENERADOR DE PROMPTS',
         // El Prompt Lab de EVA LAB (evaprompts: /prompt-lab).
         title: 'PROMPT LAB',
@@ -129,6 +138,6 @@ export const groups: readonly LinkGroup[] = [
         accent: 'violet',
         art: 'generador',
       },
-    ],
+    ]),
   },
 ];

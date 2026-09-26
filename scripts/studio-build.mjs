@@ -60,7 +60,14 @@ if (args[0] === '--render') {
   mkdirSync(outDir, { recursive: true });
   const faces = fontFaces();
   let n = 0;
+  const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml' };
   for (const piece of spec.pieces) {
+    // `imageFile`: una imagen del disco (relativa al guion) incrustada como data: URI en el slot.
+    if (piece.imageFile && !piece.image) {
+      const file = path.resolve(path.dirname(specPath), piece.imageFile);
+      const ext = path.extname(file).slice(1).toLowerCase();
+      piece.image = `data:${MIME[ext] ?? 'application/octet-stream'};base64,${readFileSync(file).toString('base64')}`;
+    }
     const svg = compose(piece, { fontCss: faces });
     writeFileSync(path.join(outDir, `${piece.file}.svg`), svg);
     n++;

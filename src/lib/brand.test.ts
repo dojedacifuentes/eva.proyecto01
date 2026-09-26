@@ -7,6 +7,8 @@ import {
   SEGMENTS,
   STROKE,
   boundsOf,
+  brandSvg,
+  brandSvgFromPose,
   durationOf,
   placeShape,
   sample,
@@ -114,4 +116,25 @@ test('al alinearse, ninguna letra pasa por encima de otra', () => {
 test('el nombre es unas cinco veces más ancho que alto', () => {
   const { width, height } = sizeOf(POSES.logotype);
   assert.ok(width / height > 4.5 && width / height < 6, `proporción ${(width / height).toFixed(2)}`);
+});
+
+test('SVG: una pose con nombre da el mismo documento por las dos vías', () => {
+  assert.equal(brandSvg('logotype'), brandSvgFromPose(POSES.logotype));
+  assert.match(brandSvg('isotype'), /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="[-\d. ]+">.*<\/svg>$/);
+});
+
+test('SVG: una pose intermedia pinta las piezas a medio apagar con su opacidad', () => {
+  const halfway = sample(REVEAL, 1500).pose; // el cuadrado se abre en E: el cuarto lado se está apagando
+  const svg = brandSvgFromPose(halfway);
+  assert.ok(svg.includes('opacity="'), 'alguna pieza lleva opacidad');
+  const polygons = svg.match(/<polygon /g) ?? [];
+  assert.ok(polygons.length >= 14 && polygons.length <= 16, `dos capas de hasta ocho piezas (${polygons.length})`);
+});
+
+test('SVG: un encuadre fijo y un fondo se respetan', () => {
+  const box = { left: -20, top: -15, right: 20, bottom: 15 };
+  const svg = brandSvgFromPose(POSES.isotype, { box, pad: 0, ground: '#03050d', halo: false });
+  assert.ok(svg.includes('viewBox="-20 -15 40 30"'));
+  assert.ok(svg.includes('fill="#03050d"'));
+  assert.ok(!svg.includes('<filter'), 'sin halo no hay filtro');
 });
