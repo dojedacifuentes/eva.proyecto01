@@ -1,3 +1,5 @@
+> **Histórico.** Roadmap de la v2 (19-09-2026): los «cuatro universos» y `content/modules.ts` ya no existen. El roadmap vigente (Entity · Arcade · Academy · Lab) está en `CONTENT_SYSTEM.md` y en el paquete `EVA_CONTENT_SYSTEM_v1/07_ROADMAP`.
+
 # Roadmap de la landing
 
 ## Decisiones tomadas

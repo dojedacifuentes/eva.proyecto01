@@ -84,15 +84,31 @@ cambió: la marca va en sus piezas, no repinta los lugares.
 Los dos iconos se generan con `node scripts/brand-assets.mjs`: hay que volver a
 ejecutarlo si cambia la geometría o el color.
 
+### Fuera de la página (26-09-2026)
+
+La misma geometría produce el material de redes y las herramientas internas, sin
+ninguna imagen dibujada a mano:
+
+| Qué | Cómo | Dónde |
+|---|---|---|
+| Las cinco poses como SVG/PNG y los fotogramas de `REVEAL`/`LOOP` | `brandSvgFromPose` (`brand.ts`) + `scripts/brand-frames.mjs` → `scripts/render-frames.mjs` (Chrome, sin dependencias) → ffmpeg | `tools/out/` (no se sube a git), paquete `EVA_CONTENT_SYSTEM_v1/01_BRAND_OS` |
+| Piezas para Instagram y LinkedIn (feed, story, documento) | **EVA Social Studio**: `tools/social-studio/` (plantillas SVG sobre `brand.ts` y `brand-art.ts`; un solo HTML con las fuentes incrustadas) | `node scripts/studio-build.mjs` |
+| El campo de la Consciencia como vídeo | `scripts/eva-signal.mjs` (motor puro, determinista) | ídem |
+| Texto tecleado con el ritmo de SINAPSIS | `scripts/transmision.mjs` | ídem |
+
+Reglas para redes: nombre ƎVΛ para lo que EVA *es* (Entity), símbolo □X para lo que
+EVA *hace* (Arcade, Academy, Lab); halo siempre de izquierda a derecha; fondo plano;
+un acento por pieza. Guía completa: `docs/CONTENT_SYSTEM.md`.
+
 ## El movimiento
 
 Líneas de tiempo en `brand.ts`:
 
-- **`REVEAL`** (4,25 s): la ida del storyboard, acelerada. Símbolo quieto →
+- **`REVEAL`** (4,05 s): la ida del storyboard, acelerada. Símbolo quieto →
   **desacople** (los lados del cuadrado se apartan, las esquinas se abren) → el
   cuadrado se abre en E → la X se parte en V y Λ → **alineación** → nombre.
 - **`RETURN`**: la vuelta, en espejo.
-- **`LOOP`** (7,9 s): vuelta + ida. Es lo que se ve al pulsar el nombre.
+- **`LOOP`** (7,5 s): vuelta + ida. Es lo que se ve al pulsar el nombre.
 
 Curva de la ficha: entrada y salida suaves, sin rebote ni sobrepaso (`ease`).
 

@@ -23,7 +23,7 @@ export interface NavChild {
   href: `#${string}`;
 }
 
-/** Un eje de la navegación. Hoy hay uno solo: Entidad. */
+/** Un eje de la navegación: hoy, cada uno de los cuatro lugares (ninguno tiene partes). */
 export interface NavItem {
   id: string;
   /** Código binario visible: «01». */
@@ -70,7 +70,7 @@ export type WritesBlock =
     };
 
 /**
- * Consciencia (10): los cuatro estados del relato del campo de partículas, las
+ * Consciencia (001): los cuatro estados del relato del campo de partículas, las
  * figuras que puede reunir y los regímenes que se le imponen. Los textos de
  * cada uno viven en `content/consciencia.ts`; la física, en el motor.
  */

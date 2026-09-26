@@ -2,7 +2,7 @@
  * Lo que el resto de la página necesita saber del canal de EVA: si está
  * abierto, y una forma de pedirle que se cierre.
  *
- * Tienda mínima, como `lib/stage`. El canal escribe su estado; la sala del
+ * Tienda mínima, mismo patrón que `lib/context`. El canal escribe su estado; la sala del
  * núcleo lo lee para bajar la voz de la ventana de lectura mientras EVA habla
  * (una sola cosa habla a la vez). Quien navega con un enlace pide el cierre sin
  * esperar a que el desplazamiento termine.

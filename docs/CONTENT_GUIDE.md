@@ -26,6 +26,8 @@ Todo lo editable vive en `src/content/`. Ningún componente contiene textos ni U
 | Activar/desactivar efectos | `content/site.ts` | `flags` |
 | Colores, radios, tiempos, suelo tipográfico | `src/styles/tokens.css` | Variables `--eva-*` |
 | SEO | `content/site.ts` | `site.seo` |
+| **`/links` (EVA ARCADE)**: hero, tarjetas de los juegos, los grupos EVA ACADEMY y EVA LAB (el curso y el generador de prompts de EVA LAB), la puerta a la landing | `content/links.ts` | `links`, `groups` (el nodo de cada entrada sale de su posición dentro del grupo, en binario: los juegos `01`, `10`, `11`…; Academy y Lab empiezan en `01`) |
+| Piezas para redes (Instagram, LinkedIn) | `tools/social-studio/` + `docs/CONTENT_SYSTEM.md` | plantillas y guiones; la voz es la de esta guía |
 
 ## Numeración binaria
 
@@ -52,7 +54,7 @@ Para devolverlos, o para añadir cualquier otro lugar:
 1. En `structure.ts`, añade el eje en `SOURCE` (o el hijo en `children` de un eje). Su código sale
    solo: un quinto lugar sería `101` (los códigos ya van a tres bits desde el cuarto); con más de
    cuatro puertas, revisar la portada. Un eje sin partes lleva su lema en `axisMottos`.
-2. Crea su sección y móntala en `src/app/page.tsx`, en el orden del recorrido.
+2. Crea su sección y móntala en `src/app/(eva)/page.tsx`, en el orden del recorrido.
 3. Añade su guion al canal en `content/channel.ts` (`scripts['<id>']`): una explicación llana
    primero, después el hilo.
 4. La cabecera muestra siempre las partes del primer eje (`ejes.css`, `.nav__axis:first-child`) y

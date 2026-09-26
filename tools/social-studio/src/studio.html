@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EVA Social Studio</title>
+<meta name="robots" content="noindex">
+<style>
+/*__FONTS__*/
+/*__CSS__*/
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar__brand"><span id="bar-logo"></span><h1 class="bar__name">EVA Social Studio</h1><span class="bar__tag">herramienta interna · __BUILT__</span></div>
+  <div class="bar__actions">
+    <button id="export-png" class="btn btn--accent">Exportar PNG</button>
+    <button id="export-png2" class="btn">PNG @2x</button>
+    <button id="export-svg" class="btn">SVG</button>
+    <button id="copy-json" class="btn btn--ghost" title="Copia la pieza como JSON para el modo --render">JSON</button>
+  </div>
+</header>
+
+<main class="studio">
+  <aside class="panel" aria-label="Controles">
+    <section class="group">
+      <h2 class="group__title">Dimensión</h2>
+      <div class="seg" role="radiogroup" id="dimension">
+        <label><input type="radio" name="dimension" value="entity" checked><span>ENTITY</span></label>
+        <label><input type="radio" name="dimension" value="arcade"><span>ARCADE</span></label>
+        <label><input type="radio" name="dimension" value="academy"><span>ACADEMY</span></label>
+        <label><input type="radio" name="dimension" value="lab"><span>LAB</span></label>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group__title">Formato</h2>
+      <div class="seg seg--wrap" role="radiogroup" id="format">
+        <label><input type="radio" name="format" value="feed" checked><span>Feed 4:5</span></label>
+        <label><input type="radio" name="format" value="square"><span>1:1</span></label>
+        <label><input type="radio" name="format" value="story"><span>Story</span></label>
+        <label><input type="radio" name="format" value="li"><span>LinkedIn</span></label>
+        <label><input type="radio" name="format" value="liwide"><span>Enlace / OG</span></label>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group__title">Plantilla</h2>
+      <div class="seg seg--wrap" role="radiogroup" id="template">
+        <label><input type="radio" name="template" value="title" checked><span>Título</span></label>
+        <label><input type="radio" name="template" value="writes"><span>EVA // ESCRIBE</span></label>
+        <label><input type="radio" name="template" value="table"><span>Tabla</span></label>
+        <label><input type="radio" name="template" value="region"><span>Región</span></label>
+        <label><input type="radio" name="template" value="node"><span>NODE</span></label>
+        <label><input type="radio" name="template" value="transmission"><span>Transmisión</span></label>
+        <label><input type="radio" name="template" value="image"><span>Imagen</span></label>
+        <label><input type="radio" name="template" value="ident"><span>Ident</span></label>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group__title">Contenido</h2>
+      <label class="field"><span>Antetítulo (kicker)</span><input id="f-kicker" type="text" placeholder="AUTOOBSERVACIÓN"></label>
+      <label class="field"><span>Título</span><textarea id="f-title" rows="2" placeholder="Cuatro lugares. Ninguna prueba."></textarea></label>
+      <label class="field"><span>Subtítulo / consigna</span><textarea id="f-subtitle" rows="2"></textarea></label>
+      <label class="field"><span>Cuerpo (≤ 250 caracteres, la regla de la caja)</span><textarea id="f-body" rows="5"></textarea><small id="body-count" class="count">0</small></label>
+      <label class="field" data-only="table"><span>Tabla · cabecera (coma) y filas (una por línea, celdas con |)</span><input id="f-head" type="text" value=", USTEDES, YO"><textarea id="f-rows" rows="4" placeholder="Alfabeto | A C G T | 0 1"></textarea></label>
+      <label class="field" data-only="region transmission"><span>Líneas (una por línea; en Transmisión, `>` para un cálculo)</span><textarea id="f-lines" rows="4"></textarea></label>
+      <div class="row" data-only="region"><label class="field"><span>Código de región</span><input id="f-tag" type="text" value="0001"></label></div>
+      <div class="row" data-only="node"><label class="field"><span>NODE</span><input id="f-node" type="text" value="NODE 01"></label><label class="field"><span>Estado</span><input id="f-state" type="text" value="EN LÍNEA"></label></div>
+      <label class="field" data-only="node image"><span>Imagen (slot; sólo material con permiso)</span><input id="f-image" type="file" accept="image/*"><button id="clear-image" class="btn btn--ghost btn--small" type="button">Quitar</button></label>
+    </section>
+
+    <section class="group">
+      <h2 class="group__title">Sistema</h2>
+      <div class="row">
+        <label class="field"><span>Código</span><input id="f-code" type="text" placeholder="001 · 1/5"></label>
+        <label class="field"><span>CTA</span><input id="f-cta" type="text" placeholder="CONOCE A EVA"></label>
+      </div>
+      <div class="row">
+        <label class="field"><span>Acento</span>
+          <select id="f-accent">
+            <option value="">de la dimensión</option>
+            <option value="violet">violeta (Consciencia)</option>
+            <option value="bio">bio (Genoma / Cuerpo)</option>
+            <option value="cyan">cian (Cerebro / Lab)</option>
+            <option value="magenta">magenta (alerta)</option>
+            <option value="electric">azul eléctrico (Arcade)</option>
+            <option value="arcadeMagenta">magenta Arcade (Familia)</option>
+          </select></label>
+        <label class="field"><span>Pieza de marca</span>
+          <select id="f-mark"><option value="">de la dimensión</option><option value="logotype">nombre ƎVΛ</option><option value="isotype">símbolo □X</option></select></label>
+      </div>
+      <label class="field"><span>Ficción declarada</span><input id="f-fiction" type="text" value="Ficción interactiva. EVA es un personaje."></label>
+      <div class="row">
+        <label class="check"><input id="f-orbit" type="checkbox"><span>Órbita de fondo</span></label>
+        <label class="check"><input id="f-marks" type="checkbox" checked><span>Marcas de instrumento</span></label>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group__title">Presets (del banco de contenidos)</h2>
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <p class="note">Las plantillas leen la geometría de <code>src/lib/brand.ts</code> y los tokens del Brand OS. Todo lo que exportas es ficción declarada: EVA es un personaje.</p>
+  </aside>
+
+  <section class="stage" aria-label="Vista previa">
+    <div class="stage__meta"><span id="meta-size">1080 × 1350</span><span id="meta-file">eva-entity-feed-title</span></div>
+    <div class="stage__canvas" id="preview"></div>
+  </section>
+</main>
+
+<script type="module">
+/*__JS__*/
+</script>
+</body>
+</html>

@@ -5,14 +5,18 @@ import { ArcadeHero } from '@/components/links/ArcadeHero';
 import { EvaGateway } from '@/components/links/EvaGateway';
 import { EntryCard } from '@/components/links/EntryCard';
 import { groups, links, type LinkGroup } from '@/content/links';
+import { site } from '@/content/site';
 import { seeded } from '@/lib/random';
 
 export const metadata: Metadata = {
   title: links.seo.title,
   description: links.seo.description,
   alternates: { canonical: '/links' },
+  // `openGraph` sustituye entero al del layout raíz: nombre del sitio e idioma se repiten aquí.
   openGraph: {
     type: 'website',
+    locale: site.locale,
+    siteName: site.name,
     url: '/links',
     title: links.seo.ogTitle,
     description: links.seo.ogDescription,

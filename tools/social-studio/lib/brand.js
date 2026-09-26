@@ -1,3 +1,4 @@
+// Generado por scripts/studio-build.mjs desde src/lib/brand.ts. No editar.
 /**
  * La marca de EVA como geometría.
  *
@@ -19,21 +20,21 @@
  * Unidades: el lado del cuadrado mide 10. Todo lo demás se deriva de ahí.
  */
 
-export type Point = readonly [number, number];
+                                              
 
-export type SegmentId = 'q1' | 'q2' | 'q3' | 'q4' | 'x1' | 'x2' | 'x3' | 'x4';
+                                                                              
 
-export const SEGMENTS: readonly SegmentId[] = ['q1', 'q2', 'q3', 'q4', 'x1', 'x2', 'x3', 'x4'];
+export const SEGMENTS                       = ['q1', 'q2', 'q3', 'q4', 'x1', 'x2', 'x3', 'x4'];
 
 /** Dónde está una pieza: centro, giro en grados y visibilidad (0–1). */
-export interface Place {
-  x: number;
-  y: number;
-  angle: number;
-  alpha: number;
-}
+                        
+            
+            
+                
+                
+ 
 
-export type Pose = Record<SegmentId, Place>;
+                                            
 
 /* ───────────── Medidas ───────────── */
 
@@ -68,7 +69,7 @@ const REACH = CAP - DROP / 2;
 
 /* ───────────── Las piezas ───────────── */
 
-const bar: readonly Point[] = [
+const bar                   = [
   [-SIDE / 2, -STROKE / 2],
   [SIDE / 2, -STROKE / 2],
   [SIDE / 2, STROKE / 2],
@@ -76,18 +77,18 @@ const bar: readonly Point[] = [
 ];
 
 /** Brazo superior izquierdo de la X (brazo izquierdo de la V), con origen en el vértice. */
-const arm: readonly Point[] = [
+const arm                   = [
   [-HALF, -REACH],
   [CUT - HALF, -REACH],
   [0, -DROP / 2],
   [0, DROP / 2],
 ];
 
-const mirror = (shape: readonly Point[], sx: number, sy: number): readonly Point[] =>
-  shape.map(([x, y]) => [x * sx, y * sy] as const);
+const mirror = (shape                  , sx        , sy        )                   =>
+  shape.map(([x, y]) => [x * sx, y * sy]         );
 
 /** El polígono de cada pieza en sus propias coordenadas. Nunca cambia. */
-export const SHAPES: Record<SegmentId, readonly Point[]> = {
+export const SHAPES                                      = {
   q1: bar,
   q2: bar,
   q3: bar,
@@ -100,10 +101,10 @@ export const SHAPES: Record<SegmentId, readonly Point[]> = {
 
 /* ───────────── Las cuatro poses del storyboard ───────────── */
 
-const at = (x: number, y: number, angle = 0, alpha = 1): Place => ({ x, y, angle, alpha });
+const at = (x        , y        , angle = 0, alpha = 1)        => ({ x, y, angle, alpha });
 
 /** Las cuatro piezas de la X comparten punto de giro: el centro de la X. */
-const cross = (cx: number, cy: number) => ({
+const cross = (cx        , cy        ) => ({
   x1: at(cx, cy),
   x2: at(cx, cy),
   x3: at(cx, cy),
@@ -122,7 +123,7 @@ const stackedE = {
   q2: at(SIDE + 4, SIDE / 2, 90, 0),
 };
 
-const RAW: Record<PoseId, Pose> = {
+const RAW                       = {
   /* 01 · El símbolo: el cuadrado sobre la X. */
   isotype: {
     q1: at(SIDE / 2, STROKE / 2),
@@ -169,27 +170,27 @@ const RAW: Record<PoseId, Pose> = {
   })(),
 };
 
-export type PoseId = 'isotype' | 'detach' | 'unlock' | 'split' | 'logotype';
+                                                                            
 
 /* ───────────── Operaciones ───────────── */
 
 /** El polígono de una pieza colocada: girada y trasladada, nunca escalada. */
-export function placeShape(id: SegmentId, place: Place): Point[] {
+export function placeShape(id           , place       )          {
   const turn = (place.angle * Math.PI) / 180;
   const cos = Math.cos(turn);
   const sin = Math.sin(turn);
-  return SHAPES[id].map(([x, y]) => [place.x + x * cos - y * sin, place.y + x * sin + y * cos] as const);
+  return SHAPES[id].map(([x, y]) => [place.x + x * cos - y * sin, place.y + x * sin + y * cos]         );
 }
 
-export interface Box {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
+                      
+               
+              
+                
+                 
+ 
 
 /** Caja de lo que se ve de una pose (las piezas apagadas no cuentan). */
-export function boundsOf(pose: Pose, only: readonly SegmentId[] = SEGMENTS): Box {
+export function boundsOf(pose      , only                       = SEGMENTS)      {
   const box = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
   for (const id of only) {
     if (pose[id].alpha < 0.5) continue;
@@ -204,8 +205,8 @@ export function boundsOf(pose: Pose, only: readonly SegmentId[] = SEGMENTS): Box
 }
 
 /** Cada pose, centrada en el origen: así todas comparten centro, como en el vídeo. */
-export const POSES: Record<PoseId, Pose> = Object.fromEntries(
-  (Object.keys(RAW) as PoseId[]).map((id) => {
+export const POSES                       = Object.fromEntries(
+  (Object.keys(RAW)            ).map((id) => {
     const box = boundsOf(RAW[id]);
     const cx = (box.left + box.right) / 2;
     const cy = (box.top + box.bottom) / 2;
@@ -214,28 +215,28 @@ export const POSES: Record<PoseId, Pose> = Object.fromEntries(
         const place = RAW[id][segment];
         return [segment, { ...place, x: place.x - cx, y: place.y - cy }];
       }),
-    ) as Pose;
+    )        ;
     return [id, pose];
   }),
-) as Record<PoseId, Pose>;
+)                        ;
 
 /**
  * Las piezas que están en todas las poses: todas menos el lado del cuadrado que
  * se retira. Para encuadrar a medio camino sirven éstas: su caja cambia sin
  * saltos, mientras que la de todas salta cuando el lado apagado deja de contar.
  */
-export const STEADY: readonly SegmentId[] = SEGMENTS.filter((id) =>
-  (Object.keys(RAW) as PoseId[]).every((pose) => RAW[pose][id].alpha >= 0.5),
+export const STEADY                       = SEGMENTS.filter((id) =>
+  (Object.keys(RAW)            ).every((pose) => RAW[pose][id].alpha >= 0.5),
 );
 
 /** Ancho y alto de una pose centrada. */
-export function sizeOf(pose: Pose) {
+export function sizeOf(pose      ) {
   const box = boundsOf(pose);
   return { width: box.right - box.left, height: box.bottom - box.top };
 }
 
 /** Curva de la ficha: entrada y salida suaves, sin rebote ni sobrepaso. */
-export function ease(t: number) {
+export function ease(t        ) {
   const c = Math.min(1, Math.max(0, t));
   return c < 0.5 ? 4 * c * c * c : 1 - (-2 * c + 2) ** 3 / 2;
 }
@@ -245,11 +246,11 @@ export function ease(t: number) {
  * un número o uno por pieza (para escalonar).
  */
 export function blendPose(
-  from: Pose,
-  to: Pose,
-  t: number | ((id: SegmentId) => number),
-  axis?: { x: number; y: number },
-): Pose {
+  from      ,
+  to      ,
+  t                                      ,
+  axis                           ,
+)       {
   return Object.fromEntries(
     SEGMENTS.map((id) => {
       const a = from[id];
@@ -265,30 +266,30 @@ export function blendPose(
         },
       ];
     }),
-  ) as Pose;
+  )        ;
 }
 
 /* ───────────── Línea de tiempo ───────────── */
 
-export interface Step {
-  pose: PoseId;
-  /** Lo que tarda en llegar a esta pose desde la anterior, en milisegundos. */
-  move: number;
-  /** Lo que se queda quieta al llegar. */
-  hold: number;
-  /**
-   * Retraso de cada pieza dentro del movimiento, como fracción de su duración.
-   * Escalonar evita que dos letras se crucen: en la alineación sale primero la
-   * Λ, después la V y al final la E, y ninguna pasa por encima de otra.
-   */
-  lag?: Partial<Record<SegmentId, number>>;
-  /**
-   * Trayectoria en L: un eje antes que el otro. Al alinear, las letras se
-   * abren primero en horizontal y después suben o bajan a su fila; en línea
-   * recta, la Λ atravesaba el brazo de la V.
-   */
-  axes?: 'x-first' | 'y-first';
-}
+                       
+               
+                                                                               
+               
+                                          
+               
+     
+                                                                               
+                                                                               
+                                                                        
+     
+                                           
+     
+                                                                          
+                                                                            
+                                             
+     
+                               
+ 
 
 /** Cuánto se solapan los dos tramos de una trayectoria en L (0: nada; 1: en recta). */
 const AXIS_OVERLAP = 0.3;
@@ -297,7 +298,7 @@ const AXIS_OVERLAP = 0.3;
  * La revelación: del símbolo al nombre (la mitad de ida del bucle de la
  * ficha, 0–5 s, acelerada: en la página es una entrada, no un vídeo).
  */
-export const REVEAL: readonly Step[] = [
+export const REVEAL                  = [
   { pose: 'isotype', move: 0, hold: 600 },
   { pose: 'detach', move: 450, hold: 150 },
   { pose: 'unlock', move: 800, hold: 200 },
@@ -306,7 +307,7 @@ export const REVEAL: readonly Step[] = [
 ];
 
 /** El regreso: del nombre al símbolo, en espejo (la mitad de vuelta del bucle). */
-export const RETURN: readonly Step[] = [
+export const RETURN                  = [
   { pose: 'logotype', move: 0, hold: 0 },
   { pose: 'split', move: 1100, hold: 150, axes: 'y-first' },
   { pose: 'unlock', move: 600, hold: 200 },
@@ -318,10 +319,10 @@ export const RETURN: readonly Step[] = [
  * El bucle entero de la ficha: del nombre al símbolo y de vuelta. Es lo que
  * se ve al pulsar el nombre en la portada.
  */
-export const LOOP: readonly Step[] = [...RETURN, ...REVEAL.slice(1)];
+export const LOOP                  = [...RETURN, ...REVEAL.slice(1)];
 
 /** Duración total de una línea de tiempo. */
-export function durationOf(steps: readonly Step[]) {
+export function durationOf(steps                 ) {
   return steps.reduce((total, step) => total + step.move + step.hold, 0);
 }
 
@@ -330,7 +331,7 @@ export function durationOf(steps: readonly Step[]) {
  * aparte, entre qué dos poses va y cuánto le falta (para que el encuadre se
  * mueva con la misma curva que las piezas).
  */
-export function sample(steps: readonly Step[], ms: number) {
+export function sample(steps                 , ms        ) {
   let clock = 0;
   let previous = steps[0];
   for (const step of steps) {
@@ -338,7 +339,7 @@ export function sample(steps: readonly Step[], ms: number) {
       const raw = (ms - clock) / step.move;
       const lag = step.lag;
       const spread = lag ? Math.max(...Object.values(lag)) : 0;
-      const each = lag ? (id: SegmentId) => ease((raw - (lag[id] ?? 0)) / (1 - spread)) : ease(raw);
+      const each = lag ? (id           ) => ease((raw - (lag[id] ?? 0)) / (1 - spread)) : ease(raw);
       const span = (1 + AXIS_OVERLAP) / 2;
       const lead = ease(raw / span);
       const follow = ease((raw - (1 - span)) / span);
@@ -365,7 +366,7 @@ export function sample(steps: readonly Step[], ms: number) {
  * símbolo y el del nombre son distintos (uno alto, otro ancho); entre medias
  * se interpola con la misma curva, como un zum de cámara lento.
  */
-export function fit(pose: PoseId | Pose, width: number, height: number, margin = 0.08) {
+export function fit(pose               , width        , height        , margin = 0.08) {
   const size = sizeOf(typeof pose === 'string' ? POSES[pose] : pose);
   return Math.min((width * (1 - margin * 2)) / size.width, (height * (1 - margin * 2)) / size.height);
 }
@@ -375,7 +376,7 @@ export function fit(pose: PoseId | Pose, width: number, height: number, margin =
  * figura puede quedar descentrada (la E ya salió por la izquierda y la Λ aún
  * no ha llegado a la derecha).
  */
-export function centerOf(pose: Pose) {
+export function centerOf(pose      ) {
   const box = boundsOf(pose);
   return { x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2 };
 }
@@ -395,7 +396,7 @@ export const BRAND_COLORS = {
   glow: ['#2a8cff', '#5a60ff', '#a24dff'],
   /** Fondo de las piezas de marca que lo necesitan (icono, imagen para redes). */
   ground: '#03050d',
-} as const;
+}         ;
 
 /* ───────────── SVG ───────────── */
 
@@ -407,15 +408,15 @@ export const BRAND_COLORS = {
  */
 export const SEAM = 0.05;
 
-const round = (value: number) => Math.round(value * 1000) / 1000;
+const round = (value        ) => Math.round(value * 1000) / 1000;
 
 /** Los `points` de un `<polygon>`. */
-export function pointsOf(shape: readonly Point[]) {
+export function pointsOf(shape                  ) {
   return shape.map(([x, y]) => `${round(x)},${round(y)}`).join(' ');
 }
 
 /** Caja de vista SVG que encierra una pose, con aire alrededor (para el halo). */
-export function viewBoxOf(pose: PoseId, pad = 0) {
+export function viewBoxOf(pose        , pad = 0) {
   const box = boundsOf(POSES[pose]);
   return {
     x: round(box.left - pad),
@@ -426,7 +427,7 @@ export function viewBoxOf(pose: PoseId, pad = 0) {
 }
 
 /** Los polígonos visibles de una pose, listos para pintar. */
-export function polygonsOf(pose: PoseId) {
+export function polygonsOf(pose        ) {
   return SEGMENTS.filter((id) => POSES[pose][id].alpha > 0.5).map((id) => ({
     id,
     points: pointsOf(placeShape(id, POSES[pose][id])),
@@ -442,14 +443,14 @@ export function polygonsOf(pose: PoseId) {
  * `ground` pinta un fondo; sin él, el SVG es transparente.
  */
 export function brandSvgFromPose(
-  pose: Pose,
+  pose      ,
   {
     pad = 1.6,
     blur = 0.8,
     box,
     ground,
     halo = true,
-  }: { pad?: number; blur?: number; box?: Box; ground?: string; halo?: boolean } = {},
+  }                                                                              = {},
 ) {
   const b = box ?? boundsOf(pose);
   const x = round(b.left - pad);
@@ -464,7 +465,7 @@ export function brandSvgFromPose(
     })
     .join('');
   const across = `gradientUnits="userSpaceOnUse" x1="${round(x + pad)}" x2="${round(x + width - pad)}" y1="0" y2="0"`;
-  const stops = (colors: readonly string[]) =>
+  const stops = (colors                   ) =>
     colors.map((color, k) => `<stop offset="${k / (colors.length - 1)}" stop-color="${color}"/>`).join('');
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${width} ${height}">`,
@@ -493,11 +494,11 @@ export function brandSvgFromPose(
  * La marca en una de sus poses con nombre, como documento SVG. Es lo que usan la vista previa
  * al compartir y el icono de la pantalla de inicio.
  */
-export function brandSvg(pose: PoseId, { pad = 1.6, blur = 0.8 }: { pad?: number; blur?: number } = {}) {
+export function brandSvg(pose        , { pad = 1.6, blur = 0.8 }                                  = {}) {
   return brandSvgFromPose(POSES[pose], { pad, blur });
 }
 
 /** El mismo SVG como `data:` URI, para una etiqueta `<img>`. */
-export function brandDataUri(pose: PoseId, options?: Parameters<typeof brandSvg>[1]) {
+export function brandDataUri(pose        , options                                 ) {
   return `data:image/svg+xml;base64,${btoa(brandSvg(pose, options))}`;
 }
